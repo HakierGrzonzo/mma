@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "moringmarkarchive"
+version = "0.1.0"
+description = ""
+authors = ["Grzegorz Koperwas <admin@grzegorzkoperwas.site>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic = "^2.4.2"
+praw = "^7.7.1"
+requests = "^2.31.0"
+pillow = "^10.1.0"
+compushady = {git = "git@github.com:rdeioris/compushady.git"}
+opencv-python = "^4.8.1.78"
+pytesseract = "^0.3.10"
+easyocr = "^1.7.1"
+language-tool-python = "^2.7.1"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.1.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
