@@ -5,13 +5,15 @@ export interface SubmissionMetadata {
   images: string[],
   link: string,
   uploaded_at: string
+  upvotes: number
 }
 
 export interface SeriesMetadata {
   name: string,
   submissions: SubmissionMetadata[],
   latest_episode: string,
-  upvotes_total: number
+  upvotes_total: number,
+  directory_name: string
 }
 
 async function readJsonFile<T>(path: string): Promise<T> {
@@ -24,10 +26,24 @@ async function readJsonFile<T>(path: string): Promise<T> {
   }
 }
 
+const ROOT_DIR = '../results'
+
 export async function getAllMetadata() {
-  const ROOT_DIR = '../results'
   const directories = await readdir(ROOT_DIR)
-  const metadata = await Promise.all(directories.map(dir => readJsonFile<SeriesMetadata>(`${ROOT_DIR}/${dir}/metadata.json`)))
+  const metadata = await Promise.all(directories.map(getSpecificMetadata))
   return metadata
-  
+}
+
+export async function getSpecificMetadata(dir: string) {
+    const path = `${ROOT_DIR}/${dir}/metadata.json`
+    const file = await readJsonFile<SeriesMetadata>(path)
+    return {...file, directory_name: dir}
+}
+
+export type OCR = Record<string, string>
+
+export async function getOcr(dir: string) {
+    const path = `${ROOT_DIR}/${dir}/ocr.json`
+    const file = await readJsonFile<OCR>(path)
+    return file
 }

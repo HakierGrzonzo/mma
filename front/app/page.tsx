@@ -1,6 +1,11 @@
 import { MetaTable } from "@/components/MetaTable";
 import { getAllMetadata } from "@/utils";
 import { Link } from "@nextui-org/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'MoringMark Archive'
+  }
 
 export default async function Home() {
   const metadatas = await getAllMetadata()

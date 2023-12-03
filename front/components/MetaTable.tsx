@@ -35,7 +35,7 @@ export function MetaTable({metadatas}: Props) {
       {sortedData.map(item => (
         <tr key={item.name} className="hover:border-b">
           <td>
-            <Link href={`/${item.name}`}>{item.name}</Link></td>
+            <Link href={`/comic/${encodeURIComponent(item.directory_name)}`}>{item.name}</Link></td>
           <td>{formatter.format(item.latest_episode)}</td>
           <td className="text-right">{item.upvotes_total}</td>
         </tr>
