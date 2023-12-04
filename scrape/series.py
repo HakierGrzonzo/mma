@@ -117,20 +117,21 @@ class SeriesDownloader:
             json.dump(results, f)
 
     def close(self):
-        with open(path.join(self.path, "metadata.json"), "w+") as metadata:
-            submissions = list(asdict(m) for m in reversed(self.metadata))
-            json.dump(
-                {
-                    "name": self.name,
-                    "submissions": submissions,
-                    "upvotes_total": sum(s.upvotes for s in self.metadata),
-                    "latest_episode": self.metadata[0].uploaded_at,
-                },
-                metadata,
-            )
         if not self.has_content:
             rmdir(self.path)
             return
+        if len(self.metadata):
+            with open(path.join(self.path, "metadata.json"), "w+") as metadata:
+                submissions = list(asdict(m) for m in reversed(self.metadata))
+                json.dump(
+                    {
+                        "name": self.name,
+                        "submissions": submissions,
+                        "upvotes_total": sum(s.upvotes for s in self.metadata),
+                        "latest_episode": self.metadata[0].uploaded_at,
+                    },
+                    metadata,
+                )
         if self.has_changed:
             print(f"Processing OCR for {self.name}")
             self.extract_content_text()
