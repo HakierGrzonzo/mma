@@ -4,7 +4,13 @@ import { Link } from "@nextui-org/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'MoringMark Archive'
+  title: 'MoringMark Archive',
+  metadataBase: new URL('https://moringmark.grzegorzkoperwas.site'),
+  description: `An archive of all MoringMark comics about The Owl House, well most of them`,
+  openGraph: {
+    title: `MoringMark Archive`,
+    description: `An archive of all MoringMark comics about The Owl House, well most of them`,
+  },
   }
 
 export default async function Home() {

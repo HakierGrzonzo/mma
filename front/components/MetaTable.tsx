@@ -18,7 +18,7 @@ const filterFunctions: Record<Filters, (a: Metadata, b: Metadata) => number> = {
 }
 
 export function MetaTable({metadatas}: Props) {
-  const [filter, setFilter] = useState<Filters>('name')
+  const [filter, setFilter] = useState<Filters>('upload')
   const formatter = new Intl.DateTimeFormat('en', {day: 'numeric', month: 'long', year: 'numeric'})
   const data = metadatas.map((item) => ({...item, latest_episode: new Date(item.latest_episode)}));
   const sortedData = data.sort(filterFunctions[filter])

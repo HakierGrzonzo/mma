@@ -47,3 +47,13 @@ export async function getOcr(dir: string) {
     const file = await readJsonFile<OCR>(path)
     return file
 }
+
+export function getImageUrl(img: string) {
+  return `/images/${img.replace("./results/", "")}`
+}
+
+export function getRandomItem<T>(array: T[]): T {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+export const formatter = new Intl.DateTimeFormat('en', {day: 'numeric', month: 'long', year: 'numeric'})

@@ -1,5 +1,5 @@
 import { Link } from '@nextui-org/link'
-import {OCR, SubmissionMetadata} from '../utils'
+import {OCR, SubmissionMetadata, getImageUrl} from '../utils'
 
 export function Submission({submission_title, isSingle, images, link, uploaded_at, upvotes, ocr}: SubmissionMetadata & {isSingle: boolean, ocr: OCR}) {
   const uploadDate = new Date(uploaded_at)
@@ -12,7 +12,7 @@ export function Submission({submission_title, isSingle, images, link, uploaded_a
       <p>Uploaded at: {uploadDate.toDateString()}</p>
       </div>
       <div className="flex flex-col gap-4 items-center">
-      {images.map((img) => <img loading="lazy" key={img} src={`/images/${img.replace("./results/", "")}`} alt={ocr[img]}/>)}
+      {images.map((img) => <img loading="lazy" key={img} src={getImageUrl(img)} alt={ocr[img]}/>)}
       </div>
     </div>
   )
