@@ -67,7 +67,7 @@ class SeriesDownloader:
 
     def get_all_image_files(self):
         for file in listdir(self.path):
-            if not file.endswith(".jpg"):
+            if not file.endswith(".webp"):
                 continue
             full_path = path.join(self.path, file)
             yield full_path
@@ -93,14 +93,14 @@ class SeriesDownloader:
                 continue
 
             name = f"{get_suffix(submission)}{i}"
-            final_path = f"{path.join(self.path, name)}.jpg"
+            final_path = f"{path.join(self.path, name)}.webp"
             metadata.add_image_path(final_path)
 
             if path.isfile(final_path):
                 continue
 
             self.has_changed = True
-            result = session.get(biggest_picture)
+            result = session.get(biggest_picture, headers={"Accept": "image/webp"})
             with open(final_path, "wb+") as f:
                 f.write(result.content)
             sleep(0.2)
