@@ -41,10 +41,20 @@ export async function getSpecificMetadata(dir: string) {
 }
 
 export type OCR = Record<string, string>
+export type ImageSize = Record<string, {
+  width: number;
+  height: number;
+}>
 
 export async function getOcr(dir: string) {
     const path = `${ROOT_DIR}/${dir}/ocr.json`
     const file = await readJsonFile<OCR>(path)
+    return file
+}
+
+export async function getImageSizes(dir: string) {
+    const path = `${ROOT_DIR}/${dir}/images.json`
+    const file = await readJsonFile<ImageSize>(path)
     return file
 }
 

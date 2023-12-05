@@ -7,7 +7,7 @@ from os import listdir, mkdir, path, rmdir
 from scrape.corrections import correct_line
 from scrape.metadata import SubmissionMetadata
 
-from scrape.process_image import process_image
+from scrape.process_image import extract_image_size, process_image
 from .reddit import session
 from time import sleep
 import re
@@ -112,14 +112,25 @@ class SeriesDownloader:
             path: correct_line(process_image(path))
             for path in self.get_all_image_files()
         }
+        if len(results.values()):
+            with open(path.join(self.path, "ocr.json"), "w+") as f:
+                json.dump(results, f)
 
-        with open(path.join(self.path, "ocr.json"), "w+") as f:
+    def extract_image_sizes(self):
+        results = {
+            path: extract_image_size(path)
+            for path in self.get_all_image_files()
+        }
+
+        with open(path.join(self.path, "images.json"), "w+") as f:
             json.dump(results, f)
+
 
     def close(self):
         if not self.has_content:
             rmdir(self.path)
             return
+        self.extract_image_sizes()
         if len(self.metadata):
             with open(path.join(self.path, "metadata.json"), "w+") as metadata:
                 submissions = list(asdict(m) for m in reversed(self.metadata))

@@ -1,6 +1,6 @@
 import { RandomComicButton } from "@/components/RandomComicButton";
 import { Submission } from "@/components/Submission";
-import { getAllMetadata, getImageUrl, getOcr, getSpecificMetadata } from "@/utils"
+import { getAllMetadata, getImageSizes, getImageUrl, getOcr, getSpecificMetadata } from "@/utils"
 import { Link } from "@nextui-org/link";
 import { Metadata } from "next";
 
@@ -35,6 +35,7 @@ export default async function ComicPage({params}: {params: {comic_name: string}}
   const comicName = decodeURIComponent(comic_name)
   const metadata = await getSpecificMetadata(comicName)
   const ocr = await getOcr(comicName)
+  const imageSizes = await getImageSizes(comicName)
 
   const allComicMetadata = await getAllMetadata();
   return (
@@ -45,7 +46,7 @@ export default async function ComicPage({params}: {params: {comic_name: string}}
       </div>
       <h1 className="text-2xl">{metadata.name}</h1>
       <p>Author: <Link isExternal href="https://www.reddit.com/user/makmark">u/makmark</Link></p>
-      {metadata.submissions.map((sub) => <Submission key={sub.link} {...sub} isSingle={metadata.submissions.length === 1} ocr={ocr}/>)}
+      {metadata.submissions.map((sub) => <Submission key={sub.link} {...sub} isSingle={metadata.submissions.length === 1} ocr={ocr} imageSizes={imageSizes}/>)}
     </section>
   )
   }
