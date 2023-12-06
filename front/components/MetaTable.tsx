@@ -1,8 +1,8 @@
 "use client";
-import classes from './metatable.module.css'
+import classes from "./metatable.module.css";
 import { useState } from "react";
 import { SeriesMetadata } from "../utils";
-import Link from 'next/link';
+import Link from "next/link";
 
 interface Props {
   metadatas: SeriesMetadata[];
@@ -37,19 +37,25 @@ export function MetaTable({ metadatas }: Props) {
       <thead>
         <tr>
           <th
-            className={`${classes.first} ${filter === "name" && classes.active}`}
+            className={`${classes.first} ${
+              filter === "name" && classes.active
+            }`}
             onClick={() => setFilter("name")}
           >
-            Title
+            Comic title
           </th>
           <th
-            className={`${classes.center} ${filter === "upload" && classes.active}`}
+            className={`${classes.center} ${
+              filter === "upload" && classes.active
+            }`}
             onClick={() => setFilter("upload")}
           >
             Upload date
           </th>
           <th
-            className={`${classes.last} ${filter === "upvote" && classes.active}`}
+            className={`${classes.last} ${
+              filter === "upvote" && classes.active
+            }`}
             onClick={() => setFilter("upvote")}
           >
             Total upvotes

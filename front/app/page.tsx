@@ -1,3 +1,4 @@
+import classes from "./page.module.css";
 import { MetaTable } from "@/components/MetaTable";
 import { getAllMetadata } from "@/utils";
 import { Metadata } from "next";
@@ -16,16 +17,18 @@ export const metadata: Metadata = {
 export default async function Home() {
   const metadatas = await getAllMetadata();
   return (
-    <section className="flex flex-col gap-4 py-8 md:py-10">
-      <h1 className="text-2xl">MoringMark archive</h1>
-      <p>
-        This page contains an archive of all MoringMark comics that were ever
-        posted to{" "}
-        <Link href="https://www.reddit.com/r/theowlhouse">
-          r/TheOwlHouse
-        </Link>
-      </p>
-      <MetaTable metadatas={metadatas} />
-    </section>
+    <>
+      <div className={classes.coverImage}>
+        <h1 className="">MoringMark archive</h1>
+        <p>
+          This page contains an archive of all MoringMark comics that were ever
+          posted to{" "}
+          <Link href="https://www.reddit.com/r/theowlhouse">r/TheOwlHouse</Link>
+        </p>
+      </div>
+      <section>
+        <MetaTable metadatas={metadatas} />
+      </section>
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import classes from "./page.module.css";
 import { RandomComicButton } from "@/components/RandomComicButton";
 import { Submission } from "@/components/Submission";
 import { PAGE_URL } from "@/constants";
@@ -63,28 +64,30 @@ export default async function ComicPage({
   const allComicMetadata = await getAllMetadata();
   const pageUrl = `${PAGE_URL}/comic/${comic_name}`;
   return (
-    <section className="flex flex-col gap-4 py-8 md:py-10">
-      <div className="flex gap-4">
-        <Link href="/">Go back</Link>
+    <>
+      <div className={classes.stickyHeader}>
+        <Link href="/">Home</Link>
         <RandomComicButton metadata={allComicMetadata} />
       </div>
-      <h1 className="text-2xl">{metadata.name}</h1>
-      <p>
-        Author:{" "}
-        <Link href="https://www.reddit.com/user/makmark">
-          u/makmark
-        </Link>
-      </p>
-      {metadata.submissions.map((sub) => (
-        <Submission
-          pageUrl={pageUrl}
-          key={sub.link}
-          {...sub}
-          isSingle={metadata.submissions.length === 1}
-          ocr={ocr}
-          imageSizes={imageSizes}
-        />
-      ))}
-    </section>
+      <section>
+        <div className={classes.metadatabox}>
+          <h1 className="">{metadata.name}</h1>
+          <p>
+            Author:{" "}
+            <Link href="https://www.reddit.com/user/makmark">u/makmark</Link>
+          </p>
+        </div>
+        {metadata.submissions.map((sub) => (
+          <Submission
+            pageUrl={pageUrl}
+            key={sub.link}
+            {...sub}
+            isSingle={metadata.submissions.length === 1}
+            ocr={ocr}
+            imageSizes={imageSizes}
+          />
+        ))}
+      </section>
+    </>
   );
 }

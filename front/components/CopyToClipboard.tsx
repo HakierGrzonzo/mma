@@ -9,5 +9,9 @@ export function CopyToClipboard({
     await navigator.clipboard.writeText(text);
   };
 
-  return <button onClick={copy}>{children}</button>;
+  return (
+    <a style={{ cursor: "pointer", color: "var(--foreground)" }} onClick={copy}>
+      {children}
+    </a>
+  );
 }

@@ -1,0 +1,38 @@
+.metadataContainer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+@media screen and (max-width: 600px) {
+  .submission img {
+    width: 100vw !important;
+    margin-left: -1em;
+  }
+}
+
+.metadata {
+  display: flex;
+  align-items: center;
+  gap: 2em;
+}
+
+.submission {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.submission img {
+  flex-shrink: 1;
+  width: auto;
+  height: auto;
+}
+
+.submissionHeader {
+  transition: color 200ms ease;
+}
+
+.submissionHeader:hover {
+  color: var(--purple);
+}

@@ -1,3 +1,4 @@
+import classes from "./Submission.module.css";
 import { ImageSize, OCR, SubmissionMetadata, getImageUrl } from "../utils";
 import Image from "next/image";
 import { CopyToClipboard } from "./CopyToClipboard";
@@ -23,38 +24,34 @@ export function Submission({
   const idForSubmission = encodeURIComponent(submission_title);
   const submissionLink = `${pageUrl}#${idForSubmission}`;
   return (
-    <div>
-      <div className="flex gap-4 py-4 justify-between align-baseline">
+    <div className={classes.submission}>
+      <div className={classes.metadataContainer}>
         {!isSingle && (
           <CopyToClipboard text={submissionLink}>
             <h2
               id={idForSubmission}
               title="Click to copy link to this part"
-              className="hover:text-sky-600 text-xl"
+              className={classes.submissionHeader}
             >
               {submission_title}
             </h2>
           </CopyToClipboard>
         )}
-        <div className="flex gap-4 align-baseline">
-          <Link href={link}>
-            Original Post
-          </Link>
+        <div className={classes.metadata}>
+          <Link href={link}>Originally posted here</Link>
           <p>Upvotes: {upvotes}</p>
           <p>Uploaded at: {uploadDate.toDateString()}</p>
         </div>
       </div>
-      <div className="flex flex-col gap-4 items-center">
-        {images.map((img) => (
-          <Image
-            loading="lazy"
-            key={img}
-            src={getImageUrl(img)}
-            alt={ocr[img]}
-            {...imageSizes[img]}
-          />
-        ))}
-      </div>
+      {images.map((img) => (
+        <Image
+          loading="lazy"
+          key={img}
+          src={getImageUrl(img)}
+          alt={ocr[img]}
+          {...imageSizes[img]}
+        />
+      ))}
     </div>
   );
 }

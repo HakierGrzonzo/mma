@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Karla:wght@400;700&display=swap');
+
+:root {
+      /* Special */
+    --background: #211c23;
+    --foreground: #efdfcc;
+
+    /* Colors */
+    --purple: #4b25d3;
+    --pink: #bc30da;
+    --accent-3: #e3606c;
+    --accent-4: #e1625a;
+    --accent-5: #ea8d92;
+    --accent-6: #ecc693;
+}
+
+html {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Karla', sans-serif;
+}
+
+main {
+  width: 100vw;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: stretch;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+section {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin: 3em;
+  margin-bottom: 1em;
+}
+
+section > * {
+  max-width: 30cm;
+}
+
+@media screen and (max-width: 600px) {
+  section {
+    margin: 1em;
+  }
+}
+
+footer {
+  margin-top: 2em;
+  padding-inline: 1em;
+}
+
+.flex {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+  justify-content: center;
+}
+
+a {
+  color: var(--purple)
+}

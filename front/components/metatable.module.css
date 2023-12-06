@@ -1,12 +1,13 @@
 .table th {
-  transition: opacity 200ms;
+  transition: color 200ms;
   opacity: 0.7;
   padding-bottom: 2ex;
-  border-bottom: 1px solid green;
+  border-bottom: 1px solid var(--accent-6);
 }
 
-.table th:hover, .table .active {
-  opacity: 1;
+.table th:hover,
+.table .active {
+  color: var(--accent-6);
 }
 
 .first {
@@ -19,21 +20,30 @@
 }
 
 .last {
- width: 8em;
- text-align: end;
+  width: 8em;
+  text-align: end;
 }
 
 .table tr {
   margin: 1px;
   box-sizing: border-box;
   border: 1px solid transparent;
-  transition: all 25ms;
-  opacity: .7;
+  transition: opacity 250ms;
+  opacity: 0.7;
 }
 
 .table > tbody > tr:hover {
-  border-bottom-color: white;
   opacity: 1;
+  background-color: var(--accent-6);
+  color: var(--background);
+}
+
+.table a {
+  color: var(--foreground);
+  display: block;
+}
+.table tr:hover a {
+  color: var(--background);
 }
 
 .table > :not(tbody:hover) > tr {
