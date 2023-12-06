@@ -8,8 +8,8 @@ import {
   getOcr,
   getSpecificMetadata,
 } from "@/utils";
-import { Link } from "@nextui-org/link";
 import { Metadata } from "next";
+import Link from "next/link";
 
 export async function generateStaticParams() {
   const metadatas = await getAllMetadata();
@@ -71,7 +71,7 @@ export default async function ComicPage({
       <h1 className="text-2xl">{metadata.name}</h1>
       <p>
         Author:{" "}
-        <Link isExternal href="https://www.reddit.com/user/makmark">
+        <Link href="https://www.reddit.com/user/makmark">
           u/makmark
         </Link>
       </p>

@@ -1,0 +1,41 @@
+.table th {
+  transition: opacity 200ms;
+  opacity: 0.7;
+  padding-bottom: 2ex;
+  border-bottom: 1px solid green;
+}
+
+.table th:hover, .table .active {
+  opacity: 1;
+}
+
+.first {
+  text-align: start;
+}
+
+.center {
+  text-align: start;
+  width: 12em;
+}
+
+.last {
+ width: 8em;
+ text-align: end;
+}
+
+.table tr {
+  margin: 1px;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  transition: all 25ms;
+  opacity: .7;
+}
+
+.table > tbody > tr:hover {
+  border-bottom-color: white;
+  opacity: 1;
+}
+
+.table > :not(tbody:hover) > tr {
+  opacity: 1;
+}

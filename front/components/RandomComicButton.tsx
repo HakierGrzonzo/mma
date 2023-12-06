@@ -1,5 +1,5 @@
 "client component";
-import { Link } from "@nextui-org/link";
+import Link from "next/link";
 import { SeriesMetadata, getRandomItem } from "../utils";
 
 export function RandomComicButton({

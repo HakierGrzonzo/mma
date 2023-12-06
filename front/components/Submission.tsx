@@ -1,7 +1,7 @@
-import { Link } from "@nextui-org/link";
 import { ImageSize, OCR, SubmissionMetadata, getImageUrl } from "../utils";
 import Image from "next/image";
 import { CopyToClipboard } from "./CopyToClipboard";
+import Link from "next/link";
 
 export function Submission({
   submission_title,
@@ -37,7 +37,7 @@ export function Submission({
           </CopyToClipboard>
         )}
         <div className="flex gap-4 align-baseline">
-          <Link href={link} isExternal>
+          <Link href={link}>
             Original Post
           </Link>
           <p>Upvotes: {upvotes}</p>

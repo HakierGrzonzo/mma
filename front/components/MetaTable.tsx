@@ -1,7 +1,8 @@
 "use client";
+import classes from './metatable.module.css'
 import { useState } from "react";
 import { SeriesMetadata } from "../utils";
-import { Link } from "@nextui-org/link";
+import Link from 'next/link';
 
 interface Props {
   metadatas: SeriesMetadata[];
@@ -32,29 +33,23 @@ export function MetaTable({ metadatas }: Props) {
   }));
   const sortedData = data.sort(filterFunctions[filter]);
   return (
-    <table className="table-auto">
-      <thead className="border-b">
+    <table className={classes.table}>
+      <thead>
         <tr>
           <th
-            className={`text-left hover:text-sky-600 ${
-              filter === "name" && "text-sky-600"
-            }`}
+            className={`${classes.first} ${filter === "name" && classes.active}`}
             onClick={() => setFilter("name")}
           >
             Title
           </th>
           <th
-            className={`text-left hover:text-sky-600 ${
-              filter === "upload" && "text-sky-600"
-            }`}
+            className={`${classes.center} ${filter === "upload" && classes.active}`}
             onClick={() => setFilter("upload")}
           >
             Upload date
           </th>
           <th
-            className={`text-left hover:text-sky-600 ${
-              filter === "upvote" && "text-sky-600"
-            }`}
+            className={`${classes.last} ${filter === "upvote" && classes.active}`}
             onClick={() => setFilter("upvote")}
           >
             Total upvotes
@@ -63,7 +58,7 @@ export function MetaTable({ metadatas }: Props) {
       </thead>
       <tbody>
         {sortedData.map((item) => (
-          <tr key={item.name} className="hover:border-b">
+          <tr key={item.name}>
             <td>
               <Link href={`/comic/${encodeURIComponent(item.directory_name)}`}>
                 {item.name}

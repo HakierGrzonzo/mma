@@ -1,7 +1,7 @@
 import { MetaTable } from "@/components/MetaTable";
 import { getAllMetadata } from "@/utils";
-import { Link } from "@nextui-org/link";
 import { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "MoringMark Archive",
@@ -21,7 +21,7 @@ export default async function Home() {
       <p>
         This page contains an archive of all MoringMark comics that were ever
         posted to{" "}
-        <Link isExternal href="https://www.reddit.com/r/theowlhouse">
+        <Link href="https://www.reddit.com/r/theowlhouse">
           r/TheOwlHouse
         </Link>
       </p>
