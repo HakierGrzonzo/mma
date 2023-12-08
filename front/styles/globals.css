@@ -1,23 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Karla:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Karla:wght@400;700&display=swap");
 
 :root {
-      /* Special */
-    --background: #211c23;
-    --foreground: #efdfcc;
+  /* Special */
+  --background: #211c23;
+  --foreground: #efdfcc;
 
-    /* Colors */
-    --purple: #4b25d3;
-    --pink: #bc30da;
-    --accent-3: #e3606c;
-    --accent-4: #e1625a;
-    --accent-5: #ea8d92;
-    --accent-6: #ecc693;
+  /* Colors */
+  --purple: #4b25d3;
+  --pink: #bc30da;
+  --accent-3: #e3606c;
+  --accent-4: #e1625a;
+  --accent-5: #ea8d92;
+  --accent-6: #ecc693;
 }
 
 html {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: 'Karla', sans-serif;
+  font-family: "Karla", sans-serif;
+  scroll-snap-type: y proximity;
 }
 
 main {
@@ -30,6 +31,7 @@ body {
   align-items: center;
   flex-direction: column;
   justify-content: stretch;
+  overflow-x: hidden;
 }
 
 .container {
@@ -69,5 +71,5 @@ footer {
 }
 
 a {
-  color: var(--purple)
+  color: var(--purple);
 }
