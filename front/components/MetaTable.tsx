@@ -64,7 +64,7 @@ export function MetaTable({ metadatas }: Props) {
       </thead>
       <tbody>
         {sortedData.map((item) => (
-          <tr key={item.name}>
+          <tr key={item.directory_name}>
             <td>
               <Link href={`/comic/${encodeURIComponent(item.directory_name)}`}>
                 {item.name}
