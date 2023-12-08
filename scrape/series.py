@@ -29,8 +29,18 @@ def get_possible_series(submission: models.Submission) -> Optional[str]:
     if title.startswith(A_LITTLE_HINT_OF_BLUE):
         return A_LITTLE_HINT_OF_BLUE
 
-    return title
+    return f"{title}-{submission.id}"
 
+def get_name(submission: SubmissionMetadata) -> Optional[str]:
+    title: str = submission.submission_title
+
+    if title.startswith(GROM_FACTOR):
+        return GROM_FACTOR
+
+    if title.startswith(A_LITTLE_HINT_OF_BLUE):
+        return A_LITTLE_HINT_OF_BLUE
+
+    return title 
 
 def get_suffix(submission: models.Submission) -> str:
     title: str = submission.title
@@ -136,7 +146,7 @@ class SeriesDownloader:
                 submissions = list(asdict(m) for m in reversed(self.metadata))
                 json.dump(
                     {
-                        "name": self.name,
+                        "name": get_name(self.metadata[0]),
                         "submissions": submissions,
                         "upvotes_total": sum(s.upvotes for s in self.metadata),
                         "latest_episode": self.metadata[0].uploaded_at,
