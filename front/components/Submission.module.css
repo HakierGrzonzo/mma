@@ -32,9 +32,14 @@
 
 .submissionHeader {
   transition: color 200ms ease;
-  scroll-snap-stop: always;
-  scroll-snap-align: start;
-  scroll-margin-top: 80px;
+}
+
+@media (pointer: coarse) {
+  .submissionHeader {
+    scroll-snap-stop: always;
+    scroll-snap-align: start;
+    scroll-margin-top: 80px;
+  }
 }
 
 .submissionHeader:hover {

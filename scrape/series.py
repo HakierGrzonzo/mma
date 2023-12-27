@@ -16,8 +16,10 @@ DOWNLOAD_PATH = "./results"
 
 GROM_FACTOR = "Grom Factor"
 A_LITTLE_HINT_OF_BLUE = "A Little Hint of Blue"
+MAMA_EDA = "Mama Eda"
 
 A_LITTLE_HINT_OF_BLUE_CHAPTER_AND_PART = re.compile(r"Chapter (\d+) Part (\d+)")
+MAMA_EDA_PART = re.compile(r"\(([0-9]+)\/[0-9]+\)")
 
 
 def get_possible_series(submission: models.Submission) -> Optional[str]:
@@ -29,6 +31,9 @@ def get_possible_series(submission: models.Submission) -> Optional[str]:
     if title.startswith(A_LITTLE_HINT_OF_BLUE):
         return A_LITTLE_HINT_OF_BLUE
 
+    if title.startswith(MAMA_EDA) and submission.id != "yd5jpn":
+        return MAMA_EDA
+
     return f"{title}-{submission.id}"
 
 def get_name(submission: SubmissionMetadata) -> Optional[str]:
@@ -39,6 +44,9 @@ def get_name(submission: SubmissionMetadata) -> Optional[str]:
 
     if title.startswith(A_LITTLE_HINT_OF_BLUE):
         return A_LITTLE_HINT_OF_BLUE
+
+    if title.startswith(MAMA_EDA):
+        return MAMA_EDA
 
     return title 
 
@@ -60,6 +68,14 @@ def get_suffix(submission: models.Submission) -> str:
             return f"{chapter}, {part.zfill(2)}_"
         raise Exception(f"Failed to parse {title}")
 
+    if series == MAMA_EDA:
+        if title == MAMA_EDA:
+            return "1_"
+
+        if match := MAMA_EDA_PART.search(title):
+            chapter = match.groups()[0]
+            return f"{chapter}_"
+
     return ""
 
 
@@ -68,7 +84,7 @@ class SeriesDownloader:
         self.name = name
         self.has_content = False
         self.has_changed = False
-        self.path = path.join(DOWNLOAD_PATH, name.replace("/", ""))
+        self.path = path.join(DOWNLOAD_PATH, name.replace("/", "").replace("#", ""))
         self.metadata: List[SubmissionMetadata] = []
         try:
             mkdir(self.path)
