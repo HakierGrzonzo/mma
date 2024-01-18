@@ -6,7 +6,10 @@ from .reddit import get_new_comics
 def scrape():
     series_savers = SeriesSavers()
     for submission in get_new_comics():
-        saver = series_savers[get_possible_series(submission)]
+        saver = series_savers[
+            get_possible_series(submission)
+            or f"{submission.title}-{submission.id}"
+        ]
         saver.download(submission)
 
     for series in series_savers.values():
