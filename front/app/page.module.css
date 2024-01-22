@@ -9,7 +9,9 @@
 }
 
 .coverImage * {
-  text-shadow: var(--purple) 2px 2px 1px, var(--purple) 0px 0px 4px;
+  text-shadow:
+    var(--purple) 2px 2px 1px,
+    var(--purple) 0px 0px 4px;
 }
 
 .coverImage a {

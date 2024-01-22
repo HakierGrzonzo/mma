@@ -41,7 +41,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${metadata.name} - MoringMark Archive`,
       images: metadata.submissions.flatMap((sub) =>
-        sub.images.map(getImageUrl)
+        sub.images.map(getImageUrl),
       ),
       description: `${metadata.name} Comic by u/makmark`,
       releaseDate: metadata.submissions.at(-1)?.uploaded_at,
@@ -63,6 +63,9 @@ export default async function ComicPage({
 
   const allComicMetadata = await getAllMetadata();
   const pageUrl = `${PAGE_URL}/comic/${comic_name}`;
+  const lastSubmissionId = encodeURIComponent(
+    metadata.submissions.at(-1)?.submission_title,
+  );
   return (
     <>
       <div className={classes.stickyHeader}>
@@ -72,10 +75,15 @@ export default async function ComicPage({
       <section>
         <div className={classes.metadatabox}>
           <h1 className="">{metadata.name}</h1>
-          <p>
-            Author:{" "}
-            <Link href="https://www.reddit.com/user/makmark">u/makmark</Link>
-          </p>
+          <div className={classes.subtitleElements}>
+            <p>
+              Author:{" "}
+              <Link href="https://www.reddit.com/user/makmark">u/makmark</Link>
+            </p>
+            {metadata.submissions.length > 1 ? (
+              <a href={`#${lastSubmissionId}`}>Go to last part</a>
+            ) : null}
+          </div>
         </div>
         {metadata.submissions.map((sub) => (
           <Submission

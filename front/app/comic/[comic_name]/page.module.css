@@ -20,6 +20,12 @@
   background-color: var(--pink);
 }
 
+.subtitleElements {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
 .metadatabox {
   width: 100%;
 }
