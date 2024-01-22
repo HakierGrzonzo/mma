@@ -1,7 +1,7 @@
 from collections import defaultdict
 from dataclasses import asdict
 import json
-from typing import Callable, List, Optional, Tuple
+from typing import List, Optional, Tuple
 from praw import models
 from os import listdir, mkdir, path, rmdir
 from scrape.corrections import correct_line
@@ -83,6 +83,12 @@ def get_name(submission: SubmissionMetadata) -> Optional[str]:
     return title
 
 
+def is_image(path: str):
+    return any(
+        path.endswith(suffix) for suffix in ["jpeg", "jpg", "png", "webp"]
+    )
+
+
 def get_suffix(submission: models.Submission) -> str:
     title: str = submission.title
     series = get_possible_series(submission)
@@ -99,7 +105,8 @@ class SeriesDownloader:
         self.has_content = False
         self.has_changed = False
         self.path = path.join(
-            DOWNLOAD_PATH, name.replace("/", "").replace("#", "")
+            DOWNLOAD_PATH,
+            name.replace("/", "").replace("#", "").replace("%", ""),
         )
         self.metadata: List[SubmissionMetadata] = []
         try:
@@ -109,23 +116,15 @@ class SeriesDownloader:
 
     def get_all_image_files(self):
         for file in listdir(self.path):
-            if not file.endswith(".webp"):
+            if not is_image(file):
                 continue
             full_path = path.join(self.path, file)
             yield full_path
 
-    def download(self, submission: models.Submission):
+    def _download_gallery(self, submission: models.Submission):
         metadata = SubmissionMetadata.from_submission(submission)
-        try:
-            items = submission.gallery_data.get("items")
-        except AttributeError:
-            print(f"{submission.title} is not a gallery, skipping")
-            return
+        items = submission.gallery_data.get("items")
         self.has_content = True
-        print(f"Downloading {submission.title}")
-        if items is None:
-            print(f"{submission.title} is not a gallery, skipping")
-            return
         for i, media_refrence in enumerate(items):
             print(f"{i+1}/{len(items)}", end="\r")
 
@@ -150,6 +149,38 @@ class SeriesDownloader:
             sleep(0.2)
 
         self.metadata.append(metadata)
+
+    def _download_single(self, submission: models.Submission):
+        metadata = SubmissionMetadata.from_submission(submission)
+        image_url = submission.url
+        if not is_image(image_url):
+            print(f"{submission.title} is not an image")
+
+        suffix = image_url.split(".")[-1]
+        name = get_suffix(submission) or "image"
+        final_path = f"{path.join(self.path, name)}.{suffix}"
+
+        metadata.add_image_path(final_path)
+        self.metadata.append(metadata)
+
+        if path.isfile(final_path):
+            return
+        self.has_changed = True
+        self.has_content = True
+
+        result = session.get(image_url, headers={"Accept": "image/webp"})
+        with open(final_path, "wb+") as f:
+            f.write(result.content)
+
+    def download(self, submission: models.Submission):
+        print(f"Downloading {submission.title}")
+        if removed_by := vars(submission).get("removed_by_category"):
+            print(f"{submission.title} was removed by {removed_by}")
+            return
+        if vars(submission).get("is_gallery"):
+            self._download_gallery(submission)
+        else:
+            self._download_single(submission)
 
     def extract_content_text(self):
         results = {
