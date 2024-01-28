@@ -53,3 +53,8 @@
 .table > :not(tbody:hover) > tr {
   opacity: 1;
 }
+
+.unread {
+  font-weight: 700;
+  color: var(--accent-4) !important;
+}

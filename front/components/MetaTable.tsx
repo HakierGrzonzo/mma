@@ -1,6 +1,6 @@
 "use client";
 import classes from "./metatable.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SeriesMetadata } from "../utils";
 import Link from "next/link";
 
@@ -22,6 +22,15 @@ const filterFunctions: Record<Filters, (a: Metadata, b: Metadata) => number> = {
 
 export function MetaTable({ metadatas }: Props) {
   const [filter, setFilter] = useState<Filters>("upload");
+  const [lastVisitedDate, setLastVisitedDate] = useState<null | Date>(null);
+  useEffect(() => {
+    const lastDate = localStorage.getItem("last-visited-date");
+    if (lastVisitedDate == null && lastDate) {
+      setLastVisitedDate(new Date(lastDate));
+      localStorage.setItem("last-visited-date", new Date().toISOString());
+    }
+  }, [lastVisitedDate]);
+
   const formatter = new Intl.DateTimeFormat("en", {
     day: "numeric",
     month: "long",
@@ -66,7 +75,16 @@ export function MetaTable({ metadatas }: Props) {
         {sortedData.map((item, index) => (
           <tr key={item.directory_name}>
             <td>
-              <Link prefetch={index < 6} href={`/comic/${encodeURIComponent(item.directory_name)}`}>
+              <Link
+                className={
+                  lastVisitedDate &&
+                  lastVisitedDate.valueOf() <= item.latest_episode.valueOf()
+                    ? classes.unread
+                    : undefined
+                }
+                prefetch={index < 6}
+                href={`/comic/${encodeURIComponent(item.directory_name)}`}
+              >
                 {item.name}
               </Link>
             </td>

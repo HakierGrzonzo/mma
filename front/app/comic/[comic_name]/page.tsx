@@ -64,7 +64,7 @@ export default async function ComicPage({
   const allComicMetadata = await getAllMetadata();
   const pageUrl = `${PAGE_URL}/comic/${comic_name}`;
   const lastSubmissionId = encodeURIComponent(
-    metadata.submissions.at(-1)?.submission_title ?? '',
+    metadata.submissions.at(-1)?.submission_title ?? "",
   );
   return (
     <>
