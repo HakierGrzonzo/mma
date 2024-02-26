@@ -27,6 +27,8 @@ export function MetaTable({ metadatas }: Props) {
     const lastDate = localStorage.getItem("last-visited-date");
     if (lastVisitedDate == null && lastDate) {
       setLastVisitedDate(new Date(lastDate));
+    }
+    if (lastVisitedDate == null) {
       localStorage.setItem("last-visited-date", new Date().toISOString());
     }
   }, [lastVisitedDate]);

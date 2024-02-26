@@ -34,7 +34,7 @@ def a_little_hint_of_blue_extractor(title: str):
     raise Exception(f"Failed to parse {title}")
 
 
-GENERIC_PART = re.compile(r"\(([0-9]+)\/[0-9]+\)")
+GENERIC_PART = re.compile(r"\(([0-9]+)\/([0-9]+|\?)\)")
 
 
 def generic_extractor(title: str):
@@ -52,6 +52,8 @@ series: List[Tuple[str, List[str]]] = [
     ("Milan", []),
     ("Pandora", []),
     ("The Hexsquad", []),
+    ("Enna", []),
+    ("Fight Coven", [])
 ]
 
 series_name_to_extractor = {
