@@ -40,9 +40,8 @@ GENERIC_PART = re.compile(r"\(([0-9]+)\/([0-9]+|\?)\)")
 def generic_extractor(title: str):
     if match := GENERIC_PART.search(title):
         chapter = match.groups()[0]
-        return f"{chapter}_"
-    else:
-        return "1_"
+        return f"{chapter.zfill(2)}_"
+    return hash_extractor(title)
 
 
 series: List[Tuple[str, List[str]]] = [
@@ -108,7 +107,7 @@ class SeriesDownloader:
         self.has_changed = False
         self.path = path.join(
             DOWNLOAD_PATH,
-            name.replace("/", "").replace("#", "").replace("%", ""),
+            name.replace("/", "").replace("#", "").replace("%", "").replace("?", ""),
         )
         self.metadata: List[SubmissionMetadata] = []
         try:
