@@ -85,7 +85,7 @@ export function MetaTable({ metadatas }: Props) {
                     : undefined
                 }
                 prefetch={index < 6}
-                href={`/comic/${encodeURIComponent(item.directory_name)}`}
+                href={`/comic/${encodeURIComponent(item.directory_name)}.html`}
               >
                 {item.name}
               </Link>

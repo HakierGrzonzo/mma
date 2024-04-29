@@ -9,7 +9,7 @@ export function RandomComicButton({
 }) {
   const randomComic = getRandomItem(metadata);
   return (
-    <Link href={`/comic/${encodeURIComponent(randomComic.directory_name)}`}>
+    <Link href={`/comic/${encodeURIComponent(randomComic.directory_name)}.html`}>
       Random Comic
     </Link>
   );
