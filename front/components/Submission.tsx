@@ -14,8 +14,10 @@ export function Submission({
   ocr,
   imageSizes,
   pageUrl,
+  isFirst
 }: SubmissionMetadata & {
   isSingle: boolean;
+  isFirst: boolean;
   pageUrl: string;
   ocr: OCR;
   imageSizes: ImageSize;
@@ -43,12 +45,12 @@ export function Submission({
           <p>Uploaded at: {uploadDate.toDateString()}</p>
         </div>
       </div>
-      {images.map((img) => (
+      {images.map((img, index) => (
         <Image
-          loading="lazy"
           key={img}
           src={getImageUrl(img)}
           alt={ocr[img]}
+          {...(isFirst && index === 0 ? {priority: true} : {loading: "lazy"})}
           {...imageSizes[img]}
         />
       ))}

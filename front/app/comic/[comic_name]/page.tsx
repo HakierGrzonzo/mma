@@ -85,12 +85,13 @@ export default async function ComicPage({
             ) : null}
           </div>
         </div>
-        {metadata.submissions.map((sub) => (
+        {metadata.submissions.map((sub, index) => (
           <Submission
             pageUrl={pageUrl}
             key={sub.link}
             {...sub}
             isSingle={metadata.submissions.length === 1}
+            isFirst={index === 0}
             ocr={ocr}
             imageSizes={imageSizes}
           />
