@@ -1,9 +1,3 @@
-from . import scrape, index
-from sys import argv
+from . import main
 
-command = argv[1]
-
-if command == "scrape":
-    scrape()
-elif command == "index":
-    index()
+main()

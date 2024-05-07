@@ -40,6 +40,7 @@ def get_new_comics() -> Generator[models.Submission, None, None]:
             continue
         yield submission
 
+logger = getLogger(__name__)
 
 @dataclass
 class Comic:
@@ -47,18 +48,19 @@ class Comic:
     image_urls: List[str]
     upvotes: int
     link: str
-    uploaded_at: datetime
+    uploaded_at: str
     id: str
 
     @classmethod
     def from_submission(cls, submission: models.Submission):
+        logger.info(f"Processing {submission.title}")
         date = datetime.fromtimestamp(submission.created)
         return cls(
             title=submission.title,
             upvotes=submission.score,
             image_urls=get_image_urls(submission),
             link=submission.shortlink,
-            uploaded_at=date,
+            uploaded_at=date.isoformat(),
             id=submission.id,
         )
 

@@ -8,10 +8,8 @@ from collections import defaultdict
 @dataclass
 class ComicSeries:
     title: str
+    id: str
     comics: List[Comic]
-
-    def total_upvotes(self):
-        return sum(c.upvotes for c in self.comics)
 
     def latest_update(self):
         return self.comics[-1].uploaded_at
@@ -33,7 +31,8 @@ def reduce_submissions_to_series(comics: Generator[Comic, None, None]):
         series_titles[series_id] = series_title
 
     comic_series = list(
-        ComicSeries(title=series_titles[k], comics=v) for k, v in comics_dict.items()
+        ComicSeries(title=series_titles[k], comics=v, id=k)
+        for k, v in comics_dict.items()
     )
-    comic_series.sort(key=lambda s: s.latest_update())
+    comic_series.sort(key=lambda s: s.latest_update(), reverse=True)
     return comic_series
