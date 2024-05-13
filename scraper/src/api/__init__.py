@@ -40,7 +40,9 @@ def get_new_comics() -> Generator[models.Submission, None, None]:
             continue
         yield submission
 
+
 logger = getLogger(__name__)
+
 
 @dataclass
 class Comic:
