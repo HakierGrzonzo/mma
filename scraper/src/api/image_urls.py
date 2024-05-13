@@ -14,7 +14,7 @@ def get_gallery_links(submission: models.Submission):
         media = submission.media_metadata[media_refrence["media_id"]]
         biggest_picture: str = media.get("s").get("u")
         if biggest_picture is None:
-            logger.warn(f"Failed to get one image")
+            logger.warn("Failed to get one image")
             continue
         yield biggest_picture
 

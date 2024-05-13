@@ -11,6 +11,7 @@ from .filters import is_submission_valid
 from .image_urls import get_image_urls
 
 USER_AGENT = "MoringMarkArchiver (by u/hakiergrzonzo)"
+COMIC_LIMIT = int(environ.get("COMIC_LIMIT", 0))
 
 logger = getLogger(__name__)
 
@@ -35,7 +36,9 @@ def get_moring_mark() -> models.Redditor:
 
 def get_new_comics() -> Generator[models.Submission, None, None]:
     mark_mark = get_moring_mark()
-    for submission in mark_mark.submissions.new(limit=None):
+    for i, submission in enumerate(mark_mark.submissions.new(limit=None)):
+        if i > COMIC_LIMIT and COMIC_LIMIT != 0:
+            break
         if submission.subreddit.display_name != "TheOwlHouse":
             continue
         yield submission
