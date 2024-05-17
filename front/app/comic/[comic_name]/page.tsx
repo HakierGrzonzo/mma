@@ -57,6 +57,8 @@ export default async function ComicPage({
 
   const isOneshot = metadata.series.comics.length != 1;
 
+  const comicsInOrder = [...metadata.series.comics].reverse()
+
   return (
     <>
       <div className={classes.stickyHeader}>
@@ -76,7 +78,7 @@ export default async function ComicPage({
             ) : null}
           </div>
         </div>
-        {metadata.series.comics.map((sub, index) => (
+        {comicsInOrder.map((sub, index) => (
           <Submission
             pageUrl={pageUrl}
             key={sub.link}
