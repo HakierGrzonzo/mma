@@ -1,15 +1,15 @@
 "client component";
 import Link from "next/link";
-import { SeriesMetadata, getRandomItem } from "../utils";
+import { Metadata, getRandomItem } from "../utils";
 
 export function RandomComicButton({
   metadata,
 }: {
-  metadata: SeriesMetadata[];
+  metadata: Metadata[];
 }) {
   const randomComic = getRandomItem(metadata);
   return (
-    <Link href={`/comic/${encodeURIComponent(randomComic.directory_name)}`}>
+    <Link href={`/comic/${encodeURIComponent(randomComic.series.id)}`}>
       Random Comic
     </Link>
   );

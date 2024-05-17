@@ -4,6 +4,7 @@ from .series import series_name_to_extractor
 from typing import Generator, List
 from dataclasses import asdict, dataclass
 from collections import defaultdict
+from string import ascii_letters, digits
 
 
 class ComicWithPrefix(Comic):
@@ -28,8 +29,11 @@ def reduce_submissions_to_series(comics: Generator[ComicWithPrefix, None, None])
         comic = ComicWithPrefix(**asdict(comic))
         if series_title is None:
             # Make up a series id
+            comic_title = "".join(
+                filter(lambda char: char in ascii_letters + digits + " ", comic.title)
+            )
             series_title = comic.title
-            series_id = f"{series_title}-{comic.id}"
+            series_id = f"{comic_title}-{comic.id}"
         else:
             series_id = series_title
             comic.prefix = series_name_to_extractor[series_title](comic.title)

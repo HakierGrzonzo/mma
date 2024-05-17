@@ -1,19 +1,30 @@
 import { readFile, readdir } from "fs/promises";
 
-export interface SubmissionMetadata {
-  submission_title: string;
-  images: string[];
+export interface Comic {
+  title: string;
+  image_urls: string[];
   link: string;
   uploaded_at: string;
   upvotes: number;
 }
 
-export interface SeriesMetadata {
-  name: string;
-  submissions: SubmissionMetadata[];
-  latest_episode: string;
-  upvotes_total: number;
-  directory_name: string;
+export interface Image {
+  ocr: string;
+  height: number;
+  width: number;
+  file_path: string;
+}
+
+export interface Series {
+  title: string;
+  // AKA the name of the folder containing the series
+  id: string
+  comics: Comic[];
+}
+
+export interface Metadata {
+  series: Series;
+  images: Record<string, Image>
 }
 
 async function readJsonFile<T>(path: string): Promise<T> {
@@ -26,7 +37,7 @@ async function readJsonFile<T>(path: string): Promise<T> {
   }
 }
 
-const ROOT_DIR = "../results";
+const ROOT_DIR = "./public/images";
 
 export async function getAllMetadata() {
   const directories = await readdir(ROOT_DIR);
@@ -36,33 +47,12 @@ export async function getAllMetadata() {
 
 export async function getSpecificMetadata(dir: string) {
   const path = `${ROOT_DIR}/${dir}/metadata.json`;
-  const file = await readJsonFile<SeriesMetadata>(path);
-  return { ...file, directory_name: dir };
+  const file = await readJsonFile<Metadata>(path);
+  return { ...file};
 }
 
-export type OCR = Record<string, string>;
-export type ImageSize = Record<
-  string,
-  {
-    width: number;
-    height: number;
-  }
->;
-
-export async function getOcr(dir: string) {
-  const path = `${ROOT_DIR}/${dir}/ocr.json`;
-  const file = await readJsonFile<OCR>(path);
-  return file;
-}
-
-export async function getImageSizes(dir: string) {
-  const path = `${ROOT_DIR}/${dir}/images.json`;
-  const file = await readJsonFile<ImageSize>(path);
-  return file;
-}
-
-export function getImageUrl(img: string) {
-  return `/images/${img.replace("./results/", "")}`;
+export function getImageUrl(image: Image) {
+  return `/images/${image.file_path.replace("./results/", "")}`;
 }
 
 export function getRandomItem<T>(array: T[]): T {

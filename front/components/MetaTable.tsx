@@ -1,21 +1,22 @@
 "use client";
 import classes from "./metatable.module.css";
 import { useEffect, useState } from "react";
-import { SeriesMetadata } from "../utils";
+import { Metadata, Series } from "../utils";
 import Link from "next/link";
 
 interface Props {
-  metadatas: SeriesMetadata[];
+  metadatas: Metadata[];
 }
 
 type Filters = "name" | "upload" | "upvote";
 
-type Metadata = Omit<SeriesMetadata, "latest_episode"> & {
+type DeserializedMetadata = Omit<Metadata, "latest_episode"> & {
   latest_episode: Date;
+  upvotes_total: number;
 };
 
-const filterFunctions: Record<Filters, (a: Metadata, b: Metadata) => number> = {
-  name: (a, b) => a.name.localeCompare(b.name),
+const filterFunctions: Record<Filters, (a: DeserializedMetadata, b: DeserializedMetadata) => number> = {
+  name: (a, b) => a.series.title.localeCompare(b.series.title),
   upvote: (a, b) => b.upvotes_total - a.upvotes_total,
   upload: (a, b) => b.latest_episode.valueOf() - a.latest_episode.valueOf(),
 };
@@ -38,10 +39,13 @@ export function MetaTable({ metadatas }: Props) {
     month: "long",
     year: "numeric",
   });
-  const data = metadatas.map((item) => ({
-    ...item,
-    latest_episode: new Date(item.latest_episode),
-  }));
+  const data = metadatas.map((item) => {
+    return {
+      ...item,
+      latest_episode: new Date(item.series.comics[0].uploaded_at),
+      upvotes_total: item.series.comics.reduce((sum, comic) => sum + comic.upvotes, 0)
+    } as DeserializedMetadata
+  });
   const sortedData = data.sort(filterFunctions[filter]);
   return (
     <table className={classes.table}>
@@ -75,7 +79,7 @@ export function MetaTable({ metadatas }: Props) {
       </thead>
       <tbody>
         {sortedData.map((item, index) => (
-          <tr key={item.directory_name}>
+          <tr key={item.series.id}>
             <td>
               <Link
                 className={
@@ -85,9 +89,9 @@ export function MetaTable({ metadatas }: Props) {
                     : undefined
                 }
                 prefetch={index < 6}
-                href={`/comic/${encodeURIComponent(item.directory_name)}`}
+                href={`/comic/${encodeURIComponent(item.series.id)}`}
               >
-                {item.name}
+                {item.series.title}
               </Link>
             </td>
             <td>{formatter.format(item.latest_episode)}</td>

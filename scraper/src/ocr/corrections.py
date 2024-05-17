@@ -13,6 +13,7 @@ def split_into_sentences(text: str):
 def make_first_letter_uppercase(text: str):
     return text[0].upper() + text[1:]
 
+
 rules = {
     "i": "I",
     "luz": "Luz",
@@ -25,11 +26,12 @@ rules = {
     "willow": "Willow",
 }
 
+
 def fixup_individual_words(sentence: str):
     words = sentence.split(" ")
     words = [rules.get(word, word) for word in words]
     return " ".join(words)
-    
+
 
 def correct_casing(original: str) -> str:
     sentences = split_into_sentences(original)

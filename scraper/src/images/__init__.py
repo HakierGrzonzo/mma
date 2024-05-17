@@ -15,14 +15,19 @@ logger = getLogger(__name__)
 
 reddit_image_lock = asyncio.Lock()
 
+
 async def download_image_from_url(url, file_path):
     logger.info(f"Downloading {file_path}")
     async with reddit_image_lock:
-        result = await asyncio.to_thread(session.get, url, headers={"Accept": "image/webp"})
+        result = await asyncio.to_thread(
+            session.get, url, headers={"Accept": "image/webp"}
+        )
     with open(file_path, "wb+") as out_file:
         out_file.write(result.content)
 
+
 textract_semaphore = asyncio.Semaphore(5)
+
 
 async def download_from_series(meta: Metadata):
     comics = meta.series.comics

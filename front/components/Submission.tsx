@@ -1,41 +1,39 @@
 import classes from "./Submission.module.css";
-import { ImageSize, OCR, SubmissionMetadata, getImageUrl } from "../utils";
+import { Comic, Metadata, Series, getImageUrl } from "../utils";
 import Image from "next/image";
 import { CopyToClipboard } from "./CopyToClipboard";
 import Link from "next/link";
 
 export function Submission({
-  submission_title,
-  isSingle,
-  images,
+  title,
+  isOneshot,
+  image_urls,
   link,
   uploaded_at,
   upvotes,
-  ocr,
-  imageSizes,
   pageUrl,
-  isFirst
-}: SubmissionMetadata & {
-  isSingle: boolean;
+  isFirst,
+  imageMetadata
+}: Comic & {
+  isOneshot: boolean;
   isFirst: boolean;
   pageUrl: string;
-  ocr: OCR;
-  imageSizes: ImageSize;
+  imageMetadata: Metadata["images"]
 }) {
   const uploadDate = new Date(uploaded_at);
-  const idForSubmission = encodeURIComponent(submission_title);
+  const idForSubmission = encodeURIComponent(title);
   const submissionLink = `${pageUrl}#${idForSubmission}`;
   return (
     <div className={classes.submission}>
       <div className={classes.metadataContainer}>
-        {!isSingle && (
+        {!isOneshot && (
           <CopyToClipboard text={submissionLink}>
             <h2
               id={idForSubmission}
               title="Click to copy link to this part"
               className={classes.submissionHeader}
             >
-              {submission_title}
+              {title}
             </h2>
           </CopyToClipboard>
         )}
@@ -45,15 +43,18 @@ export function Submission({
           <p>Uploaded at: {uploadDate.toDateString()}</p>
         </div>
       </div>
-      {images.map((img, index) => (
+      {image_urls.map((img, index) => {
+        const image = imageMetadata[img]
+        return (
         <Image
           key={img}
-          src={getImageUrl(img)}
-          alt={ocr[img]}
+          src={getImageUrl(image)}
+          alt={image.ocr}
+          width={image.width}
+          height={image.height}
           {...(isFirst && index === 0 ? {priority: true} : {loading: "lazy"})}
-          {...imageSizes[img]}
         />
-      ))}
+      )})}
     </div>
   );
 }
