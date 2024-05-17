@@ -1,6 +1,10 @@
 from logging import getLogger
 from os import path
 from typing import List
+
+from praw.reddit import asyncio
+
+from src.ocr import get_ocr_for_image
 from .size import extract_image_size
 
 from src.api import session
@@ -9,15 +13,18 @@ from src.metadata import Metadata
 
 logger = getLogger(__name__)
 
+reddit_image_lock = asyncio.Lock()
 
-def download_image_from_url(url, file_path):
+async def download_image_from_url(url, file_path):
     logger.info(f"Downloading {file_path}")
-    result = session.get(url, headers={"Accept": "image/webp"})
+    async with reddit_image_lock:
+        result = await asyncio.to_thread(session.get, url, headers={"Accept": "image/webp"})
     with open(file_path, "wb+") as out_file:
         out_file.write(result.content)
 
+textract_semaphore = asyncio.Semaphore(5)
 
-def download_from_series(meta: Metadata):
+async def download_from_series(meta: Metadata):
     comics = meta.series.comics
     for comic in comics:
         image_urls = comic.image_urls
@@ -32,13 +39,15 @@ def download_from_series(meta: Metadata):
 
     for url, image in meta.images.items():
         if not image.is_downloaded():
-            download_image_from_url(url, image.file_path)
+            await download_image_from_url(url, image.file_path)
         if not image.is_measured():
             size = extract_image_size(image.file_path)
             image.height = size["height"]
             image.width = size["width"]
+        if not image.is_ocr():
+            async with textract_semaphore:
+                image.ocr = await asyncio.to_thread(get_ocr_for_image, image)
 
 
-def download_images(metas: List[Metadata]):
-    for meta in metas:
-        download_from_series(meta)
+async def download_images(metas: List[Metadata]):
+    await asyncio.gather(*[download_from_series(meta) for meta in metas])

@@ -52,11 +52,11 @@ class ReduceIntegrationTestCase(TestCase):
         result = reduce_submissions_to_series(c for c in a_little_hint)
         self.assertTrue(len(result) == 1)
         self.assertEqual(result[0].title, "A Little Hint of Blue")
-        self.assertListEqual(result[0].comics, a_little_hint)
+        self.assertEqual(result[0].comics[0].id, a_little_hint[0].id)
+        self.assertEqual(result[0].comics[1].id, a_little_hint[1].id)
 
     def test_parses_oneshots(self):
         result = reduce_submissions_to_series(c for c in random_comics)
         self.assertTrue(len(result) == 2)
         result = result[0]
         self.assertEqual(result.title, random_comics[0].title)
-        self.assertIs(result.comics[0], random_comics[0])

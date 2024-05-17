@@ -72,7 +72,6 @@ class Metadata:
         if not path.isdir(meta_path := self.get_filepath_prefix()):
             mkdir(meta_path)
 
-
     def save(self):
         with open(file_path := self.get_metadata_path(), "w+") as f:
             logger.info(f"Writing {self.series.title} to {file_path}")

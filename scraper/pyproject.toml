@@ -12,6 +12,7 @@ praw = "^7.7.1"
 requests = "^2.31.0"
 parameterized = "^0.9.0"
 pillow = "^10.3.0"
+boto3 = "^1.34.103"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.5"
