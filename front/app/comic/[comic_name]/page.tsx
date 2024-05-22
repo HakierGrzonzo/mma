@@ -5,14 +5,21 @@ import { PAGE_URL } from "@/constants";
 import { getAllMetadata, getImageUrl, getSpecificMetadata } from "@/utils";
 import { Metadata } from "next";
 import Link from "next/link";
+import { env } from "process";
 
 export async function generateStaticParams() {
   const metadatas = await getAllMetadata();
+  if (env.NODE_ENV !== "production") {
+    const comic_names = metadatas.map((comic) => ({
+      comic_name: encodeURIComponent(comic.series.id),
+    }));
+    return comic_names
+  }
+  // Encoding/Dencoding is done by nginx
   const comic_names = metadatas.map((comic) => ({
-    comic_name: encodeURIComponent(comic.series.id),
+    comic_name: comic.series.id,
   }));
-  console.log(comic_names);
-  return comic_names;
+  return comic_names
 }
 
 export async function generateMetadata({
