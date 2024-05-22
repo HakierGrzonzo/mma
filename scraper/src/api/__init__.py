@@ -3,7 +3,7 @@ from logging import getLogger
 from typing import Generator, List
 import praw
 from praw import models
-import requests
+import httpx 
 from os import environ
 from dataclasses import dataclass
 
@@ -20,8 +20,7 @@ if secret is None:
     logger.error("No SECRET env specified!")
     secret = "foo"
 
-session = requests.session()
-session.headers.update({"User-Agent": USER_AGENT})
+http_client = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
 
 reddit = praw.Reddit(
     user_agent=USER_AGENT,
