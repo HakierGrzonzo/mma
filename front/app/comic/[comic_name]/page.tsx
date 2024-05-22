@@ -55,7 +55,7 @@ export default async function ComicPage({
     metadata.series.comics.at(-1)?.title ?? "",
   );
 
-  const isOneshot = metadata.series.comics.length != 1;
+  const isOneshot = metadata.series.comics.length === 1;
 
   const comicsInOrder = [...metadata.series.comics].reverse()
 
