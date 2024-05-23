@@ -3,7 +3,7 @@ from logging import getLogger
 from typing import Generator, List
 import praw
 from praw import models
-import httpx 
+import httpx
 from os import environ
 from dataclasses import dataclass
 

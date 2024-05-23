@@ -4,6 +4,7 @@ from typing import List
 import boto3
 
 from src.ocr.corrections import correct_casing
+from ..storage_service import storage
 from ..metadata import Image
 from .block_tree import Node
 from PIL import Image as pil_image
@@ -12,7 +13,9 @@ logger = getLogger(__name__)
 
 
 def get_image_as_png(file_path):
-    img = pil_image.open(file_path)
+    image_bytes = storage.get_object_bytes(file_path)
+    io = BytesIO(image_bytes)
+    img = pil_image.open(io)
 
     png_bytes = BytesIO()
     img.save(png_bytes, format="png")

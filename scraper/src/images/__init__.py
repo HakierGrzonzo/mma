@@ -6,7 +6,7 @@ from praw.reddit import asyncio
 
 from src.ocr import get_ocr_for_image
 from .size import extract_image_size
-
+from ..storage_service import storage
 from src.api import http_client
 
 from src.metadata import Metadata
@@ -20,8 +20,8 @@ async def download_image_from_url(url, file_path):
     logger.info(f"Downloading {file_path}")
     async with reddit_image_semaphore:
         result = await http_client.get(url, headers={"Accept": "image/webp"})
-    with open(file_path, "wb+") as out_file:
-        out_file.write(result.content)
+
+    storage.put_object_bytes(file_path, result.content)
 
 
 textract_semaphore = asyncio.Semaphore(5)

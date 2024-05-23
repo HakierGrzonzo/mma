@@ -1,14 +1,13 @@
 from dataclasses import asdict, dataclass, field
 import json
 from logging import getLogger
-from os import mkdir, path, unlink
 from typing import DefaultDict, Dict, List
 from collections import defaultdict
+from os import path
 
+from ..storage_service import storage
 
 from ..reduce import ComicSeries
-
-DOWNLOAD_PATH = "./results"
 
 logger = getLogger(__name__)
 
@@ -29,7 +28,7 @@ class Image:
     def is_downloaded(self):
         if self.file_path is None:
             return False
-        return path.isfile(self.file_path)
+        return storage.object_exists(self.file_path)
 
 
 @dataclass
@@ -47,8 +46,7 @@ class Metadata:
             .replace("%", "")
             .replace("?", "")
         )
-
-        return path.join(DOWNLOAD_PATH, sanitized)
+        return sanitized
 
     def get_metadata_path(self):
         return path.join(self.get_filepath_prefix(), "metadata.json")
@@ -56,26 +54,22 @@ class Metadata:
     @classmethod
     def from_series(cls, series: ComicSeries):
         instance = cls(series=series)
-        if path.isfile(meta_path := instance.get_metadata_path()):
+        meta_path = instance.get_metadata_path()
+        if storage.object_exists(meta_path):
+            meta = storage.get_object(meta_path)
             try:
-                with open(meta_path) as f:
-                    for k, v in json.load(f)["images"].items():
-                        instance.images[k] = Image(**v)
+                for k, v in json.loads(meta)["images"].items():
+                    instance.images[k] = Image(**v)
             except json.JSONDecodeError:
                 logger.warn(f"Broken metadata in {meta_path}")
-                unlink(meta_path)
 
-        instance.ensure_directory_exists()
         return instance
 
-    def ensure_directory_exists(self):
-        if not path.isdir(meta_path := self.get_filepath_prefix()):
-            mkdir(meta_path)
-
     def save(self):
-        with open(file_path := self.get_metadata_path(), "w+") as f:
-            logger.info(f"Writing {self.series.title} to {file_path}")
-            json.dump(asdict(self), f)
+        path = self.get_metadata_path()
+        logger.info(f"Writing {self.series.title} to {path}")
+        data = asdict(self)
+        storage.put_object(path, json.dumps(data))
 
 
 def load_metadata_from_filesystem(series: List[ComicSeries]) -> List[Metadata]:
