@@ -21,7 +21,7 @@ class ComicSeries:
         return self.comics[-1].uploaded_at
 
 
-def reduce_submissions_to_series(comics: Generator[ComicWithPrefix, None, None]):
+def reduce_submissions_to_series(comics: Generator[Comic, None, None]):
     series_titles = {}
     comics_dict = defaultdict(list)
     for comic in comics:

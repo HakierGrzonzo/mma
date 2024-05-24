@@ -1,15 +1,17 @@
+from collections.abc import AsyncGenerator
 from logging import getLogger
 from os import path
-from typing import List
+from typing import Iterable, List
 
 from praw.reddit import asyncio
 
+from src.async_buffered_map import AsyncBufferedMap
 from src.ocr import get_ocr_for_image
 from .size import extract_image_size
 from ..storage_service import storage
 from src.api import http_client
 
-from src.metadata import Metadata
+from src.metadata import Image, Metadata
 
 logger = getLogger(__name__)
 
@@ -21,10 +23,23 @@ async def download_image_from_url(url, file_path):
     async with reddit_image_semaphore:
         result = await http_client.get(url, headers={"Accept": "image/webp"})
 
-    storage.put_object_bytes(file_path, result.content)
+    await storage.put_object_bytes(file_path, result.content)
 
 
 textract_semaphore = asyncio.Semaphore(5)
+
+
+async def handle_image(url, image: Image):
+    was_image_downloaded = await image.is_downloaded()
+    if not was_image_downloaded:
+        await download_image_from_url(url, image.file_path)
+    if not image.is_measured():
+        size = await extract_image_size(image.file_path)
+        image.height = size["height"]
+        image.width = size["width"]
+    if not image.is_ocr():
+        async with textract_semaphore:
+            image.ocr = await get_ocr_for_image(image)
 
 
 async def download_from_series(meta: Metadata):
@@ -39,18 +54,12 @@ async def download_from_series(meta: Metadata):
             meta.images[url].file_path = path.join(
                 meta.get_filepath_prefix(), file_path
             )
+    await asyncio.gather(
+        *[handle_image(url, image) for url, image in meta.images.items()]
+    )
 
-    for url, image in meta.images.items():
-        if not image.is_downloaded():
-            await download_image_from_url(url, image.file_path)
-        if not image.is_measured():
-            size = extract_image_size(image.file_path)
-            image.height = size["height"]
-            image.width = size["width"]
-        if not image.is_ocr():
-            async with textract_semaphore:
-                image.ocr = await asyncio.to_thread(get_ocr_for_image, image)
+    return meta
 
 
-async def download_images(metas: List[Metadata]):
-    await asyncio.gather(*[download_from_series(meta) for meta in metas])
+def download_images(metas: AsyncGenerator[Metadata]):
+    return AsyncBufferedMap(download_from_series, metas)

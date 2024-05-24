@@ -11,7 +11,7 @@ class S3Storage(BaseService):
         s3 = boto3.resource("s3")
         self._bucket = s3.Bucket(bucket_name)
 
-    def object_exists(self, key: str) -> bool:
+    async def object_exists(self, key: str) -> bool:
         try:
             self._s3.head_object(Bucket=self._bucket_name, Key=key)
             return True
@@ -22,18 +22,18 @@ class S3Storage(BaseService):
             breakpoint()
             raise e
 
-    def get_object_bytes(self, key):
+    async def get_object_bytes(self, key):
         io = BytesIO()
         self._bucket.download_fileobj(key, io)
         io.seek(0)
         return io.read()
 
-    def get_object(self, key):
-        return self.get_object_bytes(key).decode()
+    async def get_object(self, key):
+        return (await self.get_object_bytes(key)).decode()
 
-    def put_object_bytes(self, key, value):
+    async def put_object_bytes(self, key, value):
         io = BytesIO(value)
         self._bucket.upload_fileobj(io, key)
 
-    def put_object(self, key, value):
-        self.put_object_bytes(key, value.encode())
+    async def put_object(self, key, value):
+        await self.put_object_bytes(key, value.encode())

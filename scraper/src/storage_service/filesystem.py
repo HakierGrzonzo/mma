@@ -2,6 +2,8 @@ from .base import BaseService
 
 from os import mkdir, path
 
+import aiofiles
+
 
 class FileSystemStorage(BaseService):
     def __init__(self, directory_prefix: str) -> None:
@@ -19,28 +21,28 @@ class FileSystemStorage(BaseService):
 
         mkdir(full_path)
 
-    def put_object(self, key, value):
+    async def put_object(self, key, value):
         self._ensure_directory_exists(key)
         full_path = self._get_full_path(key)
         with open(full_path, "w+") as f:
             f.write(value)
 
-    def put_object_bytes(self, key, value):
+    async def put_object_bytes(self, key, value):
         self._ensure_directory_exists(key)
         full_path = self._get_full_path(key)
-        with open(full_path, "wb+") as f:
-            f.write(value)
+        async with aiofiles.open(full_path, "wb+") as f:
+            await f.write(value)
 
-    def get_object(self, key):
+    async def get_object(self, key):
         full_path = self._get_full_path(key)
-        with open(full_path) as f:
-            return f.read()
+        async with aiofiles.open(full_path) as f:
+            return await f.read()
 
-    def get_object_bytes(self, key):
+    async def get_object_bytes(self, key):
         full_path = self._get_full_path(key)
-        with open(full_path, "rb") as f:
-            return f.read()
+        async with aiofiles.open(full_path, "rb") as f:
+            return await f.read()
 
-    def object_exists(self, key):
+    async def object_exists(self, key):
         full_path = self._get_full_path(key)
         return path.isfile(full_path)

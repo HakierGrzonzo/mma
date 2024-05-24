@@ -1,7 +1,8 @@
+import asyncio
 from dataclasses import asdict, dataclass, field
 import json
 from logging import getLogger
-from typing import DefaultDict, Dict, List
+from typing import AsyncGenerator, DefaultDict, Dict, Generator, List
 from collections import defaultdict
 from os import path
 
@@ -25,10 +26,10 @@ class Image:
     def is_measured(self):
         return self.height is not None or self.width is not None
 
-    def is_downloaded(self):
+    async def is_downloaded(self):
         if self.file_path is None:
             return False
-        return storage.object_exists(self.file_path)
+        return await storage.object_exists(self.file_path)
 
 
 @dataclass
@@ -52,11 +53,11 @@ class Metadata:
         return path.join(self.get_filepath_prefix(), "metadata.json")
 
     @classmethod
-    def from_series(cls, series: ComicSeries):
+    async def from_series(cls, series: ComicSeries):
         instance = cls(series=series)
         meta_path = instance.get_metadata_path()
-        if storage.object_exists(meta_path):
-            meta = storage.get_object(meta_path)
+        if await storage.object_exists(meta_path):
+            meta = await storage.get_object(meta_path)
             try:
                 for k, v in json.loads(meta)["images"].items():
                     instance.images[k] = Image(**v)
@@ -65,17 +66,25 @@ class Metadata:
 
         return instance
 
-    def save(self):
+    async def save(self):
         path = self.get_metadata_path()
         logger.info(f"Writing {self.series.title} to {path}")
         data = asdict(self)
-        storage.put_object(path, json.dumps(data))
+        await storage.put_object(path, json.dumps(data))
 
 
-def load_metadata_from_filesystem(series: List[ComicSeries]) -> List[Metadata]:
-    return [Metadata.from_series(s) for s in series]
+async def load_metadata_from_filesystem(
+    series: List[ComicSeries]
+) -> AsyncGenerator[Metadata, None]:
+    for m in asyncio.as_completed([Metadata.from_series(s) for s in series]):
+        yield await m
 
 
-def save_metadata(metas: List[Metadata]):
-    for m in metas:
-        m.save()
+async def save_metadata(metas: AsyncGenerator[Metadata, None]):
+    async for m in metas:
+        await m.save()
+
+
+async def save_index_metadata(metas: List[Metadata]):
+    metadata_index = {meta.series.id: asdict(meta) for meta in metas}
+    await storage.put_object("index.json", json.dumps(metadata_index))

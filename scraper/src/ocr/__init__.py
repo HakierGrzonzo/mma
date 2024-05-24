@@ -2,6 +2,7 @@ from io import BytesIO
 from logging import getLogger
 from typing import List
 import boto3
+from praw.reddit import asyncio
 
 from src.ocr.corrections import correct_casing
 from ..storage_service import storage
@@ -12,8 +13,8 @@ from PIL import Image as pil_image
 logger = getLogger(__name__)
 
 
-def get_image_as_png(file_path):
-    image_bytes = storage.get_object_bytes(file_path)
+async def get_image_as_png(file_path):
+    image_bytes = await storage.get_object_bytes(file_path)
     io = BytesIO(image_bytes)
     img = pil_image.open(io)
 
@@ -27,12 +28,14 @@ def get_image_as_png(file_path):
 client = boto3.client("textract")
 
 
-def get_ocr_for_image(image: Image):
+async def get_ocr_for_image(image: Image):
     logger.info(f"Doing OCR for {image.file_path}")
 
-    as_png = get_image_as_png(image.file_path)
-    result = client.analyze_document(
-        Document={"Bytes": as_png.read()}, FeatureTypes=["LAYOUT"]
+    as_png = await get_image_as_png(image.file_path)
+    result = await asyncio.to_thread(
+        client.analyze_document,
+        Document={"Bytes": as_png.read()},
+        FeatureTypes=["LAYOUT"],
     )
 
     blocks: List = result["Blocks"]
