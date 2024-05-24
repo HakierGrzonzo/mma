@@ -10,16 +10,6 @@ resource "aws_s3_bucket" "mma-images" {
   }
 }
 
-resource "aws_s3_bucket_cors_configuration" "mma-images" {
-  bucket = aws_s3_bucket.mma-images.id
-
-  cors_rule {
-    allowed_headers = ["*"]
-    allowed_methods = ["GET", "HEAD"]
-    allowed_origins = ["*.grzegorzkoperwas.site"]
-  }
-}
-
 resource "aws_s3_bucket" "mma-web" {
   bucket = "mma-web"
   tags = {
@@ -28,15 +18,28 @@ resource "aws_s3_bucket" "mma-web" {
   }
 }
 
-resource "aws_s3_bucket_ownership_controls" "mma-web" {
-  bucket = aws_s3_bucket.mma-web.id
+resource "aws_s3_bucket_cors_configuration" "mma" {
+  for_each = toset([aws_s3_bucket.mma-web.id, aws_s3_bucket.mma-images.id])
+  bucket = each.key
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "HEAD"]
+    allowed_origins = ["*.grzegorzkoperwas.site", "http://localhost:3000"]
+  }
+}
+
+resource "aws_s3_bucket_ownership_controls" "mma" {
+  for_each = toset([aws_s3_bucket.mma-web.id, aws_s3_bucket.mma-images.id])
+  bucket = each.key
   rule {
     object_ownership = "BucketOwnerPreferred"
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "mma-web" {
-  bucket = aws_s3_bucket.mma-web.id
+resource "aws_s3_bucket_public_access_block" "mma" {
+  for_each = toset([aws_s3_bucket.mma-web.id, aws_s3_bucket.mma-images.id])
+  bucket = each.key
 
   block_public_acls       = false
   block_public_policy     = false
@@ -44,18 +47,20 @@ resource "aws_s3_bucket_public_access_block" "mma-web" {
   restrict_public_buckets = false
 }
 
-resource "aws_s3_bucket_acl" "mma-web" {
+resource "aws_s3_bucket_acl" "mma" {
+  for_each = toset([aws_s3_bucket.mma-web.id, aws_s3_bucket.mma-images.id])
+  bucket = each.key
   depends_on = [
-    aws_s3_bucket_ownership_controls.mma-web,
-    aws_s3_bucket_public_access_block.mma-web,
+    aws_s3_bucket_ownership_controls.mma,
+    aws_s3_bucket_public_access_block.mma,
   ]
 
-  bucket = aws_s3_bucket.mma-web.id
   acl    = "public-read"
 }
 
-resource "aws_s3_bucket_website_configuration" "mma-web" {
-  bucket = aws_s3_bucket.mma-web.id
+resource "aws_s3_bucket_website_configuration" "mma" {
+  for_each = toset([aws_s3_bucket.mma-web.id, aws_s3_bucket.mma-images.id])
+  bucket = each.key
 
   index_document {
     suffix = "index.html"

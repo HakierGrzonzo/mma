@@ -13,13 +13,13 @@ export async function generateStaticParams() {
     const comic_names = metadatas.map((comic) => ({
       comic_name: encodeURIComponent(comic.series.id),
     }));
-    return comic_names
+    return comic_names;
   }
   // Encoding/Dencoding is done by nginx
   const comic_names = metadatas.map((comic) => ({
     comic_name: comic.series.id,
   }));
-  return comic_names
+  return comic_names;
 }
 
 export async function generateMetadata({
@@ -64,7 +64,7 @@ export default async function ComicPage({
 
   const isOneshot = metadata.series.comics.length === 1;
 
-  const comicsInOrder = [...metadata.series.comics].reverse()
+  const comicsInOrder = [...metadata.series.comics].reverse();
 
   return (
     <>
