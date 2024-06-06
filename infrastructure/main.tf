@@ -70,3 +70,18 @@ resource "aws_s3_bucket_website_configuration" "mma" {
     key = "error.html"
   }
 }
+
+resource "aws_ecr_repository" "mma-scraper" {
+  name = "scraper"
+  image_tag_mutability = "MUTABLE"
+  tags = {
+    Environment = "Dev"
+  }
+}
+resource "aws_ecr_repository" "mma-front" {
+  name = "front"
+  image_tag_mutability = "MUTABLE"
+  tags = {
+    Environment = "Dev"
+  }
+}
