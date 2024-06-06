@@ -89,6 +89,7 @@ resource "aws_ecr_repository" "mma-front" {
 locals {
   cert_arn = "arn:aws:acm:us-east-1:767397670578:certificate/e9263c10-140d-4b45-a27d-2dd10269d145"
   one_hour_cache_id = "67394ec7-583a-41c0-8fc7-3f62f7d59947"
+  caching_optimized = "658327ea-f89d-4fab-a63d-7e88639e58f6"
 }
 
 resource "aws_cloudfront_distribution" "mma-images" {
@@ -107,9 +108,44 @@ resource "aws_cloudfront_distribution" "mma-images" {
     compress = true
     viewer_protocol_policy = "redirect-to-https"
     # Using the one-hour policy ID:
-    cache_policy_id  = local.one_hour_cache_id
+    cache_policy_id  = local.caching_optimized
     allowed_methods  = ["GET", "HEAD"]
     target_origin_id = "mma-images"
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+
+  viewer_certificate {
+    acm_certificate_arn = local.cert_arn
+    minimum_protocol_version = "TLSv1.2_2021"
+    ssl_support_method = "sni-only"
+  }
+}
+
+resource "aws_cloudfront_distribution" "mma-web" {
+  origin {
+    domain_name = aws_s3_bucket.mma-web.bucket_domain_name
+    origin_id   = "mma-web"
+  }
+  enabled             = true
+  is_ipv6_enabled     = true
+  default_root_object = "index.html"
+
+  aliases = ["dev.moringmark.grzegorzkoperwas.site"]
+
+  default_cache_behavior {
+    cached_methods = ["GET", "HEAD"]
+    compress = true
+    viewer_protocol_policy = "redirect-to-https"
+    # Using the one-hour policy ID:
+    cache_policy_id  = local.one_hour_cache_id
+    allowed_methods  = ["GET", "HEAD"]
+    target_origin_id = "mma-web"
   }
 
   restrictions {
@@ -135,7 +171,7 @@ import {
   id = "Z05374111XE5KFVN016OU"
 }
 
-resource "aws_route53_record" "www" {
+resource "aws_route53_record" "img" {
   zone_id = aws_route53_zone.mma.zone_id
   name    = "img"
   for_each = toset(["A", "AAAA"])
@@ -143,6 +179,18 @@ resource "aws_route53_record" "www" {
   alias {
     name = aws_cloudfront_distribution.mma-images.domain_name
     zone_id = aws_cloudfront_distribution.mma-images.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "web" {
+  zone_id = aws_route53_zone.mma.zone_id
+  name    = "dev"
+  for_each = toset(["A", "AAAA"])
+  type    = each.key
+  alias {
+    name = aws_cloudfront_distribution.mma-web.domain_name
+    zone_id = aws_cloudfront_distribution.mma-web.hosted_zone_id
     evaluate_target_health = false
   }
 }
