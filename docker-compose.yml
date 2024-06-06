@@ -8,3 +8,12 @@ services:
     volumes:
       - "~/.aws:/root/.aws"
     restart: no
+  front-builder:
+    build:
+      context: ./front
+    environment:
+      BUCKET: ${BUCKET}
+      DESTINATION: ${DESTINATION}
+    volumes:
+      - "~/.aws:/root/.aws"
+    restart: no

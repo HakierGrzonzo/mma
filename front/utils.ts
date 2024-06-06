@@ -63,29 +63,15 @@ const readJsonFile = bucket_name === undefined ? readJsonFileLocal : readJsonFil
 
 const ROOT_DIR = "./public/images";
 
-async function getAllDirectories() {
-  if (bucket_name === undefined) {
-    return await readdir(ROOT_DIR)
-  }
-  const paginator = paginateListObjectsV2({client: s3Client}, {Bucket: bucket_name, Delimiter: '/'})
-  const listOfFolders: string[] = []
-  for await (const page of paginator) {
-    const objects = page.CommonPrefixes;
-    objects?.forEach((file) => file.Prefix && listOfFolders.push(file.Prefix.slice(undefined, -1)))
-  }
-  return listOfFolders
-}
-
 export async function getAllMetadata() {
-  const directories = await getAllDirectories();
-  const metadata = await Promise.all(directories.map(getSpecificMetadata));
-  return metadata;
+  const metadata = await readJsonFile<Record<string, Metadata>>("index.json")
+  return Object.values(metadata);
 }
 
 export async function getSpecificMetadata(dir: string) {
   const path = `${dir}/metadata.json`;
   const file = await readJsonFile<Metadata>(path);
-  return { ...file};
+  return file
 }
 
 export function getImageUrl(image: Image) {
@@ -93,9 +79,7 @@ export function getImageUrl(image: Image) {
   if (bucket_name === undefined){
     return `/images/${imagePath}`;
   }
-  if (env.NODE_ENV === "development") {
-    return `http://${bucket_name}.s3-website-us-east-1.amazonaws.com/${imagePath}`
-  }
+  return `http://${bucket_name}.s3-website-us-east-1.amazonaws.com/${imagePath}`
 }
 
 export function getRandomItem<T>(array: T[]): T {
