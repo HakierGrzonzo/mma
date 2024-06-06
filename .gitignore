@@ -1,4 +1,5 @@
 *.pyc
+.env
 results
 # Local .terraform directories
 **/.terraform/*
