@@ -1,0 +1,10 @@
+services:
+  scraper:
+    build:
+      context: ./scraper
+    environment:
+      BUCKET: ${BUCKET}
+      SECRET: ${SECRET}
+    volumes:
+      - "~/.aws:/root/.aws"
+    restart: no
