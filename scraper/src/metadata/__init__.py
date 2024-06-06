@@ -2,7 +2,7 @@ import asyncio
 from dataclasses import asdict, dataclass, field
 import json
 from logging import getLogger
-from typing import AsyncGenerator, DefaultDict, Dict, Generator, List
+from typing import AsyncGenerator, DefaultDict, Dict, List
 from collections import defaultdict
 from os import path
 
@@ -83,8 +83,10 @@ async def load_metadata_from_filesystem(
 async def save_metadata(metas: AsyncGenerator[Metadata, None]):
     async for m in metas:
         await m.save()
+        yield m
 
 
 async def save_index_metadata(metas: List[Metadata]):
     metadata_index = {meta.series.id: asdict(meta) for meta in metas}
+    logger.info(f"Writing index metadata with {len(metas)} series")
     await storage.put_object("index.json", json.dumps(metadata_index))

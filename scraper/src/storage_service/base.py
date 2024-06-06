@@ -1,3 +1,6 @@
+from typing import Generator
+
+
 class BaseService:
     async def put_object(self, key: str, value: str) -> None:
         raise NotImplemented()
@@ -12,4 +15,7 @@ class BaseService:
         raise NotImplemented()
 
     async def get_object_bytes(self, key: str) -> bytes:
+        raise NotImplemented()
+
+    def list_objects_in_root(self) -> Generator[str, None, None]:
         raise NotImplemented()

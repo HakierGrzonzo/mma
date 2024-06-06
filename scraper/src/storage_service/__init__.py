@@ -1,7 +1,8 @@
 from logging import getLogger
 import os
 
-from .s3 import S3Storage
+from .cached_s3 import CachedS3Storage
+
 from .filesystem import FileSystemStorage
 
 
@@ -12,7 +13,7 @@ if BUCKET is None:
     logger.warn("S3 Bucket not specified, running against the filesystem")
     storage = FileSystemStorage("./results")
 else:
-    storage = S3Storage(BUCKET)
+    storage = CachedS3Storage(BUCKET)
 
 
 __all__ = ("storage",)

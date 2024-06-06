@@ -1,7 +1,11 @@
+import asyncio
 from io import BytesIO
+from logging import getLogger
 from .base import BaseService
 import boto3
 import botocore
+
+logger = getLogger(__name__)
 
 
 class S3Storage(BaseService):
@@ -10,21 +14,24 @@ class S3Storage(BaseService):
         self._s3 = boto3.client("s3")
         s3 = boto3.resource("s3")
         self._bucket = s3.Bucket(bucket_name)
+        self._rate_limit = asyncio.Semaphore(15)
 
     async def object_exists(self, key: str) -> bool:
         try:
-            self._s3.head_object(Bucket=self._bucket_name, Key=key)
+            await asyncio.to_thread(
+                self._s3.head_object, Bucket=self._bucket_name, Key=key
+            )
             return True
         except botocore.exceptions.ClientError as e:
             # AWS returns the error code as str
             if e.response["Error"]["Code"] == "404":
                 return False
-            breakpoint()
             raise e
 
     async def get_object_bytes(self, key):
         io = BytesIO()
-        self._bucket.download_fileobj(key, io)
+        async with self._rate_limit:
+            await asyncio.to_thread(self._bucket.download_fileobj, key, io)
         io.seek(0)
         return io.read()
 
@@ -33,7 +40,14 @@ class S3Storage(BaseService):
 
     async def put_object_bytes(self, key, value):
         io = BytesIO(value)
-        self._bucket.upload_fileobj(io, key)
+        async with self._rate_limit:
+            await asyncio.to_thread(self._bucket.upload_fileobj, io, key)
 
     async def put_object(self, key, value):
         await self.put_object_bytes(key, value.encode())
+
+    def list_objects_in_root(self):
+        paginator = self._s3.get_paginator("list_objects")
+        for result in paginator.paginate(Bucket=self._bucket_name, Delimiter="/"):
+            for prefix in result.get("CommonPrefixes", []):
+                yield prefix.get("Prefix")
