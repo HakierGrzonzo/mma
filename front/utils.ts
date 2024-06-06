@@ -74,12 +74,15 @@ export async function getSpecificMetadata(dir: string) {
   return file
 }
 
+const devProtocol =process.env.NODE_ENV === 'production' ? 'https' : 'http' 
+const IMAGE_HOST = process.env.IMAGE_HOST ?? `${devProtocol}://${bucket_name}.s3-website-us-east-1.amazonaws.com`
+
 export function getImageUrl(image: Image) {
   const imagePath = image.file_path.replace("./results/", "")
   if (bucket_name === undefined){
     return `/images/${imagePath}`;
   }
-  return `http://${bucket_name}.s3-website-us-east-1.amazonaws.com/${imagePath}`
+  return `${IMAGE_HOST}/${imagePath}`
 }
 
 export function getRandomItem<T>(array: T[]): T {

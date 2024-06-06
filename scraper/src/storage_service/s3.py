@@ -41,7 +41,9 @@ class S3Storage(BaseService):
     async def put_object_bytes(self, key, value):
         io = BytesIO(value)
         async with self._rate_limit:
-            await asyncio.to_thread(self._bucket.upload_fileobj, io, key)
+            await asyncio.to_thread(
+                self._bucket.upload_fileobj, io, key, ExtraArgs={"ACL": "public-read"}
+            )
 
     async def put_object(self, key, value):
         await self.put_object_bytes(key, value.encode())
