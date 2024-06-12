@@ -7,6 +7,10 @@ on:
 permissions:
   contents: read
 
+environment: 
+  name: production
+  url: https://moringmark.grzegorzkoperwas.site
+
 jobs:
   build-scraper:
     name: Build and Upload scraper to ECR
