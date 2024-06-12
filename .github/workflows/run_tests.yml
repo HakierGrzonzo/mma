@@ -28,9 +28,11 @@ jobs:
         pip install poetry
 
     - name: Install dependencies
+      working-directory: ./scraper
       run: |
-        cd ./scraper && poetry install
+        poetry install
 
     - name: Run tests
+      working-directory: ./scraper
       run: |
-        cd ./scraper && poetry run python -m unittest discover . -v
+        poetry run python -m unittest discover . -v
