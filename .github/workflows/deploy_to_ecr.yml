@@ -2,15 +2,19 @@ name: Deploy to Amazon ECR
 
 on:
   push:
-    branches: [ $default-branch, aws ]
+    branches: [ master, aws ]
 
 permissions:
   contents: read
+
 
 jobs:
   build-scraper:
     name: Build and Upload scraper to ECR
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://moringmark.grzegorzkoperwas.site
 
     steps:
     - name: Checkout
@@ -43,6 +47,9 @@ jobs:
   build-front:
     name: Build and Upload front to ECR
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://moringmark.grzegorzkoperwas.site
 
     steps:
     - name: Checkout
