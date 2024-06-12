@@ -1,7 +1,6 @@
-import { readFile, readdir } from "fs/promises";
+import { readFile } from "fs/promises";
 import { bucket_name } from "./constants"
-import { GetObjectCommand, S3Client, paginateListDirectoryBuckets, paginateListObjectsV2 } from "@aws-sdk/client-s3";
-import { env } from "process";
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 export interface Comic {
   title: string;
@@ -83,10 +82,6 @@ export function getImageUrl(image: Image) {
     return `/images/${imagePath}`;
   }
   return `${IMAGE_HOST}/${imagePath}`
-}
-
-export function getRandomItem<T>(array: T[]): T {
-  return array[Math.floor(Math.random() * array.length)];
 }
 
 export const formatter = new Intl.DateTimeFormat("en", {

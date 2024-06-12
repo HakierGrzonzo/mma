@@ -1,16 +1,11 @@
-"client component";
-import Link from "next/link";
-import { Metadata, getRandomItem } from "../utils";
+import { Metadata } from "../utils";
 
-export function RandomComicButton({
-  metadata,
-}: {
-  metadata: Metadata[];
-}) {
-  const randomComic = getRandomItem(metadata);
+const RANDOM_HOST = process.env.NODE_ENV === "production" ? '' : 'http://localhost:8080'
+
+export function RandomComicButton({currentComic}: {currentComic: Metadata}) {
   return (
-    <Link href={`/comic/${encodeURIComponent(randomComic.series.id)}`}>
+    <a href={`${RANDOM_HOST}/random?except=${currentComic.series.id}`}>
       Random Comic
-    </Link>
+    </a>
   );
 }

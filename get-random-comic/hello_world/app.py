@@ -1,40 +1,51 @@
 import json
+import boto3
+import random
 
+def get_current_comic_ids():
+    client = boto3.client('s3')
+    response = client.get_object(Bucket="mma-images", Key="index.json")
+    body = response["Body"]
+
+    body_json = json.load(body)
+
+    return list(body_json.keys())
+
+list_of_comic_ids = get_current_comic_ids()
+
+def get_host_from_referer(referer_header_value: str):
+    DEFAULT_DOMAIN = "https://moringmark.grzegorzkoperwas.site/"
+    ALLOWED_REFERRERS = [
+        "http://localhost:3000/",
+        "https://dev.moringmark.grzegorzkoperwas.site/",
+        DEFAULT_DOMAIN
+    ]
+    if referer_header_value in ALLOWED_REFERRERS:
+        return referer_header_value
+
+    return DEFAULT_DOMAIN
+
+def get_comic_candidates(queryParams: dict):
+    except_comic_id = queryParams.get("except")
+    if except_comic_id is None:
+        return list_of_comic_ids
+    return [comic for comic in list_of_comic_ids if comic != except_comic_id]
 
 def lambda_handler(event, context):
-    """Sample pure Lambda function
+    referer = event.get("headers", {}).get("Referer")
+    host_with_trailing_slash = get_host_from_referer(referer)
+    
+    queryParams = event.get("queryStringParameters", {})
+    acceptable_comics = get_comic_candidates(queryParams)
 
-    Parameters
-    ----------
-    event: dict, required
-        API Gateway Lambda Proxy Input Format
-
-        Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
-
-    context: object, required
-        Lambda Context runtime methods and attributes
-
-        Context doc: https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
-
-    Returns
-    ------
-    API Gateway Lambda Proxy Output Format: dict
-
-        Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
-    """
-
-    # try:
-    #     ip = requests.get("http://checkip.amazonaws.com/")
-    # except requests.RequestException as e:
-    #     # Send some context about this error to Lambda Logs
-    #     print(e)
-
-    #     raise e
+    random_comic_id = random.choice(acceptable_comics)
+    url = f"{host_with_trailing_slash}comic/{random_comic_id}/"
 
     return {
-        "statusCode": 200,
-        "body": json.dumps({
-            "message": "hello world foo",
-            # "location": ip.text.replace("\n", "")
-        }),
+        "statusCode": 307,
+        "headers": {
+            "Location": url,
+            "Content-type": "text/html"
+        },
+        "body": f'<a href="{url}">Click Here</a>',
     }

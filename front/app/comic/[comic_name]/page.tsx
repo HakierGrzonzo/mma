@@ -55,8 +55,6 @@ export default async function ComicPage({
   const { comic_name } = params;
   const comicName = decodeURIComponent(comic_name);
   const metadata = await getSpecificMetadata(comicName);
-
-  const allComicMetadata = await getAllMetadata();
   const pageUrl = `${PAGE_URL}/comic/${comic_name}`;
   const lastSubmissionId = encodeURIComponent(
     metadata.series.comics.at(-1)?.title ?? "",
@@ -70,7 +68,7 @@ export default async function ComicPage({
     <>
       <div className={classes.stickyHeader}>
         <Link href="/">Home</Link>
-        <RandomComicButton metadata={allComicMetadata} />
+        <RandomComicButton currentComic={metadata}/>
       </div>
       <section>
         <div className={classes.metadatabox}>
