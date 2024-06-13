@@ -68,7 +68,7 @@ export default async function ComicPage({
     <>
       <div className={classes.stickyHeader}>
         <Link href="/">Home</Link>
-        <RandomComicButton currentComic={metadata}/>
+        <RandomComicButton currentComic={metadata} />
       </div>
       <section>
         <div className={classes.metadatabox}>

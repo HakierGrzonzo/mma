@@ -1,25 +1,13 @@
 "use client";
 import classes from "./metatable.module.css";
 import { useEffect, useState } from "react";
-import { Metadata, Series } from "../utils";
+import { Metadata } from "../utils";
 import Link from "next/link";
+import { Filters, useComicMetadata } from "@/hooks";
 
 interface Props {
   metadatas: Metadata[];
 }
-
-type Filters = "name" | "upload" | "upvote";
-
-type DeserializedMetadata = Omit<Metadata, "latest_episode"> & {
-  latest_episode: Date;
-  upvotes_total: number;
-};
-
-const filterFunctions: Record<Filters, (a: DeserializedMetadata, b: DeserializedMetadata) => number> = {
-  name: (a, b) => a.series.title.localeCompare(b.series.title),
-  upvote: (a, b) => b.upvotes_total - a.upvotes_total,
-  upload: (a, b) => b.latest_episode.valueOf() - a.latest_episode.valueOf(),
-};
 
 export function MetaTable({ metadatas }: Props) {
   const [filter, setFilter] = useState<Filters>("upload");
@@ -39,14 +27,9 @@ export function MetaTable({ metadatas }: Props) {
     month: "long",
     year: "numeric",
   });
-  const data = metadatas.map((item) => {
-    return {
-      ...item,
-      latest_episode: new Date(item.series.comics[0].uploaded_at),
-      upvotes_total: item.series.comics.reduce((sum, comic) => sum + comic.upvotes, 0)
-    } as DeserializedMetadata
-  });
-  const sortedData = data.sort(filterFunctions[filter]);
+
+  const sortedData = useComicMetadata(metadatas, filter)
+
   return (
     <table className={classes.table}>
       <thead>
