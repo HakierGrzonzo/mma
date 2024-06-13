@@ -1,5 +1,5 @@
 import { readFile } from "fs/promises";
-import { bucket_name } from "./constants"
+import { PAGE_URL, bucket_name } from "./constants"
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 export interface Comic {
@@ -79,7 +79,7 @@ const IMAGE_HOST = process.env.IMAGE_HOST ?? `${devProtocol}://${bucket_name}.s3
 export function getImageUrl(image: Image) {
   const imagePath = image.file_path.replace("./results/", "")
   if (bucket_name === undefined){
-    return `/images/${imagePath}`;
+    return `${PAGE_URL}/images/${imagePath}`;
   }
   return `${IMAGE_HOST}/${imagePath}`
 }

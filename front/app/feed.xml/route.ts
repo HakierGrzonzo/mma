@@ -1,6 +1,6 @@
 import { PAGE_URL } from "@/constants";
 import { useComicMetadata } from "@/hooks";
-import { getAllMetadata } from "@/utils";
+import { getAllMetadata, getImageUrl } from "@/utils";
 import RSS from "rss";
 
 export async function GET() {
@@ -16,13 +16,20 @@ export async function GET() {
   const comics = await getAllMetadata();
   const orderedComics = useComicMetadata(comics, "upload");
   orderedComics.forEach((comic) => {
+    const firstImageLink = comic.series.comics[0].image_urls[0];
+    const firstImage = comic.images[firstImageLink];
+    const articleImageLink = getImageUrl(firstImage);
+    const description = firstImage.ocr || "A Comic";
     feed.item({
       title: comic.series.title,
-      description: "A comic",
+      description,
       url: `${PAGE_URL}/comic/${comic.series.id}`,
       categories: [],
       author: "u/makmark",
       date: comic.latest_episode.toUTCString(),
+      enclosure: {
+        url: articleImageLink as string,
+      },
     });
   });
 
