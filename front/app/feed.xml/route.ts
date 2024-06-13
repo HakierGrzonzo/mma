@@ -1,7 +1,16 @@
 import { PAGE_URL } from "@/constants";
-import { useComicMetadata } from "@/hooks";
-import { getAllMetadata, getImageUrl } from "@/utils";
+import {Comic, getAllMetadata, getImageUrl, Metadata} from "@/utils";
 import RSS from "rss";
+
+function compare(a:{comic: Comic, series: Metadata}, b:{comic: Comic, series: Metadata}) {
+  if ( a.comic.uploaded_at < b.comic.uploaded_at ){
+    return 1;
+  }
+  if ( a.comic.uploaded_at > b.comic.uploaded_at ){
+    return -1;
+  }
+  return 0;
+}
 
 export async function GET() {
   const feed = new RSS({
@@ -13,23 +22,29 @@ export async function GET() {
     ttl: 6 * 60, // 6 hours
   });
 
-  const comics = await getAllMetadata();
-  const orderedComics = useComicMetadata(comics, "upload");
-  orderedComics.forEach((comic) => {
-    const firstImageLink = comic.series.comics[0].image_urls[0];
-    const firstImage = comic.images[firstImageLink];
-    const articleImageLink = getImageUrl(firstImage);
-    const description = firstImage.ocr || "A Comic";
+  const metadata = await getAllMetadata();
+  let comics : {comic: Comic, series: Metadata}[] = []
+  metadata.forEach((series) => {
+    Object.values(series.series.comics).forEach((comic) => {
+      comics.push({comic, series})
+    })
+  });
+  comics.sort(compare);
+  comics.length = 30;
+
+  comics.forEach((comic) => {
+    let description = ""
+    comic.comic.image_urls.forEach((img) => {
+      const image = comic.series.images[img]
+      description += '<img src="'+getImageUrl(image)+'" alt="'+image.ocr+'" width="'+image.width+'" height="'+image.height+'" />'
+    })
     feed.item({
-      title: comic.series.title,
-      description,
-      url: `${PAGE_URL}/comic/${comic.series.id}`,
+      title: comic.comic.title,
+      description: description,
+      url: `${PAGE_URL}/comic/${comic.series.series.id}`,
       categories: [],
       author: "u/makmark",
-      date: comic.latest_episode.toUTCString(),
-      enclosure: {
-        url: articleImageLink as string,
-      },
+      date: comic.comic.uploaded_at,
     });
   });
 
