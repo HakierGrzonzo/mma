@@ -48,3 +48,25 @@ jobs:
         docker push $ECR_REGISTRY/front:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/front:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
+  deploy-front:
+    if: github.ref_name == 'master'
+    name: Run frontend generation task on AWS
+    runs-on: ubuntu-latest
+    environment: 
+      name: production
+      url: https://moringmark.grzegorzkoperwas.site
+    needs:
+      - 'build-front'
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: run aws task
+        run: aws ecs run-task 
+            --cluster mma-test 
+            --task-definition front-mma:3 
+            --network-configuration "awsvpcConfiguration={subnets=[subnet-00c5cd223fe861889],securityGroups=[sg-0d0cabbabacb7842f],assignPublicIp=ENABLED}" 
+            --launch-type FARGATE
