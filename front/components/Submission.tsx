@@ -1,5 +1,5 @@
 import classes from "./Submission.module.css";
-import { Comic, Metadata, getImageUrl } from "../utils";
+import { Comic, Metadata, getImageUrl, getSubmissionLinks } from "../utils";
 import Image from "next/image";
 import { CopyToClipboard } from "./CopyToClipboard";
 import Link from "next/link";
@@ -21,15 +21,14 @@ export function Submission({
   imageMetadata: Metadata["images"]
 }) {
   const uploadDate = new Date(uploaded_at);
-  const idForSubmission = encodeURIComponent(title);
-  const submissionLink = `${pageUrl}#${idForSubmission}`;
+  const {idForComic, comicLink} = getSubmissionLinks(pageUrl, title)
   return (
     <div className={classes.submission}>
       <div className={classes.metadataContainer}>
         {!isOneshot && (
-          <CopyToClipboard text={submissionLink}>
+          <CopyToClipboard text={comicLink}>
             <h2
-              id={idForSubmission}
+              id={idForComic}
               title="Click to copy link to this part"
               className={classes.submissionHeader}
             >

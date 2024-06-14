@@ -89,3 +89,11 @@ export const formatter = new Intl.DateTimeFormat("en", {
   month: "long",
   year: "numeric",
 });
+
+export function getSubmissionLinks(pageUrl: string, title: Comic["title"]) {
+  const idForComic = encodeURIComponent(title)
+  return {
+    idForComic,
+    comicLink: `${pageUrl}#${idForComic}`
+  }
+}

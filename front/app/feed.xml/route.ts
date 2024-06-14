@@ -1,16 +1,22 @@
 import { PAGE_URL } from "@/constants";
-import {Comic, getAllMetadata, getImageUrl, Metadata} from "@/utils";
+import {
+  Comic,
+  getAllMetadata,
+  getImageUrl,
+  getSubmissionLinks,
+  Metadata,
+} from "@/utils";
 import RSS from "rss";
 
 interface ComicWithMetadata {
   comic: Comic;
-  metadata: Metadata
+  metadata: Metadata;
 }
 
 function compare(a: ComicWithMetadata, b: ComicWithMetadata) {
-  const aDate = new Date(a.comic.uploaded_at)
-  const bDate = new Date(b.comic.uploaded_at)
-  return bDate.valueOf() - aDate.valueOf()
+  const aDate = new Date(a.comic.uploaded_at);
+  const bDate = new Date(b.comic.uploaded_at);
+  return bDate.valueOf() - aDate.valueOf();
 }
 
 export async function GET() {
@@ -24,29 +30,31 @@ export async function GET() {
   });
 
   const rawMetadata = await getAllMetadata();
-  const comicsWithMetadata = rawMetadata.flatMap(metadata => {
-      const {series} = metadata
-      return series.comics.map(comic => ({comic, metadata}))
+  const comicsWithMetadata = rawMetadata.flatMap((metadata) => {
+    const { series } = metadata;
+    return series.comics.map((comic) => ({ comic, metadata }));
   });
   comicsWithMetadata.sort(compare);
   comicsWithMetadata.length = 30;
 
   comicsWithMetadata.forEach((comicWithMetadata) => {
-    const {comic, metadata} = comicWithMetadata
-    let description = ""
+    const { comic, metadata } = comicWithMetadata;
+    let description = "";
     comic.image_urls.forEach((img: string) => {
-      const image = metadata.images[img]
+      const image = metadata.images[img];
       description += `<img 
         src="${getImageUrl(image)}"
         alt="${image.ocr}"
         width="${image.width}"
         height="${image.height}"
-      />`
-    })
+      />`;
+    });
+    const seriesLink = `${PAGE_URL}/comic/${metadata.series.id}`;
+    const { comicLink } = getSubmissionLinks(seriesLink, comic.title);
     feed.item({
       title: comic.title,
       description: description,
-      url: `${PAGE_URL}/comic/${metadata.series.id}`,
+      url: comicLink,
       categories: [],
       author: "u/makmark",
       date: comic.uploaded_at,
