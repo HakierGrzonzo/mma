@@ -1,7 +1,17 @@
 import { PAGE_URL } from "@/constants";
-import { useComicMetadata } from "@/hooks";
-import { getAllMetadata, getImageUrl } from "@/utils";
+import {Comic, getAllMetadata, getImageUrl, Metadata} from "@/utils";
 import RSS from "rss";
+
+interface ComicWithMetadata {
+  comic: Comic;
+  metadata: Metadata
+}
+
+function compare(a: ComicWithMetadata, b: ComicWithMetadata) {
+  const aDate = new Date(a.comic.uploaded_at)
+  const bDate = new Date(b.comic.uploaded_at)
+  return bDate.valueOf() - aDate.valueOf()
+}
 
 export async function GET() {
   const feed = new RSS({
@@ -13,23 +23,33 @@ export async function GET() {
     ttl: 6 * 60, // 6 hours
   });
 
-  const comics = await getAllMetadata();
-  const orderedComics = useComicMetadata(comics, "upload");
-  orderedComics.forEach((comic) => {
-    const firstImageLink = comic.series.comics[0].image_urls[0];
-    const firstImage = comic.images[firstImageLink];
-    const articleImageLink = getImageUrl(firstImage);
-    const description = firstImage.ocr || "A Comic";
+  const rawMetadata = await getAllMetadata();
+  const comicsWithMetadata = rawMetadata.flatMap(metadata => {
+      const {series} = metadata
+      return series.comics.map(comic => ({comic, metadata}))
+  });
+  comicsWithMetadata.sort(compare);
+  comicsWithMetadata.length = 30;
+
+  comicsWithMetadata.forEach((comicWithMetadata) => {
+    const {comic, metadata} = comicWithMetadata
+    let description = ""
+    comic.image_urls.forEach((img: string) => {
+      const image = metadata.images[img]
+      description += `<img 
+        src="${getImageUrl(image)}"
+        alt="${image.ocr}"
+        width="${image.width}"
+        height="${image.height}"
+      />`
+    })
     feed.item({
-      title: comic.series.title,
-      description,
-      url: `${PAGE_URL}/comic/${comic.series.id}`,
+      title: comic.title,
+      description: description,
+      url: `${PAGE_URL}/comic/${metadata.series.id}`,
       categories: [],
       author: "u/makmark",
-      date: comic.latest_episode.toUTCString(),
-      enclosure: {
-        url: articleImageLink as string,
-      },
+      date: comic.uploaded_at,
     });
   });
 
