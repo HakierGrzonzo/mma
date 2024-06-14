@@ -87,7 +87,7 @@ export function getImageUrl(image: Image) {
   return `${IMAGE_HOST}/${imagePath}`;
 }
 
-export const formatter = new Intl.DateTimeFormat("en", {
+export const formatter = new Intl.DateTimeFormat("en-UK", {
   day: "numeric",
   month: "long",
   year: "numeric",
