@@ -1,3 +1,4 @@
+import RSSbutton from "@/components/RSSbutton";
 import classes from "./page.module.css";
 import { MetaTable } from "@/components/MetaTable";
 import { getAllMetadata } from "@/utils";
@@ -27,6 +28,7 @@ export default async function Home() {
         </p>
       </div>
       <section>
+        <RSSbutton />
         <MetaTable metadatas={metadatas} />
       </section>
     </>

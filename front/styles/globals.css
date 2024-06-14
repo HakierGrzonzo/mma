@@ -45,7 +45,7 @@ section {
   align-items: center;
   flex-direction: column;
   margin: 3em;
-  margin-bottom: 1em;
+  margin-block: 1em;
 }
 
 section > * {
@@ -71,5 +71,5 @@ footer {
 }
 
 a {
-  color: var(--purple);
+  color: var(--pink);
 }

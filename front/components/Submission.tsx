@@ -13,15 +13,15 @@ export function Submission({
   upvotes,
   pageUrl,
   isFirst,
-  imageMetadata
+  imageMetadata,
 }: Comic & {
   isOneshot: boolean;
   isFirst: boolean;
   pageUrl: string;
-  imageMetadata: Metadata["images"]
+  imageMetadata: Metadata["images"];
 }) {
   const uploadDate = new Date(uploaded_at);
-  const {idForComic, comicLink} = getSubmissionLinks(pageUrl, title)
+  const { idForComic, comicLink } = getSubmissionLinks(pageUrl, title);
   return (
     <div className={classes.submission}>
       <div className={classes.metadataContainer}>
@@ -43,17 +43,20 @@ export function Submission({
         </div>
       </div>
       {image_urls.map((img, index) => {
-        const image = imageMetadata[img]
+        const image = imageMetadata[img];
         return (
-        <Image
-          key={img}
-          src={getImageUrl(image)}
-          alt={image.ocr}
-          width={image.width}
-          height={image.height}
-          {...(isFirst && index === 0 ? {priority: true} : {loading: "lazy"})}
-        />
-      )})}
+          <Image
+            key={img}
+            src={getImageUrl(image)}
+            alt={image.ocr}
+            width={image.width}
+            height={image.height}
+            {...(isFirst && index === 0
+              ? { priority: true }
+              : { loading: "lazy" })}
+          />
+        );
+      })}
     </div>
   );
 }

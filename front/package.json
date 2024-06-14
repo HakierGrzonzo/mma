@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prettier": "prettier -w ./app",
+    "prettier": "prettier -w ./app ./types *.ts ./components",
     "prod": "python -m http.server 3000 --directory ./out"
   },
   "dependencies": {

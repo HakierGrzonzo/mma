@@ -1,0 +1,9 @@
+.feed {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-block: 1em;
+}
+.icon {
+  max-height: 1em;
+}

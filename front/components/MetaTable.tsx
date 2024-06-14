@@ -28,7 +28,7 @@ export function MetaTable({ metadatas }: Props) {
     year: "numeric",
   });
 
-  const sortedData = useComicMetadata(metadatas, filter)
+  const sortedData = useComicMetadata(metadatas, filter);
 
   return (
     <table className={classes.table}>
