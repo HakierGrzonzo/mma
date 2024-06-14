@@ -2,14 +2,15 @@ import { PAGE_URL } from "@/constants";
 import {Comic, getAllMetadata, getImageUrl, Metadata} from "@/utils";
 import RSS from "rss";
 
-function compare(a:{comic: Comic, series: Metadata}, b:{comic: Comic, series: Metadata}) {
-  if ( a.comic.uploaded_at < b.comic.uploaded_at ){
-    return 1;
-  }
-  if ( a.comic.uploaded_at > b.comic.uploaded_at ){
-    return -1;
-  }
-  return 0;
+interface ComicWithMetadata {
+  comic: Comic;
+  metadata: Metadata
+}
+
+function compare(a: ComicWithMetadata, b: ComicWithMetadata) {
+  const aDate = new Date(a.comic.uploaded_at)
+  const bDate = new Date(b.comic.uploaded_at)
+  return bDate.valueOf() - aDate.valueOf()
 }
 
 export async function GET() {
@@ -22,29 +23,33 @@ export async function GET() {
     ttl: 6 * 60, // 6 hours
   });
 
-  const metadata = await getAllMetadata();
-  let comics : {comic: Comic, series: Metadata}[] = []
-  metadata.forEach((series) => {
-    Object.values(series.series.comics).forEach((comic) => {
-      comics.push({comic, series})
-    })
+  const rawMetadata = await getAllMetadata();
+  const comicsWithMetadata = rawMetadata.flatMap(metadata => {
+      const {series} = metadata
+      return series.comics.map(comic => ({comic, metadata}))
   });
-  comics.sort(compare);
-  comics.length = 30;
+  comicsWithMetadata.sort(compare);
+  comicsWithMetadata.length = 30;
 
-  comics.forEach((comic) => {
+  comicsWithMetadata.forEach((comicWithMetadata) => {
+    const {comic, metadata} = comicWithMetadata
     let description = ""
-    comic.comic.image_urls.forEach((img) => {
-      const image = comic.series.images[img]
-      description += '<img src="'+getImageUrl(image)+'" alt="'+image.ocr+'" width="'+image.width+'" height="'+image.height+'" />'
+    comic.image_urls.forEach((img: string) => {
+      const image = metadata.images[img]
+      description += `<img 
+        src="${getImageUrl(image)}"
+        alt="${image.ocr}"
+        width="${image.width}"
+        height="${image.height}"
+      />`
     })
     feed.item({
-      title: comic.comic.title,
+      title: comic.title,
       description: description,
-      url: `${PAGE_URL}/comic/${comic.series.series.id}`,
+      url: `${PAGE_URL}/comic/${metadata.series.id}`,
       categories: [],
       author: "u/makmark",
-      date: comic.comic.uploaded_at,
+      date: comic.uploaded_at,
     });
   });
 
