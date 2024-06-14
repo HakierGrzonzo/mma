@@ -1,7 +1,6 @@
 from collections.abc import AsyncGenerator
 from logging import getLogger
 from os import path
-from typing import Iterable, List
 
 from praw.reddit import asyncio
 

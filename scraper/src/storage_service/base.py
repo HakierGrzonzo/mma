@@ -3,19 +3,19 @@ from typing import Generator
 
 class BaseService:
     async def put_object(self, key: str, value: str) -> None:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     async def get_object(self, key: str) -> str:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     async def object_exists(self, key: str) -> bool:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     async def put_object_bytes(self, key: str, value: bytes) -> None:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     async def get_object_bytes(self, key: str) -> bytes:
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def list_objects_in_root(self) -> Generator[str, None, None]:
-        raise NotImplemented()
+        raise NotImplementedError()
