@@ -36,6 +36,8 @@ Two ECS tasks (built by github actions) process reddit posts and store them in `
 
 1. Clone the repo
 2. Acquire reddit API secret and export it into env variable `SECRET`.
+    - Alternatively use the `./get_example_results_from_scraper.sh` to download example 
+      data for frontend development
 3. Go to `./scraper` and launch `poetry install` to install scraper dependencies
 4. Launch `poetry run -m src` to gather the data from reddit
     - You can pass an env parameter `COMIC_LIMIT` to limit the amount of comics
