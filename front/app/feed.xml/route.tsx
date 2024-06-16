@@ -36,9 +36,7 @@ export async function GET() {
   comicsWithMetadata.forEach((comicWithMetadata) => {
     const { comic, metadata } = comicWithMetadata;
     let description = renderToString(
-      <>
-        <RSSdescription comic={comic} metadata={metadata} />
-      </>,
+      <RSSdescription comic={comic} metadata={metadata} />,
     );
     const seriesLink = `${PAGE_URL}/comic/${metadata.series.id}`;
     const { comicLink } = getSubmissionLinks(seriesLink, comic.title);
