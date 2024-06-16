@@ -12,9 +12,9 @@ permissions:
   contents: read
 
 jobs:
-  format-frontend:
+  format-and-lint-frontend:
     runs-on: ubuntu-latest
-    name: Run prettier
+    name: Run prettier and eslint
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
@@ -23,6 +23,8 @@ jobs:
     - run: npm install
       working-directory: ./front
     - run: npm run prettier-ci
+      working-directory: ./front
+    - run: npm run lint
       working-directory: ./front
 
   format-backend:
