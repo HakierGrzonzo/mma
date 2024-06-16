@@ -20,6 +20,7 @@ function compare(a: ComicWithMetadata, b: ComicWithMetadata) {
 }
 
 export async function GET() {
+  const { renderToString } = await import("react-dom/server");
   const feed = new RSS({
     title: "MoringMarkArchive",
     feed_url: `${PAGE_URL}/feed.xml`,
@@ -39,16 +40,24 @@ export async function GET() {
 
   comicsWithMetadata.forEach((comicWithMetadata) => {
     const { comic, metadata } = comicWithMetadata;
-    let description = "";
-    comic.image_urls.forEach((img: string) => {
-      const image = metadata.images[img];
-      description += `<img 
-        src="${getImageUrl(image)}"
-        alt="${image.ocr}"
-        width="${image.width}"
-        height="${image.height}"
-      />`;
-    });
+    let description = renderToString(
+      <>
+        {comic.image_urls.map((image_url) => {
+          const image = metadata.images[image_url];
+          return (
+            <img
+              src={getImageUrl(image)}
+              alt={image.ocr}
+              width={image.width}
+              height={image.height}
+            />
+          );
+        })}
+        <p>
+          <a href={comic.link}>Original Post</a>
+        </p>
+      </>,
+    );
     const seriesLink = `${PAGE_URL}/comic/${metadata.series.id}`;
     const { comicLink } = getSubmissionLinks(seriesLink, comic.title);
     feed.item({
