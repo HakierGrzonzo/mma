@@ -1,12 +1,7 @@
 import { PAGE_URL } from "@/constants";
-import {
-  Comic,
-  getAllMetadata,
-  getImageUrl,
-  getSubmissionLinks,
-  Metadata,
-} from "@/utils";
+import { Comic, getAllMetadata, getSubmissionLinks, Metadata } from "@/utils";
 import RSS from "rss";
+import { RSSdescription } from "@/components/RSSdescription";
 
 interface ComicWithMetadata {
   comic: Comic;
@@ -20,6 +15,7 @@ function compare(a: ComicWithMetadata, b: ComicWithMetadata) {
 }
 
 export async function GET() {
+  const { renderToString } = await import("react-dom/server");
   const feed = new RSS({
     title: "MoringMarkArchive",
     feed_url: `${PAGE_URL}/feed.xml`,
@@ -39,16 +35,9 @@ export async function GET() {
 
   comicsWithMetadata.forEach((comicWithMetadata) => {
     const { comic, metadata } = comicWithMetadata;
-    let description = "";
-    comic.image_urls.forEach((img: string) => {
-      const image = metadata.images[img];
-      description += `<img 
-        src="${getImageUrl(image)}"
-        alt="${image.ocr}"
-        width="${image.width}"
-        height="${image.height}"
-      />`;
-    });
+    let description = renderToString(
+      <RSSdescription comic={comic} metadata={metadata} />,
+    );
     const seriesLink = `${PAGE_URL}/comic/${metadata.series.id}`;
     const { comicLink } = getSubmissionLinks(seriesLink, comic.title);
     feed.item({
