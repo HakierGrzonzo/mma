@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { Comic, getImageUrl, Metadata } from "@/utils";
 
 export function RSSdescription({
@@ -13,6 +14,7 @@ export function RSSdescription({
         const image = metadata.images[image_url];
         return (
           <img
+            key={image_url}
             src={getImageUrl(image)}
             alt={image.ocr}
             width={image.width}
