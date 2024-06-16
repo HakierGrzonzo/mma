@@ -1,12 +1,7 @@
 import { PAGE_URL } from "@/constants";
-import {
-  Comic,
-  getAllMetadata,
-  getImageUrl,
-  getSubmissionLinks,
-  Metadata,
-} from "@/utils";
+import { Comic, getAllMetadata, getSubmissionLinks, Metadata } from "@/utils";
 import RSS from "rss";
+import { RSSdescription } from "@/components/RSSdescription";
 
 interface ComicWithMetadata {
   comic: Comic;
@@ -42,20 +37,7 @@ export async function GET() {
     const { comic, metadata } = comicWithMetadata;
     let description = renderToString(
       <>
-        {comic.image_urls.map((image_url) => {
-          const image = metadata.images[image_url];
-          return (
-            <img
-              src={getImageUrl(image)}
-              alt={image.ocr}
-              width={image.width}
-              height={image.height}
-            />
-          );
-        })}
-        <p>
-          <a href={comic.link}>Original Post</a>
-        </p>
+        <RSSdescription comic={comic} metadata={metadata} />
       </>,
     );
     const seriesLink = `${PAGE_URL}/comic/${metadata.series.id}`;
