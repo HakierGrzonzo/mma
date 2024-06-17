@@ -55,3 +55,14 @@ jobs:
       working-directory: ./scraper
       run: |
         poetry run ruff check . 
+
+  format-infra:
+    runs-on: ubuntu-latest
+    name: Run tofu fmt
+    steps:
+    - uses: actions/checkout@v3
+    - uses: opentofu/setup-opentofu@v1
+    - name: Check formatter
+      run: |
+        tofu fmt -recursive -check
+      working-directory: ./infrastructure
