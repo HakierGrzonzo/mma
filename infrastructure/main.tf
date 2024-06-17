@@ -49,6 +49,12 @@ module "mma_images"{
   applicationARN = local.applicationARN
 }
 
+module "random_lambda" {
+  source = "./lambda"
+  lambda_source_file_path = "./get-random-comic/lambda_function.py"
+  lambda_name = "get-random-comic"
+}
+
 module "mma_webroot"{
   source = "./bucket"
   bucket_domain = "moringmark.grzegorzkoperwas.site"
@@ -56,7 +62,6 @@ module "mma_webroot"{
   bucket_caching_policy_id = local.one_hour_cache_id
   route_53_zone_id = aws_route53_zone.mma.id
   applicationARN = local.applicationARN
-  random_function_domain = local.random_function_domain
+  random_function_domain = trimprefix(trimsuffix(aws_lambda_function_url.random_comic.function_url, "/"), "https://")
 }
-
 

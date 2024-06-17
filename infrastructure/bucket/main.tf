@@ -60,7 +60,7 @@ resource "aws_cloudfront_distribution" "distribuition" {
     iterator = domain
     content {
       domain_name = domain.value
-      origin_id = domain.value
+      origin_id = "random-function"
       custom_origin_config {
         http_port              = "80"
         https_port             = "443"
@@ -79,7 +79,7 @@ resource "aws_cloudfront_distribution" "distribuition" {
       cached_methods = ["GET", "HEAD"]
       cache_policy_id = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
       allowed_methods = ["GET", "HEAD"]
-      target_origin_id = domain.value
+      target_origin_id = "random-function"
       path_pattern = "/random"
       viewer_protocol_policy = "redirect-to-https"
       compress = true
