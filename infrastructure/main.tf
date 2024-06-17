@@ -3,11 +3,9 @@ provider "aws" {
 }
 
 locals {
-  applicationARN         = "arn:aws:resource-groups:us-east-1:767397670578:group/mma/0epa3txbvzptdclxtbl6yiw89s"
-  cert_arn               = "arn:aws:acm:us-east-1:767397670578:certificate/e9263c10-140d-4b45-a27d-2dd10269d145"
-  one_hour_cache_id      = "67394ec7-583a-41c0-8fc7-3f62f7d59947"
-  caching_optimized      = "658327ea-f89d-4fab-a63d-7e88639e58f6"
-  random_function_domain = "465euyd151.execute-api.us-east-1.amazonaws.com"
+  applicationARN    = "arn:aws:resource-groups:us-east-1:767397670578:group/mma/0epa3txbvzptdclxtbl6yiw89s"
+  one_hour_cache_id = "67394ec7-583a-41c0-8fc7-3f62f7d59947"
+  caching_optimized = "658327ea-f89d-4fab-a63d-7e88639e58f6"
 }
 
 resource "aws_ecr_repository" "mma-scraper" {
