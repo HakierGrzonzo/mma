@@ -164,3 +164,13 @@ resource "aws_scheduler_schedule" "mma-refresh" {
     }
   }
 }
+
+output "subnet_id" {
+  value = aws_subnet.mma.id
+}
+output "front_task_arn" {
+  value = aws_ecs_task_definition.mma-front.arn
+}
+output "cluster_arn" {
+  value = aws_ecs_cluster.mma.arn
+}

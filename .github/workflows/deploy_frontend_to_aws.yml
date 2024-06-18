@@ -66,7 +66,7 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
       - name: run aws task
         run: aws ecs run-task 
-            --cluster mma-test 
-            --task-definition front-mma:3 
-            --network-configuration "awsvpcConfiguration={subnets=[subnet-00c5cd223fe861889],securityGroups=[sg-0d0cabbabacb7842f],assignPublicIp=ENABLED}" 
+            --cluster ${{ vars.CLUSTER_ARN }} 
+            --task-definition ${{ vars.FRONT_TASK_ARN }} 
+            --network-configuration "awsvpcConfiguration={subnets=[${{ vars.SUBNET_ID }}],securityGroups=[],assignPublicIp=ENABLED}" 
             --launch-type FARGATE
