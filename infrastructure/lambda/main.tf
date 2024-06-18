@@ -32,6 +32,9 @@ resource "aws_lambda_function" "random_comic" {
   runtime          = "python3.12"
   handler          = "lambda_function.lambda_handler"
   timeout          = 10
+  environment {
+    variables = var.environment_variables
+  }
 }
 
 resource "aws_lambda_function_url" "random_comic" {

@@ -33,11 +33,6 @@ resource "aws_route53_zone" "mma" {
   }
 }
 
-import {
-  to = aws_route53_zone.mma
-  id = "Z05374111XE5KFVN016OU"
-}
-
 module "mma_images" {
   source                   = "./bucket"
   bucket_domain            = "img.moringmark.grzegorzkoperwas.site"
@@ -51,6 +46,9 @@ module "random_lambda" {
   source                  = "./lambda"
   lambda_source_file_path = "./get-random-comic/lambda_function.py"
   lambda_name             = "get-random-comic"
+  environment_variables = {
+    BUCKET = module.mma_images.bucket.id
+  }
 }
 
 module "mma_webroot" {

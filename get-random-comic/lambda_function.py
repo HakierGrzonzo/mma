@@ -1,10 +1,13 @@
 import json
+from os import environ
 import boto3
 import random
 
+BUCKET = environ["BUCKET"]
+
 def get_current_comic_ids():
     client = boto3.client('s3')
-    response = client.get_object(Bucket="mma-images", Key="index.json")
+    response = client.get_object(Bucket=BUCKET, Key="index.json")
     body = response["Body"]
 
     body_json = json.load(body)
