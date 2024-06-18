@@ -1,8 +1,7 @@
 resource "aws_s3_bucket" "bucket" {
   bucket = var.bucket_name
   tags = {
-    Name           = var.bucket_name
-    awsApplication = var.applicationARN
+    Name = var.bucket_name
   }
 }
 
@@ -118,9 +117,6 @@ resource "aws_cloudfront_distribution" "distribuition" {
     acm_certificate_arn      = var.bucket_certificate_arn
     minimum_protocol_version = "TLSv1.2_2021"
     ssl_support_method       = "sni-only"
-  }
-  tags = {
-    awsApplication = var.applicationARN
   }
 }
 

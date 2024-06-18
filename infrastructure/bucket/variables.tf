@@ -6,10 +6,6 @@ variable "bucket_domain" {
   type = string
 }
 
-variable "applicationARN" {
-  type = string
-}
-
 variable "bucket_caching_policy_id" {
   type = string
 }

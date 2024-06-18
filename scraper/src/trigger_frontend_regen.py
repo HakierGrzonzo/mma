@@ -6,10 +6,11 @@ logger = getLogger(__name__)
 
 CLUSTER_ARN = environ.get("CLUSTER_ARN")
 TASK_DEFINITION_ARN = environ.get("TASK_DEFINITION_ARN")
+SUBNET = environ.get("SUBNET")
 
 
 def trigger_frontend_regen():
-    if CLUSTER_ARN is None or TASK_DEFINITION_ARN is None:
+    if CLUSTER_ARN is None or TASK_DEFINITION_ARN is None or SUBNET is None:
         raise Exception("Cluster and task not specified")
     client = boto3.client("ecs")
     logger.info("Triggering Frontend task")
@@ -20,7 +21,7 @@ def trigger_frontend_regen():
         taskDefinition=TASK_DEFINITION_ARN,
         networkConfiguration={
             "awsvpcConfiguration": {
-                "subnets": [],
+                "subnets": [SUBNET],
                 "securityGroups": [],
                 "assignPublicIp": "ENABLED",
             }
