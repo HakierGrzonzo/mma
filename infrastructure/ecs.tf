@@ -18,12 +18,13 @@ resource "aws_ecs_cluster_capacity_providers" "mma" {
   capacity_providers = ["FARGATE"]
 }
 
+
 resource "aws_ecs_task_definition" "mma-front" {
   family                   = "mma-front"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  execution_role_arn       = "arn:aws:iam::767397670578:role/MMA-container"
-  task_role_arn            = "arn:aws:iam::767397670578:role/MMA-container"
+  execution_role_arn       = aws_iam_role.mma-container.arn
+  task_role_arn            = aws_iam_role.mma-container.arn
   cpu                      = 1024
   memory                   = 3072
   container_definitions = jsonencode([{
@@ -56,40 +57,12 @@ resource "aws_ecs_task_definition" "mma-front" {
   }])
 }
 
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
-}
-
-resource "aws_internet_gateway" "mma" {
-  vpc_id = aws_vpc.main.id
-}
-
-resource "aws_subnet" "mma" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
-}
-
-resource "aws_route_table" "mma" {
-  vpc_id = aws_vpc.main.id
-}
-
-resource "aws_route_table_association" "mma-main" {
-  subnet_id      = aws_subnet.mma.id
-  route_table_id = aws_route_table.mma.id
-}
-
-resource "aws_route" "internet" {
-  route_table_id         = aws_route_table.mma.id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.mma.id
-}
-
 resource "aws_ecs_task_definition" "mma-scraper" {
   family                   = "mma-scraper"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  execution_role_arn       = "arn:aws:iam::767397670578:role/MMA-container"
-  task_role_arn            = "arn:aws:iam::767397670578:role/MMA-container"
+  execution_role_arn       = aws_iam_role.mma-container.arn
+  task_role_arn            = aws_iam_role.mma-container.arn
   cpu                      = 1024
   memory                   = 3072
   container_definitions = jsonencode([{
@@ -138,16 +111,14 @@ resource "aws_scheduler_schedule" "mma-refresh" {
     mode = "OFF"
   }
 
-  schedule_expression          = "cron(30 17,22 * * ? *)" # run every 30 minutes
+  schedule_expression          = "cron(30 17,22 * * ? *)"
   schedule_expression_timezone = "Europe/Warsaw"
 
   target {
-    arn = aws_ecs_cluster.mma.arn # arn of the ecs cluster to run on
-    # role that allows scheduler to start the task (explained later)
+    arn      = aws_ecs_cluster.mma.arn
     role_arn = aws_iam_role.scheduler.arn
 
     ecs_parameters {
-      # trimming the revision suffix here so that schedule always uses latest revision
       task_definition_arn = aws_ecs_task_definition.mma-scraper.arn_without_revision
       launch_type         = "FARGATE"
 
@@ -165,12 +136,11 @@ resource "aws_scheduler_schedule" "mma-refresh" {
   }
 }
 
-output "subnet_id" {
-  value = aws_subnet.mma.id
-}
-output "front_task_arn" {
+# output variables for github CD
+output "FRONT_TASK_ARN" {
   value = aws_ecs_task_definition.mma-front.arn
 }
-output "cluster_arn" {
+
+output "CLUSTER_ARN" {
   value = aws_ecs_cluster.mma.arn
 }

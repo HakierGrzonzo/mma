@@ -1,13 +1,7 @@
 locals {
-  applicationARN    = "arn:aws:resource-groups:us-east-1:767397670578:group/mma/0epa3txbvzptdclxtbl6yiw89s"
-  one_hour_cache_id = "67394ec7-583a-41c0-8fc7-3f62f7d59947"
-  caching_optimized = "658327ea-f89d-4fab-a63d-7e88639e58f6"
-  image_domain      = "img.moringmark.grzegorzkoperwas.site"
-}
-
-variable "reddit_api_secret" {
-  type      = string
-  sensitive = true
+  applicationARN = "arn:aws:resource-groups:us-east-1:767397670578:group/mma/0epa3txbvzptdclxtbl6yiw89s"
+  root_domain    = "moringmark.grzegorzkoperwas.site"
+  image_domain   = "img.${local.root_domain}"
 }
 
 provider "aws" {
@@ -19,17 +13,73 @@ provider "aws" {
   }
 }
 
+variable "reddit_api_secret" {
+  type      = string
+  sensitive = true
+}
+
 
 resource "aws_route53_zone" "mma" {
-  name = "moringmark.grzegorzkoperwas.site"
+  name = local.root_domain
+}
+
+resource "aws_acm_certificate" "mma-cert" {
+  domain_name               = local.root_domain
+  subject_alternative_names = [local.image_domain]
+  validation_method         = "DNS"
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "cert" {
+  for_each = {
+    for dvo in aws_acm_certificate.mma-cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = aws_route53_zone.mma.zone_id
+}
+
+data "aws_cloudfront_cache_policy" "caching_optimized" {
+  name = "Managed-CachingOptimized"
+}
+
+resource "aws_cloudfront_cache_policy" "one_hour_cache" {
+  name        = "one-hour-cache-policy"
+  default_ttl = 60 * 30
+  max_ttl     = 60 * 60
+  min_ttl     = 60 * 15
+  parameters_in_cache_key_and_forwarded_to_origin {
+    enable_accept_encoding_gzip   = true
+    enable_accept_encoding_brotli = true
+    cookies_config {
+      cookie_behavior = "none"
+    }
+    headers_config {
+      header_behavior = "none"
+    }
+    query_strings_config {
+      query_string_behavior = "none"
+    }
+  }
 }
 
 module "mma_images" {
-  source                   = "./bucket"
+  bucket_caching_policy_id = data.aws_cloudfront_cache_policy.caching_optimized.id
+  bucket_certificate_arn   = aws_acm_certificate.mma-cert.arn
   bucket_domain            = local.image_domain
   bucket_name              = "mma-images"
-  bucket_caching_policy_id = local.caching_optimized
   route_53_zone_id         = aws_route53_zone.mma.id
+  source                   = "./bucket"
 }
 
 module "random_lambda" {
@@ -42,11 +92,12 @@ module "random_lambda" {
 }
 
 module "mma_webroot" {
-  source                   = "./bucket"
-  bucket_domain            = "moringmark.grzegorzkoperwas.site"
+  bucket_caching_policy_id = aws_cloudfront_cache_policy.one_hour_cache.id
+  bucket_certificate_arn   = aws_acm_certificate.mma-cert.arn
+  bucket_domain            = local.root_domain
   bucket_name              = "mma-web"
-  bucket_caching_policy_id = local.one_hour_cache_id
   route_53_zone_id         = aws_route53_zone.mma.id
+  source                   = "./bucket"
   random_function_domain = trimprefix(
     trimsuffix(
       module.random_lambda.url,
