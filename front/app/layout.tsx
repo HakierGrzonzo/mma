@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 import { Metadata } from "next";
 import { siteConfig } from "@/config/site";
 import Link from "next/link";
+import UpdatedAtTimestamp from "@/components/UpdatedAtTimestamp";
 
 export const metadata: Metadata = {
   title: {
@@ -21,13 +22,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const formatter = new Intl.DateTimeFormat("en-UK", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  const now = new Date();
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -63,7 +58,7 @@ export default function RootLayout({
           </div>
           <div className="flex">
             <Link href="https://github.com/HakierGrzonzo/mma">Source Code</Link>
-            <p>Updated on {formatter.format(new Date())}</p>
+            <UpdatedAtTimestamp now={now} />
           </div>
         </footer>
       </body>
