@@ -56,13 +56,14 @@ export default async function ComicPage({
   const comicName = decodeURIComponent(comic_name);
   const metadata = await getSpecificMetadata(comicName);
   const pageUrl = `${PAGE_URL}/comic/${comic_name}`;
-  const lastSubmissionId = encodeURIComponent(
-    metadata.series.comics.at(-1)?.title ?? "",
-  );
 
   const isOneshot = metadata.series.comics.length === 1;
 
   const comicsInOrder = [...metadata.series.comics].reverse();
+
+  const lastSubmissionId = encodeURIComponent(
+    comicsInOrder.at(-1)?.title ?? "",
+  );
 
   return (
     <>
