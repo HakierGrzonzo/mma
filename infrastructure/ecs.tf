@@ -1,11 +1,29 @@
-resource "aws_ecr_repository" "mma-scraper" {
-  name                 = "scraper"
+resource "aws_ecr_repository" "mma" {
+  for_each             = toset(["scraper", "front"])
+  name                 = each.key
   image_tag_mutability = "MUTABLE"
 }
 
-resource "aws_ecr_repository" "mma-front" {
-  name                 = "front"
-  image_tag_mutability = "MUTABLE"
+resource "aws_ecr_lifecycle_policy" "mma" {
+  for_each   = tomap(aws_ecr_repository.mma)
+  repository = each.value.name
+  policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Expire untagged"
+        selection = {
+          tagStatus   = "untagged"
+          countType   = "sinceImagePushed"
+          countUnit   = "days"
+          countNumber = 2
+        }
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
 }
 
 
@@ -29,7 +47,7 @@ resource "aws_ecs_task_definition" "mma-front" {
   memory                   = 3072
   container_definitions = jsonencode([{
     essential = true
-    image     = "${aws_ecr_repository.mma-front.repository_url}:latest"
+    image     = "${aws_ecr_repository.mma["front"].repository_url}:latest"
     name      = "front"
     logConfiguration = {
       logDriver = "awslogs"
@@ -67,7 +85,7 @@ resource "aws_ecs_task_definition" "mma-scraper" {
   memory                   = 3072
   container_definitions = jsonencode([{
     essential = true
-    image     = "${aws_ecr_repository.mma-scraper.repository_url}:latest"
+    image     = "${aws_ecr_repository.mma["scraper"].repository_url}:latest"
     name      = "scraper"
     logConfiguration = {
       logDriver = "awslogs"
