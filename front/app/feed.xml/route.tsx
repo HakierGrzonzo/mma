@@ -22,7 +22,7 @@ export async function GET() {
     description: "An archive of MoringMark The Owl House comics",
     site_url: PAGE_URL,
     pubDate: new Date().toUTCString(),
-    ttl: 6 * 60, // 6 hours
+    ttl: 60, // 1 hour
   });
 
   const rawMetadata = await getAllMetadata();
