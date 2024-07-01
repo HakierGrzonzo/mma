@@ -6,8 +6,21 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/"],
+        allow: "/",
         disallow: "/random",
+      },
+      {
+        userAgent: [
+          "GPTBot",
+          "ChatGPT-User",
+          "Google-Extended",
+          "CCBot",
+          "PerplexityBot",
+          "anthropic-ai",
+          "Claude-Web",
+          "ClaudeBot",
+        ],
+        disallow: "/",
       },
     ],
     sitemap: `${PAGE_URL}/sitemap.xml`,
