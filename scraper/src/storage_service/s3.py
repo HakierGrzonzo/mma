@@ -16,6 +16,12 @@ class S3Storage(BaseService):
         self._bucket = s3.Bucket(bucket_name)
         self._rate_limit = asyncio.Semaphore(15)
 
+    def get_object_content_type_from_key(self, key: str):
+        mime_map = {"webp": "image/webp", "json": "application/json"}
+        file_extension = key.split(".")[-1]
+        logger.warn(f"{key} -> {mime_map.get(file_extension)}")
+        return mime_map.get(file_extension, "binary/octet-stream")
+
     async def object_exists(self, key: str) -> bool:
         try:
             await asyncio.to_thread(
@@ -40,9 +46,13 @@ class S3Storage(BaseService):
 
     async def put_object_bytes(self, key, value):
         io = BytesIO(value)
+        content_type = self.get_object_content_type_from_key(key)
         async with self._rate_limit:
             await asyncio.to_thread(
-                self._bucket.upload_fileobj, io, key, ExtraArgs={"ACL": "public-read"}
+                self._bucket.upload_fileobj,
+                io,
+                key,
+                ExtraArgs={"ACL": "public-read", "ContentType": content_type},
             )
 
     async def put_object(self, key, value):
