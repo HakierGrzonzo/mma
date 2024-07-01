@@ -21,7 +21,7 @@ export async function GET() {
     feed_url: `${PAGE_URL}/feed.xml`,
     description: "An archive of MoringMark The Owl House comics",
     site_url: PAGE_URL,
-    pubDate: new Date().toUTCString(),
+    pubDate: new Date().toISOString(),
     ttl: 60, // 1 hour
   });
 

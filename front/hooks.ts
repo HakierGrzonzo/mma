@@ -16,7 +16,7 @@ const filterFunctions: Record<
 
 export type Filters = keyof typeof filterFunctions;
 
-export function useComicMetadata(
+export function sortComicMetadata(
   rawMetadatas: Metadata[],
   sortMethod: Filters,
 ) {

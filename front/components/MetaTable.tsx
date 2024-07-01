@@ -3,7 +3,7 @@ import classes from "./metatable.module.css";
 import { useEffect, useState } from "react";
 import { Metadata } from "../utils";
 import Link from "next/link";
-import { Filters, useComicMetadata } from "@/hooks";
+import { Filters, sortComicMetadata } from "@/hooks";
 
 interface Props {
   metadatas: Metadata[];
@@ -28,7 +28,7 @@ export function MetaTable({ metadatas }: Props) {
     year: "numeric",
   });
 
-  const sortedData = useComicMetadata(metadatas, filter);
+  const sortedData = sortComicMetadata(metadatas, filter);
 
   return (
     <table className={classes.table}>
