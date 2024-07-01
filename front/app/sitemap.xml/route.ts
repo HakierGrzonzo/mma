@@ -32,7 +32,7 @@ function getDateInUtc(timestamp: Date | string | undefined) {
     return new Date().toISOString();
   }
   if (typeof timestamp === "string") {
-    return timestamp;
+    return new Date(timestamp).toISOString();
   }
   return timestamp.toISOString();
 }
