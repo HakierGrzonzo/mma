@@ -30,6 +30,7 @@ resource "aws_s3_bucket_acl" "acl" {
 
   acl = "public-read"
 }
+
 resource "aws_s3_bucket_website_configuration" "website_config" {
   bucket = aws_s3_bucket.bucket.id
 
@@ -89,6 +90,21 @@ resource "aws_cloudfront_distribution" "distribuition" {
     }
   }
 
+  dynamic "ordered_cache_behavior" {
+    for_each = var.cloudfront_cache_behaviors
+    iterator = behaviour
+    content {
+      cached_methods             = ["GET", "HEAD"]
+      allowed_methods            = ["GET", "HEAD"]
+      cache_policy_id            = behaviour.value.policy_id
+      target_origin_id           = var.bucket_name
+      path_pattern               = behaviour.value.path
+      viewer_protocol_policy     = "redirect-to-https"
+      compress                   = true
+      response_headers_policy_id = behaviour.value.response_headers_policy_id
+    }
+  }
+
   custom_error_response {
     error_caching_min_ttl = 0
     error_code            = 404
@@ -102,12 +118,13 @@ resource "aws_cloudfront_distribution" "distribuition" {
   aliases = [var.bucket_domain]
 
   default_cache_behavior {
-    cached_methods         = ["GET", "HEAD"]
-    compress               = true
-    viewer_protocol_policy = "redirect-to-https"
-    cache_policy_id        = var.bucket_caching_policy_id
-    allowed_methods        = ["GET", "HEAD"]
-    target_origin_id       = var.bucket_name
+    cached_methods             = ["GET", "HEAD"]
+    compress                   = true
+    viewer_protocol_policy     = "redirect-to-https"
+    cache_policy_id            = var.bucket_caching_policy_id
+    allowed_methods            = ["GET", "HEAD"]
+    target_origin_id           = var.bucket_name
+    response_headers_policy_id = var.default_response_header_policy_id
   }
 
   restrictions {

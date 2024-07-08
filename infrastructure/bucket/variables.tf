@@ -22,3 +22,16 @@ variable "random_function_domain" {
   nullable = true
   default  = null
 }
+
+variable "cloudfront_cache_behaviors" {
+  type = list(object({
+    path                       = string
+    policy_id                  = string
+    response_headers_policy_id = string
+  }))
+  default = []
+}
+
+variable "default_response_header_policy_id" {
+  type = string
+}

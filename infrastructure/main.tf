@@ -73,13 +73,28 @@ resource "aws_cloudfront_cache_policy" "one_hour_cache" {
   }
 }
 
+resource "aws_cloudfront_response_headers_policy" "mma" {
+  for_each = tomap({
+    optimized = data.aws_cloudfront_cache_policy.caching_optimized
+    onehour   = aws_cloudfront_cache_policy.one_hour_cache
+  })
+  name = "mma-cache-${each.value.name}"
+  custom_headers_config {
+    items {
+      header   = "Cache-Control"
+      value    = "max-age=${each.value.max_ttl}, public"
+      override = false
+    }
+  }
+}
 module "mma_images" {
-  bucket_caching_policy_id = data.aws_cloudfront_cache_policy.caching_optimized.id
-  bucket_certificate_arn   = aws_acm_certificate.mma-cert.arn
-  bucket_domain            = local.image_domain
-  bucket_name              = "mma-images"
-  route_53_zone_id         = aws_route53_zone.mma.id
-  source                   = "./bucket"
+  bucket_caching_policy_id          = data.aws_cloudfront_cache_policy.caching_optimized.id
+  bucket_certificate_arn            = aws_acm_certificate.mma-cert.arn
+  bucket_domain                     = local.image_domain
+  bucket_name                       = "mma-images"
+  route_53_zone_id                  = aws_route53_zone.mma.id
+  default_response_header_policy_id = aws_cloudfront_response_headers_policy.mma["optimized"].id
+  source                            = "./bucket"
 }
 
 module "random_lambda" {
@@ -91,13 +106,15 @@ module "random_lambda" {
   }
 }
 
+
 module "mma_webroot" {
-  bucket_caching_policy_id = aws_cloudfront_cache_policy.one_hour_cache.id
-  bucket_certificate_arn   = aws_acm_certificate.mma-cert.arn
-  bucket_domain            = local.root_domain
-  bucket_name              = "mma-web"
-  route_53_zone_id         = aws_route53_zone.mma.id
-  source                   = "./bucket"
+  bucket_caching_policy_id          = aws_cloudfront_cache_policy.one_hour_cache.id
+  bucket_certificate_arn            = aws_acm_certificate.mma-cert.arn
+  bucket_domain                     = local.root_domain
+  bucket_name                       = "mma-web"
+  route_53_zone_id                  = aws_route53_zone.mma.id
+  source                            = "./bucket"
+  default_response_header_policy_id = aws_cloudfront_response_headers_policy.mma["onehour"].id
   random_function_domain = trimprefix(
     trimsuffix(
       module.random_lambda.url,
@@ -105,5 +122,10 @@ module "mma_webroot" {
     ),
     "https://"
   )
+  cloudfront_cache_behaviors = [{
+    path                       = "/_next/*"
+    policy_id                  = data.aws_cloudfront_cache_policy.caching_optimized.id
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.mma["optimized"].id
+  }]
 }
 
