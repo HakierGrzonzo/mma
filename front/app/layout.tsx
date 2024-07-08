@@ -24,7 +24,7 @@ export default function RootLayout({
 }) {
   const now = new Date();
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
         <link
           rel="apple-touch-icon"

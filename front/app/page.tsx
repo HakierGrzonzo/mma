@@ -4,6 +4,7 @@ import { MetaTable } from "@/components/MetaTable";
 import { getAllMetadata } from "@/utils";
 import { Metadata } from "next";
 import Link from "next/link";
+import { PAGE_URL } from "@/constants";
 
 export const metadata: Metadata = {
   title: "MoringMark Archive",
@@ -12,6 +13,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: `MoringMark Archive`,
     description: `An archive of all MoringMark comics about The Owl House, well most of them`,
+  },
+  alternates: {
+    canonical: `${PAGE_URL}`,
+    types: {
+      "application/rss+xml": [
+        { url: `${PAGE_URL}/feed.xml`, title: "MoringMark Archive RSS" },
+      ],
+    },
   },
 };
 

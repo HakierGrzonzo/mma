@@ -44,6 +44,9 @@ export async function generateMetadata({
       releaseDate: metadata.series.comics.at(-1)?.uploaded_at,
       modifiedTime: metadata.series.comics.at(0)?.uploaded_at,
     },
+    alternates: {
+      canonical: `${PAGE_URL}/comic/${metadata.series.id}`,
+    },
   };
 }
 
