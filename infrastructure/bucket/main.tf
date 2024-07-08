@@ -42,6 +42,10 @@ resource "aws_s3_bucket_website_configuration" "website_config" {
   }
 }
 
+data "aws_cloudfront_cache_policy" "caching_disabled" {
+  name = "Managed-CachingDisabled"
+}
+
 resource "aws_cloudfront_distribution" "distribuition" {
   origin {
     domain_name = aws_s3_bucket_website_configuration.website_config.website_endpoint
@@ -76,7 +80,7 @@ resource "aws_cloudfront_distribution" "distribuition" {
     iterator = domain
     content {
       cached_methods         = ["GET", "HEAD"]
-      cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
+      cache_policy_id        = data.aws_cloudfront_cache_policy.caching_disabled.id
       allowed_methods        = ["GET", "HEAD"]
       target_origin_id       = "random-function"
       path_pattern           = "/random"
