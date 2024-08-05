@@ -17,6 +17,7 @@ series: List[Tuple[str, List[str]]] = [
     ("The Hexsquad", []),
     ("Enna", []),
     ("Fight Coven", []),
+    ("Boscha", []),
 ]
 
 _series_name_to_extractor = {
