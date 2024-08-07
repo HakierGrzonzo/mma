@@ -9,15 +9,16 @@ from .extractors import (
 )
 
 series: List[Tuple[str, List[str]]] = [
-    ("Grom Factor", []),
     ("A Little Hint of Blue", []),
+    ("Boscha", []),
+    ("Enna", []),
+    ("Fight Coven", []),
+    ("Grom Factor", []),
+    ("Grom", []),
     ("Mama Eda", ["yd5jpn"]),
     ("Milan", []),
     ("Pandora", []),
     ("The Hexsquad", []),
-    ("Enna", []),
-    ("Fight Coven", []),
-    ("Boscha", []),
 ]
 
 _series_name_to_extractor = {
