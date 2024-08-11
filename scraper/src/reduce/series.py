@@ -19,6 +19,7 @@ series: List[Tuple[str, List[str]]] = [
     ("Milan", []),
     ("Pandora", []),
     ("The Hexsquad", []),
+    ("King", ["uwdd5c", "1cmcl6t"]),  # To be replaced with grammar
 ]
 
 _series_name_to_extractor = {
