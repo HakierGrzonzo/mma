@@ -10,7 +10,7 @@ from .extractors import (
 
 series: List[Tuple[str, List[str]]] = [
     ("A Little Hint of Blue", []),
-    ("Boscha", []),
+    ("Boscha", ["uq6q4m"]),
     ("Enna", []),
     ("Fight Coven", []),
     ("Grom Factor", []),
@@ -20,6 +20,7 @@ series: List[Tuple[str, List[str]]] = [
     ("Pandora", []),
     ("The Hexsquad", []),
     ("King", ["uwdd5c", "1cmcl6t"]),  # To be replaced with grammar
+    ("Hero Complex", []),
 ]
 
 _series_name_to_extractor = {
