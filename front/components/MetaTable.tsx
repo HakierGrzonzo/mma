@@ -3,7 +3,7 @@ import classes from "./metatable.module.css";
 import { useEffect, useState } from "react";
 import { Metadata } from "../utils";
 import Link from "next/link";
-import { Filters, sortComicMetadata } from "@/hooks";
+import { Direction, Filters, sortComicMetadata } from "@/hooks";
 
 interface Props {
   metadatas: Metadata[];
@@ -11,6 +11,7 @@ interface Props {
 
 export function MetaTable({ metadatas }: Props) {
   const [filter, setFilter] = useState<Filters>("upload");
+  const [direction, setDirection] = useState<Direction>("asc");
   const [lastVisitedDate, setLastVisitedDate] = useState<null | Date>(null);
   useEffect(() => {
     const lastDate = localStorage.getItem("last-visited-date");
@@ -28,7 +29,17 @@ export function MetaTable({ metadatas }: Props) {
     year: "numeric",
   });
 
-  const sortedData = sortComicMetadata(metadatas, filter);
+  const sortedData = sortComicMetadata(metadatas, filter, direction);
+
+  const handleFilterClick = (newFilter: Filters) => () => {
+    if (newFilter === filter) {
+      const newDirection = direction === "asc" ? "dsc" : "asc";
+      setDirection(newDirection);
+      return;
+    }
+    setFilter(newFilter);
+    setDirection("asc");
+  };
 
   return (
     <table className={classes.table}>
@@ -38,7 +49,7 @@ export function MetaTable({ metadatas }: Props) {
             className={`${classes.first} ${
               filter === "name" && classes.active
             }`}
-            onClick={() => setFilter("name")}
+            onClick={handleFilterClick("name")}
           >
             Comic title
           </th>
@@ -46,7 +57,7 @@ export function MetaTable({ metadatas }: Props) {
             className={`${classes.center} ${
               filter === "upload" && classes.active
             }`}
-            onClick={() => setFilter("upload")}
+            onClick={handleFilterClick("upload")}
           >
             Upload date
           </th>
@@ -54,7 +65,7 @@ export function MetaTable({ metadatas }: Props) {
             className={`${classes.last} ${
               filter === "upvote" && classes.active
             }`}
-            onClick={() => setFilter("upvote")}
+            onClick={handleFilterClick("upvote")}
           >
             Total upvotes
           </th>

@@ -12,13 +12,15 @@ const filterFunctions: Record<
   name: (a, b) => a.series.title.localeCompare(b.series.title),
   upvote: (a, b) => b.upvotes_total - a.upvotes_total,
   upload: (a, b) => b.latest_episode.valueOf() - a.latest_episode.valueOf(),
-};
+} as const;
 
 export type Filters = keyof typeof filterFunctions;
+export type Direction = "asc" | "dsc";
 
 export function sortComicMetadata(
   rawMetadatas: Metadata[],
   sortMethod: Filters,
+  sortDirection: Direction = "asc",
 ) {
   const data = rawMetadatas.map((item) => {
     return {
@@ -31,6 +33,12 @@ export function sortComicMetadata(
     } as DeserializedMetadata;
   });
 
-  const sortedData = data.sort(filterFunctions[sortMethod]);
+  const filter = filterFunctions[sortMethod];
+  const directedFilter =
+    sortDirection === "asc"
+      ? filter
+      : (a: DeserializedMetadata, b: DeserializedMetadata) => filter(b, a);
+
+  const sortedData = data.sort(directedFilter);
   return sortedData;
 }
