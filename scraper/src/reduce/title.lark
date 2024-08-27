@@ -1,0 +1,14 @@
+start : multiple_words " "* series_marker " "* multiple_words?
+
+?series_marker: hash_marker | out_of_marker | a_little_hint_of_blue_marker
+
+hash_marker: "#" INT
+out_of_marker: "(" NUMBER "/" /[^\)]/ ")"
+a_little_hint_of_blue_marker: "-" " "* "chapter"i " "* INT " "* "part"i " "* INT
+
+multiple_words : word (" "+ word)*
+word: /\S/+
+
+%import common.INT
+%import common.NUMBER
+%import common.WS

@@ -9,6 +9,7 @@ Made cause I wanted to read all the parts of [Grom Factor](https://moringmark.gr
 ## Features:
 
 - Individual comics are merged into series
+    - series recognition based on a custom grammar!
 - A sortable list of comics
 - OCR in alt text
 - Automatic update via scheduled jobs
