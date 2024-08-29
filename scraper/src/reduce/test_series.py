@@ -41,3 +41,7 @@ class SeriesRecognitionTestCase(unittest.TestCase):
     def test_handles_mama_eda_but_not_the_unrelated_one(self):
         result = get_possible_series(ComicLike("Mama Eda", "yd5jpn"))
         self.assertIsNone(result)
+
+    def test_handles_missing_the_in_hexsquad(self):
+        title, _ = get_possible_series(ComicLike("Hexsquad #2137", "yd5jpn"))
+        self.assertEqual(title, "The Hexsquad")

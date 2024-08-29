@@ -42,6 +42,9 @@ def get_possible_series(comic: Comic) -> tuple[str, str] | None:
     try:
         parsed = parser.parse(comic.title.strip())
         series_title, comic_part = transformer.transform(parsed)
+        if series_title == "Hexsquad":
+            # MM forgot the `the`?
+            return "The Hexsquad", comic_part
         return series_title, comic_part
     except ParseError:
         return None
