@@ -1,4 +1,4 @@
-import { Metadata } from "../utils";
+import { Metadata } from "../types";
 
 const RANDOM_HOST =
   process.env.NODE_ENV === "production" ? "" : "http://localhost:8080";

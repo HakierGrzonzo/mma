@@ -1,33 +1,7 @@
 import { readFile } from "fs/promises";
 import { PAGE_URL, bucket_name } from "./constants";
+import { Metadata, Image, Comic } from "./types";
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
-
-export interface Comic {
-  title: string;
-  image_urls: string[];
-  link: string;
-  uploaded_at: string;
-  upvotes: number;
-}
-
-export interface Image {
-  ocr: string;
-  height: number;
-  width: number;
-  file_path: string;
-}
-
-export interface Series {
-  title: string;
-  // AKA the name of the folder containing the series
-  id: string;
-  comics: Comic[];
-}
-
-export interface Metadata {
-  series: Series;
-  images: Record<string, Image>;
-}
 
 const s3Client = new S3Client({});
 

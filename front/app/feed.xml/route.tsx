@@ -1,5 +1,6 @@
 import { PAGE_URL } from "@/constants";
-import { Comic, getAllMetadata, getSubmissionLinks, Metadata } from "@/utils";
+import { getAllMetadata, getSubmissionLinks } from "@/utils";
+import { Metadata, Comic } from "@/types";
 import RSS from "rss";
 import { RSSdescription } from "@/components/RSSdescription";
 

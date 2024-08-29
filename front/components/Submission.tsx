@@ -1,5 +1,6 @@
 import classes from "./Submission.module.css";
-import { Comic, Metadata, getImageUrl, getSubmissionLinks } from "../utils";
+import { getImageUrl, getSubmissionLinks } from "../utils";
+import { Comic, Metadata } from "../types";
 import Image from "next/image";
 import { CopyToClipboard } from "./CopyToClipboard";
 import Link from "next/link";

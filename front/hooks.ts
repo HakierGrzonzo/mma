@@ -1,4 +1,4 @@
-import { Metadata } from "./utils";
+import { Metadata } from "./types";
 
 type DeserializedMetadata = Omit<Metadata, "latest_episode"> & {
   latest_episode: Date;

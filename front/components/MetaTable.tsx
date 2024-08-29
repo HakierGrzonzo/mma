@@ -1,7 +1,8 @@
 "use client";
 import classes from "./metatable.module.css";
 import { useEffect, useState } from "react";
-import { Metadata } from "../utils";
+import { Metadata } from "../types";
+import { getSeriesTitle } from "../clientUtils";
 import Link from "next/link";
 import { Direction, Filters, sortComicMetadata } from "@/hooks";
 
@@ -85,7 +86,7 @@ export function MetaTable({ metadatas }: Props) {
                 prefetch={index < 6}
                 href={`/comic/${encodeURIComponent(item.series.id)}`}
               >
-                {item.series.title}
+                {getSeriesTitle(item.series)}
               </Link>
             </td>
             <td>{formatter.format(item.latest_episode)}</td>

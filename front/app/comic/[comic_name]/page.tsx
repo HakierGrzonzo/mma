@@ -3,6 +3,7 @@ import { RandomComicButton } from "@/components/RandomComicButton";
 import { Submission } from "@/components/Submission";
 import { PAGE_URL } from "@/constants";
 import { getAllMetadata, getImageUrl, getSpecificMetadata } from "@/utils";
+import { getSeriesTitle } from "@/clientUtils";
 import { Metadata } from "next";
 import Link from "next/link";
 import { env } from "process";
@@ -30,17 +31,18 @@ export async function generateMetadata({
   const { comic_name } = params;
   const comicName = decodeURIComponent(comic_name);
   const metadata = await getSpecificMetadata(comicName);
+  const seriesTitle = getSeriesTitle(metadata.series);
   return {
-    title: `${metadata.series.title} - MoringMark Archive`,
+    title: `${seriesTitle} - MoringMark Archive`,
     metadataBase: new URL(PAGE_URL),
-    description: `${metadata.series.title} Comic by u/makmark`,
+    description: `${seriesTitle} Comic by u/makmark`,
     openGraph: {
-      title: `${metadata.series.title} - MoringMark Archive`,
+      title: `${seriesTitle} - MoringMark Archive`,
       images: metadata.series.comics.flatMap((sub) => {
         const images = sub.image_urls.map((url) => metadata.images[url]);
         return images.map(getImageUrl);
       }),
-      description: `${metadata.series.title} Comic by u/makmark`,
+      description: `${seriesTitle} Comic by u/makmark`,
       releaseDate: metadata.series.comics.at(-1)?.uploaded_at,
       modifiedTime: metadata.series.comics.at(0)?.uploaded_at,
     },
@@ -76,7 +78,7 @@ export default async function ComicPage({
       </div>
       <section>
         <div className={classes.metadatabox}>
-          <h1 className="">{metadata.series.title}</h1>
+          <h1>{getSeriesTitle(metadata.series)}</h1>
           <div className={classes.subtitleElements}>
             <p>
               Author:{" "}

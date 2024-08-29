@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
-import { Comic, getImageUrl, Metadata } from "@/utils";
+import { Comic, Metadata } from "@/types";
+import { getImageUrl } from "@/utils";
 
 export function RSSdescription({
   comic,
