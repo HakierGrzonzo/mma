@@ -19,6 +19,12 @@ class ComicSeries:
     def latest_update(self):
         return self.comics[-1].uploaded_at
 
+    @classmethod
+    def from_dict(cls, value: dict):
+        comics = value["comics"]
+        comics = [ComicWithPrefix(**v) for v in comics]
+        return cls(title=value["title"], id=value["id"], comics=comics)
+
 
 def reduce_submissions_to_series(comics: Generator[Comic, None, None]):
     series_titles = {}

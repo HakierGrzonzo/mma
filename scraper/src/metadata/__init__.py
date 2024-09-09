@@ -35,6 +35,7 @@ class Image:
 @dataclass
 class Metadata:
     series: ComicSeries
+    tags: List[int] = field(default_factory=lambda: list())
     images: DefaultDict[str, Image] | Dict[str, Image] = field(
         default_factory=lambda: defaultdict(lambda: Image())
     )
@@ -51,6 +52,11 @@ class Metadata:
 
     def get_metadata_path(self):
         return path.join(self.get_filepath_prefix(), "metadata.json")
+
+    @classmethod
+    def from_dict(cls, value: dict):
+        series = ComicSeries.from_dict(value["series"])
+        return cls(tags=value["tags"], series=series, images={})
 
     @classmethod
     async def from_series(cls, series: ComicSeries):
