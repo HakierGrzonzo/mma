@@ -8,17 +8,16 @@ from src.tagger.series_session import SeriesSession
 
 from .tag_sheet import TagSheet
 
-from ..metadata import Metadata
+from ..metadata import Metadata, save_index_metadata
 from ..storage_service import storage
 
 
-async def get_metas_without_tags():
-    all_series = await storage.get_object("./index.json")
+async def get_metas():
+    all_series = await storage.get_object("index.json")
     all_series = json.loads(all_series)
     all_series = [Metadata.from_dict(v) for v in all_series.values()]
-    series_without_tags = filter(lambda item: len(item.tags) == 0, all_series)
     sorted_series = sorted(
-        series_without_tags, key=lambda item: item.series.latest_update(), reverse=True
+        all_series, key=lambda item: item.series.latest_update(), reverse=True
     )
     return sorted_series
 
@@ -26,7 +25,7 @@ async def get_metas_without_tags():
 class TaggingSession:
     def __init__(self, tag_sheet: TagSheet, metas: List[Metadata]) -> None:
         self.tag_sheet = tag_sheet
-        self.metas_to_tag = iter(metas)
+        self.metas_to_tag = metas
         self.session = PromptSession()
         self.background_tasks: list[asyncio.Task] = []
 
@@ -37,13 +36,20 @@ class TaggingSession:
     @classmethod
     async def start(cls):
         metas, tag_sheet = await asyncio.gather(
-            get_metas_without_tags(), TagSheet.from_file_system()
+            get_metas(), TagSheet.from_file_system()
         )
         return cls(tag_sheet, metas)
 
     async def tagging_loop(self):
-        for meta in self.metas_to_tag:
-            series_session = SeriesSession(meta, self)
-            with patch_stdout.patch_stdout():
-                await series_session.tag_series()
+        try:
+            with patch_stdout.patch_stdout(True):
+                for i, meta in enumerate(self.metas_to_tag):
+                    print(f"({i+1}/{len(self.metas_to_tag)})")
+                    if len(meta.tags) > 0:
+                        continue
+                    series_session = SeriesSession(meta, self)
+                    await series_session.tag_series()
+                    self.run_in_background(save_index_metadata(self.metas_to_tag))
+        except EOFError:
+            pass
         await asyncio.gather(*self.background_tasks)

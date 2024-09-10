@@ -37,7 +37,10 @@ class S3Storage(BaseService):
     async def get_object_bytes(self, key):
         io = BytesIO()
         async with self._rate_limit:
-            await asyncio.to_thread(self._bucket.download_fileobj, key, io)
+            try:
+                await asyncio.to_thread(self._bucket.download_fileobj, key, io)
+            except botocore.exceptions.ClientError:
+                raise FileNotFoundError(key)
         io.seek(0)
         return io.read()
 

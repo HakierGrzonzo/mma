@@ -680,6 +680,21 @@ files = [
 ]
 
 [[package]]
+name = "term-image"
+version = "0.7.2"
+description = "Display images in the terminal"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "term_image-0.7.2-py3-none-any.whl", hash = "sha256:97d9dba5afcf3989a23b1868adc5b2de3126d1ef915df2a7859f67fbdd613e15"},
+    {file = "term_image-0.7.2.tar.gz", hash = "sha256:07320573baa667dcde145d55e94769cbaafeea43b61245245153ff5075b55ffb"},
+]
+
+[package.dependencies]
+pillow = ">=9.1,<11"
+requests = ">=2.23,<3"
+
+[[package]]
 name = "typing-extensions"
 version = "4.8.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -756,4 +771,4 @@ test = ["websockets"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "7e06b8efa694fcc951286a84305b751c4f666c93a4c3c33c2235d4ddd3e7422a"
+content-hash = "28270237f7741e6d7f5e1192e1005e2c5531041a4c09c032b713b76b6852297b"

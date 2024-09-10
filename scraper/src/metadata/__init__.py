@@ -56,7 +56,8 @@ class Metadata:
     @classmethod
     def from_dict(cls, value: dict):
         series = ComicSeries.from_dict(value["series"])
-        return cls(tags=value["tags"], series=series, images={})
+        images = {k: Image(**v) for k, v in value["images"].items()}
+        return cls(tags=value.get("tags", []), series=series, images=images)
 
     @classmethod
     async def from_series(cls, series: ComicSeries):
@@ -65,8 +66,10 @@ class Metadata:
         if await storage.object_exists(meta_path):
             meta = await storage.get_object(meta_path)
             try:
-                for k, v in json.loads(meta)["images"].items():
+                meta_json = json.loads(meta)
+                for k, v in meta_json["images"].items():
                     instance.images[k] = Image(**v)
+                instance.tags = meta_json["tags"]
             except json.JSONDecodeError:
                 logger.warn(f"Broken metadata in {meta_path}")
 

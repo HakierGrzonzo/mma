@@ -51,7 +51,7 @@ class TagSheet:
     @classmethod
     async def from_file_system(cls) -> Self:
         try:
-            raw_sheet = await storage.get_object("./tags.json")
+            raw_sheet = await storage.get_object("tags.json")
         except FileNotFoundError:
             logger.warn("No tag sheet found, going with empty tag sheet")
             return cls([])
@@ -60,8 +60,8 @@ class TagSheet:
         return cls(tags)
 
     async def save(self):
-        serialized = json.dumps([asdict(t) for t in self._tags])
-        await storage.put_object("./tags.json", serialized)
+        serialized = json.dumps([asdict(t) for t in self._tags], indent=4)
+        await storage.put_object("tags.json", serialized)
 
     def create(self, name: str) -> Tag:
         all_tag_names = self._tags_for_name.keys()
