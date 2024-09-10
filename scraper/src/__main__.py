@@ -8,7 +8,7 @@ from .trigger_frontend_regen import trigger_frontend_regen
 
 
 if "tag" in argv:
-    asyncio.run(tagger.tag_loop())
+    asyncio.run(tagger.main())
 elif "migrate" in argv:
     asyncio.run(run_migrations())
 else:
