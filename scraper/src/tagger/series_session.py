@@ -1,3 +1,4 @@
+import asyncio
 from io import BytesIO
 from logging import getLogger
 from typing import TYPE_CHECKING
@@ -22,23 +23,27 @@ class SeriesSession:
         self.subject = meta
         self.parent = tagging_session
         self.image_cursor = 0
+        image_ids = sum(
+            [c.image_urls for c in reversed(self.subject.series.comics)], start=[]
+        )
+        images = [self.subject.images[id] for id in image_ids]
+        self.images = [
+            asyncio.create_task(storage.get_object_bytes(m.file_path)) for m in images
+        ]
 
     async def _draw_image(self):
-        image_ids = sum([c.image_urls for c in self.subject.series.comics], start=[])
-        if len(image_ids) <= self.image_cursor:
+        if len(self.images) <= self.image_cursor:
             self.image_cursor -= 1
         elif self.image_cursor < 0:
             self.image_cursor = 0
-        image_id_to_draw = image_ids[self.image_cursor]
-        image_metadata = self.subject.images[image_id_to_draw]
-        if image_metadata is None:
-            return
-        image_bytes = await storage.get_object_bytes(image_metadata.file_path)
-        io = BytesIO(image_bytes)
+        image_bytes = self.images[self.image_cursor]
+        if not image_bytes.done():
+            await image_bytes
+        io = BytesIO(image_bytes.result())
         img = Image.open(io)
         auto_image = AutoImage(img, height=30)
         auto_image.draw(h_align="left", v_align="bottom", pad_height=10)
-        print(f"({self.image_cursor + 1}/{len(image_ids)})")
+        print(f"({self.image_cursor + 1}/{len(self.images)})")
 
     def _print_separator(self):
         separator = "=" * 20

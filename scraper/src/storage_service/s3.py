@@ -1,11 +1,8 @@
 import asyncio
 from io import BytesIO
-from logging import getLogger
 from .base import BaseService
 import boto3
 import botocore
-
-logger = getLogger(__name__)
 
 
 class S3Storage(BaseService):
@@ -19,7 +16,6 @@ class S3Storage(BaseService):
     def get_object_content_type_from_key(self, key: str):
         mime_map = {"webp": "image/webp", "json": "application/json"}
         file_extension = key.split(".")[-1]
-        logger.warn(f"{key} -> {mime_map.get(file_extension)}")
         return mime_map.get(file_extension, "binary/octet-stream")
 
     async def object_exists(self, key: str) -> bool:
