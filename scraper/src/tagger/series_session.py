@@ -8,6 +8,7 @@ from prompt_toolkit.completion import NestedCompleter
 from term_image.image import AutoImage
 from PIL import Image
 from ..metadata import Metadata
+from xml.parsers.expat import ExpatError
 from ..storage_service import storage
 
 if TYPE_CHECKING:
@@ -26,10 +27,18 @@ class SeriesSession:
         image_ids = sum(
             [c.image_urls for c in reversed(self.subject.series.comics)], start=[]
         )
-        images = [self.subject.images[id] for id in image_ids]
-        self.images = [
-            asyncio.create_task(storage.get_object_bytes(m.file_path)) for m in images
-        ]
+        self.image_meta = [self.subject.images[id] for id in image_ids]
+        self.images = [asyncio.Future() for _ in self.image_meta]
+        self.parent.run_in_background(self._download_images())
+
+    async def _download_images(self):
+        for i, image in enumerate(self.image_meta):
+            if image.file_path:
+                content = await storage.get_object_bytes(image.file_path)
+            else:
+                content = None
+
+            self.images[i].set_result(content)
 
     async def _draw_image(self):
         if len(self.images) <= self.image_cursor:
@@ -39,7 +48,10 @@ class SeriesSession:
         image_bytes = self.images[self.image_cursor]
         if not image_bytes.done():
             await image_bytes
-        io = BytesIO(image_bytes.result())
+        image_bytes = image_bytes.result()
+        if image_bytes is None:
+            return
+        io = BytesIO(image_bytes)
         img = Image.open(io)
         auto_image = AutoImage(img, height=30)
         auto_image.draw(h_align="left", v_align="bottom", pad_height=10)
@@ -58,7 +70,10 @@ class SeriesSession:
 <b>Title:</b>\t<i>{self.subject.series.title}</i>
 <b>Tags:</b>\t<i>{", ".join(human_readable_tags)}</i>
         """
-        print_formatted_text(HTML(text))
+        try:
+            print_formatted_text(HTML(text))
+        except ExpatError:
+            print_formatted_text(text)
 
     async def prompt_user(self):
         completer = NestedCompleter.from_nested_dict(

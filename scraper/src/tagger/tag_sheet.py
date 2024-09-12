@@ -4,7 +4,12 @@ import json
 from logging import getLogger
 from typing import Iterable, Self
 
-from prompt_toolkit.completion import CompleteEvent, Completer, Completion
+from prompt_toolkit.completion import (
+    CompleteEvent,
+    Completer,
+    Completion,
+    FuzzyCompleter,
+)
 from prompt_toolkit.document import Document
 
 from ..storage_service import storage
@@ -79,7 +84,7 @@ class TagSheet:
         return self._tags_for_name[name_or_id]
 
     def get_completer(self):
-        return TagCompleter(self._tags)
+        return FuzzyCompleter(TagCompleter(self._tags))
 
     def resolve_ids_to_names(self, ids: Iterable[int]):
         for id in ids:
