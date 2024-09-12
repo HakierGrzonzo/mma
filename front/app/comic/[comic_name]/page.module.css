@@ -38,3 +38,24 @@
 .metadatabox p {
   margin-top: 0;
 }
+
+.tagList {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.tagList div {
+  background-color: var(--purple);
+  padding: 8px;
+  border-radius: 1em;
+  transition: all 100ms ease-in-out;
+}
+
+.tagList div a {
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.tagList div:hover {
+  background-color: var(--pink);
+}

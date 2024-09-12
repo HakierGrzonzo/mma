@@ -7,6 +7,8 @@ import { getSeriesTitle } from "@/clientUtils";
 import { Metadata } from "next";
 import Link from "next/link";
 import { env } from "process";
+import { getTags } from "@/tags";
+import TagLink from "@/components/TagLink";
 
 export async function generateStaticParams() {
   const metadatas = await getAllMetadata();
@@ -70,6 +72,10 @@ export default async function ComicPage({
     comicsInOrder.at(-1)?.title ?? "",
   );
 
+  const { tagsById } = await getTags();
+
+  const comicTags = metadata.tags.map((t) => tagsById[t]);
+
   return (
     <>
       <div className={classes.stickyHeader}>
@@ -87,6 +93,13 @@ export default async function ComicPage({
             {metadata.series.comics.length > 1 ? (
               <a href={`#${lastSubmissionId}`}>Go to last part</a>
             ) : null}
+          </div>
+          <div className={classes.tagList}>
+            {comicTags.map((t) => (
+              <div key={t.id}>
+                <TagLink tag={t} />
+              </div>
+            ))}
           </div>
         </div>
         {comicsInOrder.map((sub, index) => (

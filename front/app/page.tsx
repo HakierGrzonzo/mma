@@ -38,6 +38,9 @@ export default async function Home() {
       </div>
       <section>
         <RSSbutton />
+        <p>
+          Browse all comics or <Link href="/tags">browse by tags.</Link>
+        </p>
         <MetaTable metadatas={metadatas} />
       </section>
     </>

@@ -32,7 +32,7 @@ async function readJsonFileS3<T>(path: string): Promise<T> {
   }
 }
 
-const readJsonFile =
+export const readJsonFile =
   bucket_name === undefined ? readJsonFileLocal : readJsonFileS3;
 
 const ROOT_DIR = "./public/images";
