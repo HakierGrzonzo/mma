@@ -69,7 +69,7 @@ class Metadata:
                 meta_json = json.loads(meta)
                 for k, v in meta_json["images"].items():
                     instance.images[k] = Image(**v)
-                instance.tags = meta_json["tags"]
+                instance.tags = meta_json.get("tags", [])
             except json.JSONDecodeError:
                 logger.warn(f"Broken metadata in {meta_path}")
 
