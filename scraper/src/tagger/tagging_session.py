@@ -1,4 +1,5 @@
 import asyncio
+from itertools import pairwise
 import json
 from typing import List
 
@@ -40,16 +41,27 @@ class TaggingSession:
         )
         return cls(tag_sheet, metas)
 
+    def should_prompt_about_comic(self, meta: Metadata):
+        return len(meta.tags) == 0
+
     async def tagging_loop(self):
-        try:
-            with patch_stdout.patch_stdout(True):
-                for i, meta in enumerate(self.metas_to_tag):
-                    print(f"({i+1}/{len(self.metas_to_tag)})")
-                    if len(meta.tags) > 0:
-                        continue
-                    series_session = SeriesSession(meta, self)
+        with patch_stdout.patch_stdout(True):
+            metas_with_numbers = filter(
+                lambda pair: self.should_prompt_about_comic(pair[1]),
+                enumerate(self.metas_to_tag),
+            )
+            sessions_with_numbers = [
+                (i, SeriesSession(meta, self)) for i, meta in metas_with_numbers
+            ]
+            sessions_with_numbers[0][1].start_downloading_images()
+            for (i, series_session), (_, next_session) in pairwise(
+                sessions_with_numbers
+            ):
+                print(f"({i+1}/{len(self.metas_to_tag)})")
+                next_session.start_downloading_images()
+                try:
                     await series_session.tag_series()
-                    self.run_in_background(save_index_metadata(self.metas_to_tag))
-        except EOFError:
-            pass
+                except EOFError:
+                    break
+                self.run_in_background(save_index_metadata(self.metas_to_tag))
         await asyncio.gather(*self.background_tasks)

@@ -29,6 +29,8 @@ class SeriesSession:
         )
         self.image_meta = [self.subject.images[id] for id in image_ids]
         self.images = [asyncio.Future() for _ in self.image_meta]
+
+    def start_downloading_images(self):
         self.parent.run_in_background(self._download_images())
 
     async def _download_images(self):
@@ -47,7 +49,11 @@ class SeriesSession:
             self.image_cursor = 0
         image_bytes = self.images[self.image_cursor]
         if not image_bytes.done():
-            await image_bytes
+            try:
+                await asyncio.wait_for(asyncio.shield(image_bytes), 5)
+            except TimeoutError:
+                logger.error("Timeout waiting on image")
+                return
         image_bytes = image_bytes.result()
         if image_bytes is None:
             return
@@ -84,6 +90,8 @@ class SeriesSession:
                 "next": None,
                 "previous": None,
                 "list": None,
+                "clear": None,
+                "revert": None,
             }
         )
         while True:
@@ -134,6 +142,12 @@ class SeriesSession:
                     self.image_cursor -= 1
                     await self._draw_image()
                 case "list":
+                    self._print_series_details()
+                case "clear":
+                    self.subject.tags = []
+                    self._print_series_details()
+                case "revert":
+                    self.subject.tags = self.subject.tags[:-1]
                     self._print_series_details()
                 case _:
                     print_formatted_text("unknown command")
