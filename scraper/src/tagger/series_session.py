@@ -111,9 +111,15 @@ class SeriesSession:
         if tag_name is None:
             logger.error("Can't add empty tag")
             return
-        tag = self.parent.tag_sheet.get(tag_name)
-        print_formatted_text(f"Added tag {tag}")
-        self.subject.tags.append(tag.id)
+        if "," in tag_name:
+            tags = [t.strip() for t in tag_name.split(",")]
+            tags = filter(lambda t: len(t) > 0, tags)
+        else:
+            tags = [tag_name.strip()]
+        for tag_name in tags:
+            tag = self.parent.tag_sheet.get(tag_name)
+            print_formatted_text(f"Added tag {tag}")
+            self.subject.tags.append(tag.id)
 
     async def save_subject_with_new_tags(self):
         await self.subject.save()

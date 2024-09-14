@@ -38,10 +38,14 @@ class TagCompleter(Completer):
 
     def get_completions(self, document: Document, complete_event: CompleteEvent):
         prefix = document.text_before_cursor
+        if "," in prefix:
+            prefix = prefix[prefix.rindex(",") + 1 :]
+        prefix = prefix.strip()
         for tag in self.tags:
             if tag.name.startswith(prefix):
                 yield Completion(
-                    text=tag.name,
+                    text=f"{tag.name}, ",
+                    display=tag.name,
                     display_meta=f"id: {tag.id}",
                     start_position=-len(prefix),
                 )
