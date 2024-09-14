@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import { MetaTable } from "@/components/MetaTable";
 import {
   deNormalizeSlash,
@@ -33,10 +34,13 @@ export default async function TagsList({
   const metadataByTag = await getMetadataByTag();
   const metadatas = metadataByTag[tag.id] ?? [];
   return (
-    <section>
-      <h1>{tag.name}</h1>
-      <p>Here put flavor text</p>
-      <MetaTable metadatas={metadatas} />
-    </section>
+    <>
+      <Header />
+      <section>
+        <h1>{tag.name}</h1>
+        <p>Here put flavor text</p>
+        <MetaTable metadatas={metadatas} />
+      </section>
+    </>
   );
 }

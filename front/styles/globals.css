@@ -43,6 +43,7 @@ body {
 section {
   display: flex;
   align-items: center;
+  min-width: 50vw;
   flex-direction: column;
   margin: 3em;
   margin-block: 1em;

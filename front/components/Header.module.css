@@ -1,0 +1,23 @@
+.stickyHeader {
+  position: sticky;
+  top: 0;
+  background-color: var(--purple);
+  display: flex;
+  height: 3em;
+  font-size: 120%;
+  /* Prevents <MetaTable/> from clipping through */
+  z-index: 2;
+}
+
+.stickyHeader a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--foreground);
+  transition: all 200ms ease-in-out;
+  padding: 1em;
+}
+
+.stickyHeader a:hover {
+  background-color: var(--pink);
+}

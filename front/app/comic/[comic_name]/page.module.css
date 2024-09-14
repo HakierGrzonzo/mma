@@ -1,25 +1,3 @@
-.stickyHeader {
-  position: sticky;
-  top: 0;
-  background-color: var(--purple);
-  display: flex;
-  height: 3em;
-  font-size: 120%;
-}
-
-.stickyHeader a {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: var(--foreground);
-  transition: all 200ms ease-in-out;
-  padding: 1em;
-}
-
-.stickyHeader a:hover {
-  background-color: var(--pink);
-}
-
 .subtitleElements {
   display: flex;
   flex-direction: row;
@@ -43,19 +21,4 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-}
-.tagList div {
-  background-color: var(--purple);
-  padding: 8px;
-  border-radius: 1em;
-  transition: all 100ms ease-in-out;
-}
-
-.tagList div a {
-  color: var(--foreground);
-  text-decoration: none;
-}
-
-.tagList div:hover {
-  background-color: var(--pink);
 }
