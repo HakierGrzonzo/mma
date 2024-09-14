@@ -57,7 +57,9 @@ class Metadata:
     def from_dict(cls, value: dict):
         series = ComicSeries.from_dict(value["series"])
         images = {k: Image(**v) for k, v in value["images"].items()}
-        return cls(tags=value.get("tags", []), series=series, images=images)
+        tags = value.get("tags", [])
+        unique_tags = set(tags)
+        return cls(tags=list(unique_tags), series=series, images=images)
 
     @classmethod
     async def from_series(cls, series: ComicSeries):
