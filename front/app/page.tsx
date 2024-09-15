@@ -36,7 +36,7 @@ export default async function Home() {
         </p>
       </CoverImage>
       <section>
-        <p style={{ ["font-size"]: "120%" }}>
+        <p style={{ fontSize: "120%" }}>
           Browse all comics or <Link href="/tags">browse by tags.</Link>
         </p>
         <RSSbutton />
