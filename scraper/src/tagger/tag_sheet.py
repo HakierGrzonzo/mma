@@ -1,10 +1,15 @@
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 import json
 from logging import getLogger
 from typing import Iterable, Self
 
-from prompt_toolkit.completion import CompleteEvent, Completer, Completion
+from prompt_toolkit.completion import (
+    CompleteEvent,
+    Completer,
+    Completion,
+    FuzzyCompleter,
+)
 from prompt_toolkit.document import Document
 
 from ..storage_service import storage
@@ -16,6 +21,7 @@ logger = getLogger(__name__)
 class Tag:
     name: str
     id: int
+    details: str | None = field(default=None)
 
     @classmethod
     def new(cls, name: str):
@@ -33,10 +39,14 @@ class TagCompleter(Completer):
 
     def get_completions(self, document: Document, complete_event: CompleteEvent):
         prefix = document.text_before_cursor
+        if "," in prefix:
+            prefix = prefix[prefix.rindex(",") + 1 :]
+        prefix = prefix.strip()
         for tag in self.tags:
             if tag.name.startswith(prefix):
                 yield Completion(
-                    text=tag.name,
+                    text=f"{tag.name}, ",
+                    display=tag.name,
                     display_meta=f"id: {tag.id}",
                     start_position=-len(prefix),
                 )
@@ -79,8 +89,11 @@ class TagSheet:
         return self._tags_for_name[name_or_id]
 
     def get_completer(self):
-        return TagCompleter(self._tags)
+        return FuzzyCompleter(TagCompleter(self._tags))
 
     def resolve_ids_to_names(self, ids: Iterable[int]):
         for id in ids:
             yield self._tags_for_id[id].name
+
+    def __iter__(self):
+        return iter(self._tags)

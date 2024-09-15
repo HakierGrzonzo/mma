@@ -1,5 +1,4 @@
 import classes from "./page.module.css";
-import { RandomComicButton } from "@/components/RandomComicButton";
 import { Submission } from "@/components/Submission";
 import { PAGE_URL } from "@/constants";
 import { getAllMetadata, getImageUrl, getSpecificMetadata } from "@/utils";
@@ -7,6 +6,9 @@ import { getSeriesTitle } from "@/clientUtils";
 import { Metadata } from "next";
 import Link from "next/link";
 import { env } from "process";
+import { getTags } from "@/tags";
+import TagLink from "@/components/TagLink";
+import Header from "@/components/Header";
 
 export async function generateStaticParams() {
   const metadatas = await getAllMetadata();
@@ -70,12 +72,13 @@ export default async function ComicPage({
     comicsInOrder.at(-1)?.title ?? "",
   );
 
+  const { tagsById } = await getTags();
+
+  const comicTags = metadata.tags.map((t) => tagsById[t]);
+
   return (
     <>
-      <div className={classes.stickyHeader}>
-        <Link href="/">Home</Link>
-        <RandomComicButton currentComic={metadata} />
-      </div>
+      <Header currentComic={metadata} />
       <section>
         <div className={classes.metadatabox}>
           <h1>{getSeriesTitle(metadata.series)}</h1>
@@ -87,6 +90,11 @@ export default async function ComicPage({
             {metadata.series.comics.length > 1 ? (
               <a href={`#${lastSubmissionId}`}>Go to last part</a>
             ) : null}
+          </div>
+          <div className={classes.tagList}>
+            {comicTags.map((t) => (
+              <TagLink tag={t} key={t.id} />
+            ))}
           </div>
         </div>
         {comicsInOrder.map((sub, index) => (

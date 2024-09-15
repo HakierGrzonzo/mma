@@ -28,4 +28,5 @@ export interface Series {
 export interface Metadata {
   series: Series;
   images: Record<string, Image>;
+  tags: number[];
 }

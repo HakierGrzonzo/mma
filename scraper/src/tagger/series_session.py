@@ -8,6 +8,7 @@ from prompt_toolkit.completion import NestedCompleter
 from term_image.image import AutoImage
 from PIL import Image
 from ..metadata import Metadata
+from xml.parsers.expat import ExpatError
 from ..storage_service import storage
 
 if TYPE_CHECKING:
@@ -26,10 +27,20 @@ class SeriesSession:
         image_ids = sum(
             [c.image_urls for c in reversed(self.subject.series.comics)], start=[]
         )
-        images = [self.subject.images[id] for id in image_ids]
-        self.images = [
-            asyncio.create_task(storage.get_object_bytes(m.file_path)) for m in images
-        ]
+        self.image_meta = [self.subject.images[id] for id in image_ids]
+        self.images = [asyncio.Future() for _ in self.image_meta]
+
+    def start_downloading_images(self):
+        self.parent.run_in_background(self._download_images())
+
+    async def _download_images(self):
+        for i, image in enumerate(self.image_meta):
+            if image.file_path:
+                content = await storage.get_object_bytes(image.file_path)
+            else:
+                content = None
+
+            self.images[i].set_result(content)
 
     async def _draw_image(self):
         if len(self.images) <= self.image_cursor:
@@ -38,8 +49,15 @@ class SeriesSession:
             self.image_cursor = 0
         image_bytes = self.images[self.image_cursor]
         if not image_bytes.done():
-            await image_bytes
-        io = BytesIO(image_bytes.result())
+            try:
+                await asyncio.wait_for(asyncio.shield(image_bytes), 5)
+            except TimeoutError:
+                logger.error("Timeout waiting on image")
+                return
+        image_bytes = image_bytes.result()
+        if image_bytes is None:
+            return
+        io = BytesIO(image_bytes)
         img = Image.open(io)
         auto_image = AutoImage(img, height=30)
         auto_image.draw(h_align="left", v_align="bottom", pad_height=10)
@@ -58,7 +76,10 @@ class SeriesSession:
 <b>Title:</b>\t<i>{self.subject.series.title}</i>
 <b>Tags:</b>\t<i>{", ".join(human_readable_tags)}</i>
         """
-        print_formatted_text(HTML(text))
+        try:
+            print_formatted_text(HTML(text))
+        except ExpatError:
+            print_formatted_text(text)
 
     async def prompt_user(self):
         completer = NestedCompleter.from_nested_dict(
@@ -69,6 +90,8 @@ class SeriesSession:
                 "next": None,
                 "previous": None,
                 "list": None,
+                "clear": None,
+                "revert": None,
             }
         )
         while True:
@@ -88,9 +111,15 @@ class SeriesSession:
         if tag_name is None:
             logger.error("Can't add empty tag")
             return
-        tag = self.parent.tag_sheet.get(tag_name)
-        print_formatted_text(f"Added tag {tag}")
-        self.subject.tags.append(tag.id)
+        if "," in tag_name:
+            tags = [t.strip() for t in tag_name.split(",")]
+            tags = filter(lambda t: len(t) > 0, tags)
+        else:
+            tags = [tag_name.strip()]
+        for tag_name in tags:
+            tag = self.parent.tag_sheet.get(tag_name)
+            print_formatted_text(f"Added tag {tag}")
+            self.subject.tags.append(tag.id)
 
     async def save_subject_with_new_tags(self):
         await self.subject.save()
@@ -119,6 +148,12 @@ class SeriesSession:
                     self.image_cursor -= 1
                     await self._draw_image()
                 case "list":
+                    self._print_series_details()
+                case "clear":
+                    self.subject.tags = []
+                    self._print_series_details()
+                case "revert":
+                    self.subject.tags = self.subject.tags[:-1]
                     self._print_series_details()
                 case _:
                     print_formatted_text("unknown command")

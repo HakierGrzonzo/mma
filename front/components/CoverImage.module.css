@@ -1,0 +1,19 @@
+.coverImage {
+  background-image: url("/cover.webp");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  padding: 3em;
+  font-size: 120%;
+  color: var(--foreground);
+}
+
+.coverImage * {
+  text-shadow:
+    var(--purple) 2px 2px 1px,
+    var(--purple) 0px 0px 4px;
+}
+
+.coverImage a {
+  color: var(--foreground);
+}

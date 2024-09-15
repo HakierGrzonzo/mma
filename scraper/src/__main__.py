@@ -10,12 +10,14 @@ from .trigger_frontend_regen import trigger_frontend_regen
 
 async def run():
     if "tag" in argv:
-        await tagger.main()
+        await tagger.add_tags_to_series()
         return
     if "migrate" in argv:
         await run_migrations()
         return
-
+    if "review_tags" in argv:
+        await tagger.review_tags()
+        return
     ten_minutes = timedelta(minutes=10)
     async with asyncio.timeout(ten_minutes.total_seconds()):
         await main()
