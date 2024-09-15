@@ -38,7 +38,11 @@ export default async function TagsList({
       <Header />
       <section>
         <h1>{tag.name}</h1>
-        <p>Here put flavor text</p>
+        {
+          <p>
+            {tag.details || "This tag does not have a description just yet"}
+          </p>
+        }
         <MetaTable metadatas={metadatas} />
       </section>
     </>

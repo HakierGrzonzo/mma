@@ -4,6 +4,7 @@ import { getAllMetadata, readJsonFile } from "./utils";
 export interface Tag {
   name: string;
   id: number;
+  details?: string;
 }
 
 export async function getTags() {

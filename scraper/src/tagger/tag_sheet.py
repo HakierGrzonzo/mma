@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 import json
 from logging import getLogger
@@ -21,6 +21,7 @@ logger = getLogger(__name__)
 class Tag:
     name: str
     id: int
+    details: str | None = field(default=None)
 
     @classmethod
     def new(cls, name: str):
@@ -93,3 +94,6 @@ class TagSheet:
     def resolve_ids_to_names(self, ids: Iterable[int]):
         for id in ids:
             yield self._tags_for_id[id].name
+
+    def __iter__(self):
+        return iter(self._tags)
