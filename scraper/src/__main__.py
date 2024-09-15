@@ -1,4 +1,5 @@
 import asyncio
+from datetime import timedelta
 from sys import argv
 
 from src import tagger
@@ -7,12 +8,19 @@ from .migrations import run_migrations
 from .trigger_frontend_regen import trigger_frontend_regen
 
 
-if "tag" in argv:
-    asyncio.run(tagger.main())
-elif "migrate" in argv:
-    asyncio.run(run_migrations())
-else:
-    asyncio.run(main())
+async def run():
+    if "tag" in argv:
+        await tagger.main()
+        return
+    if "migrate" in argv:
+        await run_migrations()
+        return
 
-if "deploy" in argv:
-    trigger_frontend_regen()
+    ten_minutes = timedelta(minutes=10)
+    async with asyncio.timeout(ten_minutes.total_seconds()):
+        await main()
+        if "deploy" in argv:
+            trigger_frontend_regen()
+
+
+asyncio.run(run())
