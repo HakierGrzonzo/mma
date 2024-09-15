@@ -2,8 +2,41 @@
 
 import { PAGE_URL } from "@/constants";
 import { sortComicMetadata } from "@/hooks";
+import { getMetadataByTag } from "@/tags";
+import { Tag, getTags, normalizeSlash } from "@/tags";
 import { getAllMetadata } from "@/utils";
 import { MetadataRoute } from "next";
+
+async function getSitemapForTags(): Promise<MetadataRoute.Sitemap> {
+  const { tags } = await getTags();
+  const newestTag = tags.at(-1) as Tag;
+  const newestTagTimestampInMiliseconds = newestTag.id * 1000;
+  const metadataPerTag = await getMetadataByTag();
+  return [
+    {
+      url: `${PAGE_URL}/tags`,
+      changeFrequency: "monthly",
+      lastModified: new Date(newestTagTimestampInMiliseconds),
+      priority: 1,
+    },
+    ...(tags
+      .map((t) => {
+        const metas = metadataPerTag[t.id] ?? [];
+        if (metas.length === 0) {
+          return undefined;
+        }
+        const sortedMetas = sortComicMetadata(metas, "date");
+        const lastMeta = sortedMetas[0];
+        return {
+          url: `${PAGE_URL}/tags/${normalizeSlash(t)}`,
+          lastModified: lastMeta.latest_episode,
+          priority: 0.7,
+          changeFrequency: "weekly",
+        };
+      })
+      .filter((v) => v !== undefined) as MetadataRoute.Sitemap),
+  ];
+}
 
 async function getSitemap(): Promise<MetadataRoute.Sitemap> {
   const rawMetadata = await getAllMetadata();
@@ -38,7 +71,9 @@ function getDateInUtc(timestamp: Date | string | undefined) {
 }
 
 export async function GET() {
-  const data = await getSitemap();
+  const seriesData = await getSitemap();
+  const tagData = await getSitemapForTags();
+  const data = [...seriesData, ...tagData];
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
