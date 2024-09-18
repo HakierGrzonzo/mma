@@ -49,7 +49,7 @@ export async function generateMetadata({
       modifiedTime: metadata.series.comics.at(0)?.uploaded_at,
     },
     alternates: {
-      canonical: `${PAGE_URL}/comic/${metadata.series.id}`,
+      canonical: `${PAGE_URL}/comic/${metadata.series.id}/`,
     },
   };
 }
