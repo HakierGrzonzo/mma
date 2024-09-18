@@ -14,7 +14,7 @@ async function getSitemapForTags(): Promise<MetadataRoute.Sitemap> {
   const metadataPerTag = await getMetadataByTag();
   return [
     {
-      url: `${PAGE_URL}/tags`,
+      url: `${PAGE_URL}/tags/`,
       changeFrequency: "monthly",
       lastModified: new Date(newestTagTimestampInMiliseconds),
       priority: 1,
@@ -28,7 +28,7 @@ async function getSitemapForTags(): Promise<MetadataRoute.Sitemap> {
         const sortedMetas = sortComicMetadata(metas, "date");
         const lastMeta = sortedMetas[0];
         return {
-          url: `${PAGE_URL}/tags/${normalizeSlash(t)}`,
+          url: `${PAGE_URL}/tags/${normalizeSlash(t)}/`,
           lastModified: lastMeta.latest_episode,
           priority: 0.7,
           changeFrequency: "weekly",
