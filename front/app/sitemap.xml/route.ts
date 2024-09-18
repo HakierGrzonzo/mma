@@ -51,7 +51,7 @@ async function getSitemap(): Promise<MetadataRoute.Sitemap> {
     ...(metadata.map((m) => {
       const isOneshot = m.series.comics.length === 1;
       return {
-        url: `${PAGE_URL}/comic/${m.series.id}`,
+        url: `${PAGE_URL}/comic/${m.series.id}/`,
         lastModified: m.series.comics[0].uploaded_at,
         changeFrequency: isOneshot ? "monthly" : "weekly",
         priority: 0.5,
