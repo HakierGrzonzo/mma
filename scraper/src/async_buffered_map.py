@@ -29,3 +29,7 @@ class AsyncBufferedMap(Generic[Tin, Tout]):
         if is_complete:
             raise StopAsyncIteration()
         return await task
+
+    async def do_all(self):
+        async for _ in self:
+            pass

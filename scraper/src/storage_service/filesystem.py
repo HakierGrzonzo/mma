@@ -1,3 +1,4 @@
+import os
 from .base import BaseService
 
 from os import mkdir, path
@@ -46,3 +47,6 @@ class FileSystemStorage(BaseService):
     async def object_exists(self, key):
         full_path = self._get_full_path(key)
         return path.isfile(full_path)
+
+    def list_objects_in_root(self):
+        yield from os.listdir(self._directory_prefix)

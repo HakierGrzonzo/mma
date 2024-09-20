@@ -21,6 +21,9 @@ export async function getTags() {
 export async function getMetadataByTag() {
   const metadata = await getAllMetadata();
   const metadataTagPairs = metadata.flatMap((m) => {
+    if (m.tags === undefined) {
+      return [];
+    }
     return m.tags.map((t) => [t, m] as [number, Metadata]);
   });
   const tagIdToMetadata = metadataTagPairs.reduce(

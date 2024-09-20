@@ -91,13 +91,22 @@ async def load_metadata_from_filesystem(
         yield await m
 
 
-async def save_metadata(metas: AsyncGenerator[Metadata, None]):
-    async for m in metas:
-        await m.save()
-        yield m
+async def save_index_metadata():
+    objects_in_root = storage.list_objects_in_root()
 
+    async def try_get_metadata(prefix: str) -> Metadata | None:
+        try:
+            raw_json = await storage.get_object(f"{prefix}/metadata.json")
+        except (FileNotFoundError, NotADirectoryError):
+            return None
+        data = json.loads(raw_json)
+        return Metadata.from_dict(data)
 
-async def save_index_metadata(metas: List[Metadata]):
-    metadata_index = {meta.series.id: asdict(meta) for meta in metas}
-    logger.info(f"Writing index metadata with {len(metas)} series")
+    metas_or_nulls = await asyncio.gather(
+        *[try_get_metadata(p) for p in objects_in_root]
+    )
+    metadata_index = {
+        meta.series.id: asdict(meta) for meta in metas_or_nulls if meta is not None
+    }
+    logger.info(f"Writing index metadata with {len(metadata_index.keys())} series")
     await storage.put_object("index.json", json.dumps(metadata_index))

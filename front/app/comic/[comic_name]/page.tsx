@@ -74,7 +74,7 @@ export default async function ComicPage({
 
   const { tagsById } = await getTags();
 
-  const comicTags = metadata.tags.map((t) => tagsById[t]);
+  const comicTags = metadata.tags?.map((t) => tagsById[t]) ?? [];
 
   return (
     <>
