@@ -49,4 +49,4 @@ class FileSystemStorage(BaseService):
         return path.isfile(full_path)
 
     def list_objects_in_root(self):
-        yield from [p.removesuffix("/") for p in os.listdir(self._directory_prefix)]
+        yield from [f"{p}/" for p in os.listdir(self._directory_prefix)]

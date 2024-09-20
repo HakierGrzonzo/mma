@@ -63,5 +63,4 @@ class TaggingSession:
                     await series_session.tag_series()
                 except EOFError:
                     break
-                self.run_in_background(save_index_metadata(self.metas_to_tag))
-        await asyncio.gather(*self.background_tasks)
+        await asyncio.gather(*self.background_tasks, save_index_metadata())
