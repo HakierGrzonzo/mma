@@ -96,7 +96,7 @@ async def save_index_metadata():
 
     async def try_get_metadata(prefix: str) -> Metadata | None:
         try:
-            raw_json = await storage.get_object(f"{prefix}/metadata.json")
+            raw_json = await storage.get_object(f"{prefix}metadata.json")
         except (FileNotFoundError, NotADirectoryError):
             return None
         data = json.loads(raw_json)
