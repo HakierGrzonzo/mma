@@ -1,7 +1,8 @@
 import { readFile } from "fs/promises";
-import { PAGE_URL, bucket_name } from "./constants";
+import { bucket_name } from "./constants";
 import { Metadata, Image, Comic } from "./types";
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { getSeriesTitle } from "./clientUtils";
 
 const s3Client = new S3Client({});
 
@@ -56,7 +57,7 @@ const IMAGE_HOST =
 export function getImageUrl(image: Image) {
   const imagePath = image.file_path.replace("./results/", "");
   if (bucket_name === undefined) {
-    return `${PAGE_URL}/images/${imagePath}`;
+    return `/images/${imagePath}`;
   }
   return `${IMAGE_HOST}/${imagePath}`;
 }
@@ -73,4 +74,20 @@ export function getSubmissionLinks(pageUrl: string, title: Comic["title"]) {
     idForComic,
     comicLink: `${pageUrl}#${idForComic}`,
   };
+}
+
+export function getComicDescrtiptionFromAltText(meta: Metadata) {
+  const firstComic = meta.series.comics.at(-1);
+  const fallbackDescription = `${getSeriesTitle(meta.series)} - Comic by MoringMark`;
+
+  if (firstComic === undefined) {
+    return fallbackDescription;
+  }
+
+  const firstImage = meta.images[firstComic.image_urls[0]];
+  const imageAltText = firstImage.ocr;
+  if (imageAltText.length < fallbackDescription.length) {
+    return fallbackDescription;
+  }
+  return `${imageAltText} - Comic by MoringMark`;
 }

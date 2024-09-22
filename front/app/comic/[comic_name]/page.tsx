@@ -1,7 +1,12 @@
 import classes from "./page.module.css";
 import { Submission } from "@/components/Submission";
 import { PAGE_URL } from "@/constants";
-import { getAllMetadata, getImageUrl, getSpecificMetadata } from "@/utils";
+import {
+  getAllMetadata,
+  getComicDescrtiptionFromAltText,
+  getImageUrl,
+  getSpecificMetadata,
+} from "@/utils";
 import { getSeriesTitle } from "@/clientUtils";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -33,23 +38,38 @@ export async function generateMetadata({
   const { comic_name } = params;
   const comicName = decodeURIComponent(comic_name);
   const metadata = await getSpecificMetadata(comicName);
+  const { tagsById } = await getTags();
+
   const seriesTitle = getSeriesTitle(metadata.series);
+  const imageUrls = metadata.series.comics.flatMap((sub) => {
+    const images = sub.image_urls.map((url) => metadata.images[url]);
+    return images.map(getImageUrl);
+  });
+
+  const description = getComicDescrtiptionFromAltText(metadata);
+
   return {
     title: `${seriesTitle} - MoringMark Archive`,
     metadataBase: new URL(PAGE_URL),
-    description: `${seriesTitle} Comic by u/makmark`,
+    description,
     openGraph: {
       title: `${seriesTitle} - MoringMark Archive`,
-      images: metadata.series.comics.flatMap((sub) => {
-        const images = sub.image_urls.map((url) => metadata.images[url]);
-        return images.map(getImageUrl);
-      }),
-      description: `${seriesTitle} Comic by u/makmark`,
-      releaseDate: metadata.series.comics.at(-1)?.uploaded_at,
+      type: "article",
+      images: imageUrls,
+      description,
+      publishedTime: metadata.series.comics.at(-1)?.uploaded_at,
       modifiedTime: metadata.series.comics.at(0)?.uploaded_at,
+      tags: metadata.tags?.map((t) => tagsById[t].name),
+      authors: ["MoringMark"],
     },
     alternates: {
       canonical: `${PAGE_URL}/comic/${metadata.series.id}/`,
+    },
+    twitter: {
+      title: `${seriesTitle} - MoringMark Archive`,
+      card: "summary_large_image",
+      description,
+      images: imageUrls,
     },
   };
 }

@@ -8,11 +8,15 @@ import CoverImage from "@/components/CoverImage";
 
 export const metadata: Metadata = {
   title: "MoringMark Archive",
-  metadataBase: new URL("https://moringmark.grzegorzkoperwas.site"),
+  metadataBase: new URL(PAGE_URL),
   description: `An archive of all MoringMark comics about The Owl House, well most of them`,
   openGraph: {
+    type: "website",
     title: `MoringMark Archive`,
     description: `An archive of all MoringMark comics about The Owl House, well most of them`,
+    images: {
+      url: `${PAGE_URL}/cover.webp`,
+    },
   },
   alternates: {
     canonical: `${PAGE_URL}`,
