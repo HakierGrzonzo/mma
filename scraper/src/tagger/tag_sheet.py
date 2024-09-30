@@ -47,7 +47,7 @@ class TagCompleter(Completer):
                 yield Completion(
                     text=f"{tag.name}, ",
                     display=tag.name,
-                    display_meta=f"id: {tag.id}",
+                    display_meta=tag.details,
                     start_position=-len(prefix),
                 )
 
