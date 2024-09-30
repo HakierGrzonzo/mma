@@ -3,6 +3,7 @@ import { bucket_name } from "./constants";
 import { Metadata, Image, Comic } from "./types";
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSeriesTitle } from "./clientUtils";
+import { unstable_cache } from "next/cache";
 
 const s3Client = new S3Client({});
 
@@ -17,16 +18,24 @@ async function readJsonFileLocal<T>(path: string): Promise<T> {
   }
 }
 
+async function getFileFromAws(path: string) {
+  const command = new GetObjectCommand({ Bucket: bucket_name, Key: path });
+  const response = await s3Client.send(command);
+  const body = response.Body;
+  if (body === undefined) {
+    throw new Error("Invalid response.Body");
+  }
+  const content = await body.transformToString();
+  return JSON.parse(content);
+}
+
 async function readJsonFileS3<T>(path: string): Promise<T> {
   try {
-    const command = new GetObjectCommand({ Bucket: bucket_name, Key: path });
-    const response = await s3Client.send(command);
-    const body = response.Body;
-    if (body === undefined) {
-      throw new Error("Invalid response.Body");
-    }
-    const content = await body.transformToString();
-    return JSON.parse(content);
+    const getFile = unstable_cache(() => getFileFromAws(path), [path], {
+      tags: [path],
+      revalidate: 60,
+    });
+    return await getFile();
   } catch (e) {
     console.error(e, path);
     throw e;
