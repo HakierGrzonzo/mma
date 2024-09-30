@@ -15,7 +15,7 @@ export default function TagLink({ tag, children, prefetch }: Props) {
       prefetch={prefetch ?? false}
       href={`/tags/${encodeURIComponent(normalizeSlash(tag))}`}
     >
-      <div className={classes.tag}>
+      <div title={tag.details} className={classes.tag}>
         {tag.name} {children}
       </div>
     </Link>

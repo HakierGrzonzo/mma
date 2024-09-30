@@ -14,6 +14,7 @@ import { env } from "process";
 import { getTags } from "@/tags";
 import TagLink from "@/components/TagLink";
 import Header from "@/components/Header";
+import BingeButtons from "@/components/BingeButtons";
 
 export async function generateStaticParams() {
   const metadatas = await getAllMetadata();
@@ -96,6 +97,7 @@ export default async function ComicPage({
 
   const comicTags = metadata.tags?.map((t) => tagsById[t]) ?? [];
 
+  const metadatas = await getAllMetadata();
   return (
     <>
       <Header currentComic={metadata} />
@@ -127,6 +129,7 @@ export default async function ComicPage({
             imageMetadata={metadata.images}
           />
         ))}
+        <BingeButtons metadatas={metadatas} currentComic={metadata} />
       </section>
     </>
   );

@@ -12,6 +12,9 @@ const filterFunctions: Record<
   name: (a, b) => a.series.title.localeCompare(b.series.title),
   upvote: (a, b) => b.upvotes_total - a.upvotes_total,
   upload: (a, b) => b.latest_episode.valueOf() - a.latest_episode.valueOf(),
+  firstUploaded: (a, b) =>
+    new Date(a.series.comics.at(-1)?.uploaded_at ?? "").valueOf() -
+    new Date(b.series.comics.at(-1)?.uploaded_at ?? "").valueOf(),
 } as const;
 
 export type Filters = keyof typeof filterFunctions;

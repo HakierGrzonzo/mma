@@ -1,0 +1,17 @@
+.container {
+  display: flex;
+  gap: 8px;
+}
+
+.button {
+  color: var(--foreground);
+  text-decoration: none;
+  background-color: var(--purple);
+  padding: 5px;
+  border-radius: 8px;
+  transition: all 100ms ease-in-out;
+}
+
+.button:hover {
+  background-color: var(--pink);
+}
