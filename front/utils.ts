@@ -35,7 +35,12 @@ async function readJsonFileS3<T>(path: string): Promise<T> {
       tags: [path],
       revalidate: 60,
     });
-    return await getFile();
+    try {
+      return await getFile();
+    } catch {
+      console.warn("Failed to cache file from AWS, too big!");
+      return await getFileFromAws(path);
+    }
   } catch (e) {
     console.error(e, path);
     throw e;
