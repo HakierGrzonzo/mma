@@ -15,12 +15,18 @@ export function MetaTable({ metadatas }: Props) {
   const [direction, setDirection] = useState<Direction>("asc");
   const [lastVisitedDate, setLastVisitedDate] = useState<null | Date>(null);
   useEffect(() => {
-    const lastDate = localStorage.getItem("last-visited-date");
-    if (lastVisitedDate == null && lastDate) {
-      setLastVisitedDate(new Date(lastDate));
-    }
-    if (lastVisitedDate == null) {
-      localStorage.setItem("last-visited-date", new Date().toISOString());
+    try {
+      const lastDate = localStorage.getItem("last-visited-date");
+      if (lastVisitedDate == null && lastDate) {
+        setLastVisitedDate(new Date(lastDate));
+      }
+      if (lastVisitedDate == null) {
+        localStorage.setItem("last-visited-date", new Date().toISOString());
+      }
+    } catch {
+      console.warn(
+        "localStorage is not available in this env, skipping updating last seen",
+      );
     }
   }, [lastVisitedDate]);
 
