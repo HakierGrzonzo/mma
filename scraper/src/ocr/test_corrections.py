@@ -8,7 +8,10 @@ class CorrectionsTestCase(TestCase):
         [
             ("i am not as cool as you think", "I am not as cool as you think"),
             ("who are you? no one!", "Who are you? No one!"),
-            ("well, i don't wanna start drama.", "Well, I don't wanna start drama."),
+            (
+                "well, i don't wanna start drama.",
+                "Well, I don't wanna start drama.",
+            ),
         ]
     )
     def test_corrects(self, original, expected):

@@ -35,7 +35,10 @@ def reduce_submissions_to_series(comics: Generator[Comic, None, None]):
         if series is None:
             # Make up a series id
             comic_title = "".join(
-                filter(lambda char: char in ascii_letters + digits + " ", comic.title)
+                filter(
+                    lambda char: char in ascii_letters + digits + " ",
+                    comic.title,
+                )
             )
             series_title = comic.title
             series_id = f"{comic_title}-{comic.id}"

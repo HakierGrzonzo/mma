@@ -25,7 +25,8 @@ class SeriesSession:
         self.parent = tagging_session
         self.image_cursor = 0
         image_ids = sum(
-            [c.image_urls for c in reversed(self.subject.series.comics)], start=[]
+            [c.image_urls for c in reversed(self.subject.series.comics)],
+            start=[],
         )
         self.image_meta = [self.subject.images[id] for id in image_ids]
         self.images = [asyncio.Future() for _ in self.image_meta]
