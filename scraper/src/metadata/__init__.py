@@ -85,7 +85,7 @@ class Metadata:
 
 
 async def load_metadata_from_filesystem(
-    series: List[ComicSeries]
+    series: List[ComicSeries],
 ) -> AsyncGenerator[Metadata, None]:
     for m in asyncio.as_completed([Metadata.from_series(s) for s in series]):
         yield await m
