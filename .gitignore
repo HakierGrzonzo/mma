@@ -1,4 +1,5 @@
 *.pyc
+*.sqlite
 .env
 results
 # Local .terraform directories
