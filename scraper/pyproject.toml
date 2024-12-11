@@ -23,6 +23,7 @@ piccolo = {extras = ["sqlite"], version = "^1.22.0"}
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.5"
 ipython = "^8.30.0"
+litecli = "^1.13.2"
 
 [build-system]
 requires = ["poetry-core"]

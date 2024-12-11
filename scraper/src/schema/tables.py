@@ -1,3 +1,4 @@
+from datetime import datetime
 from piccolo.table import Table
 from piccolo import columns
 
@@ -34,6 +35,14 @@ class Tag(Table):
     comics = columns.M2M(
         columns.LazyTableReference("ComicSeriesTag", module_path=__name__)
     )
+
+    @classmethod
+    async def new(cls, name):
+        now = datetime.now().timestamp()
+        id = int(now)
+        tag = cls(name=name, id=id)
+        await cls.insert(tag)
+        return tag
 
 
 class ComicSeriesTag(Table):

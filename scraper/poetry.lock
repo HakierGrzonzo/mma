@@ -283,6 +283,25 @@ files = [
 ]
 
 [[package]]
+name = "cli-helpers"
+version = "2.3.1"
+description = "Helpers for building command-line apps"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "cli_helpers-2.3.1-py3-none-any.whl", hash = "sha256:208a24a44f41a8289b742867197450a002967a5a67c779911c0b8487b1c16b83"},
+    {file = "cli_helpers-2.3.1.tar.gz", hash = "sha256:b82a8983ceee21f180e6fd0ddb7ca8dae43c40e920951e3817f996ab204dae6a"},
+]
+
+[package.dependencies]
+configobj = ">=5.0.5"
+Pygments = {version = ">=1.6", optional = true, markers = "extra == \"styles\""}
+tabulate = {version = ">=0.9.0", extras = ["widechars"]}
+
+[package.extras]
+styles = ["Pygments (>=1.6)"]
+
+[[package]]
 name = "click"
 version = "8.1.7"
 description = "Composable command line interface toolkit"
@@ -305,6 +324,17 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
+]
+
+[[package]]
+name = "configobj"
+version = "5.0.9"
+description = "Config file reading, writing and validation."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "configobj-5.0.9-py2.py3-none-any.whl", hash = "sha256:1ba10c5b6ee16229c79a05047aeda2b55eb4e80d7c7d8ecf17ec1ca600c79882"},
+    {file = "configobj-5.0.9.tar.gz", hash = "sha256:03c881bbf23aa07bccf1b837005975993c4ab4427ba57f959afdd9d1a2386848"},
 ]
 
 [[package]]
@@ -560,6 +590,28 @@ atomic-cache = ["atomicwrites"]
 interegular = ["interegular (>=0.3.1,<0.4.0)"]
 nearley = ["js2py"]
 regex = ["regex"]
+
+[[package]]
+name = "litecli"
+version = "1.13.2"
+description = "CLI for SQLite Databases with auto-completion and syntax highlighting."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "litecli-1.13.2-py3-none-any.whl", hash = "sha256:866379c740bf8fd0cf3c1a82c1cee73a94856f2d732224a99184bfda4173ec14"},
+    {file = "litecli-1.13.2.tar.gz", hash = "sha256:ac374929a5b3d914a9f47e0a7f4a838a7e1f6e963b4893cd7d67a1e2a3ac4762"},
+]
+
+[package.dependencies]
+cli-helpers = {version = ">=2.2.1", extras = ["styles"]}
+click = ">=4.1"
+configobj = ">=5.0.5"
+prompt-toolkit = ">=3.0.3,<4.0.0"
+pygments = ">=1.6"
+sqlparse = ">=0.4.4"
+
+[package.extras]
+dev = ["behave (>=1.2.6)", "coverage (>=7.2.7)", "pdbpp (>=0.10.3)", "pexpect (>=4.9.0)", "pytest (>=7.4.4)", "pytest-cov (>=4.1.0)", "tox (>=4.8.0)"]
 
 [[package]]
 name = "markupsafe"
@@ -1185,6 +1237,21 @@ files = [
 ]
 
 [[package]]
+name = "sqlparse"
+version = "0.5.3"
+description = "A non-validating SQL parser."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "sqlparse-0.5.3-py3-none-any.whl", hash = "sha256:cf2196ed3418f3ba5de6af7e82c694a9fbdbfecccdfc72e281548517081f16ca"},
+    {file = "sqlparse-0.5.3.tar.gz", hash = "sha256:09f67787f56a0b16ecdbde1bfc7f5d9c3371ca683cfeaa8e6ff60b4807ec9272"},
+]
+
+[package.extras]
+dev = ["build", "hatch"]
+doc = ["sphinx"]
+
+[[package]]
 name = "stack-data"
 version = "0.6.3"
 description = "Extract data from python stack frames and tracebacks for informative displays"
@@ -1202,6 +1269,23 @@ pure-eval = "*"
 
 [package.extras]
 tests = ["cython", "littleutils", "pygments", "pytest", "typeguard"]
+
+[[package]]
+name = "tabulate"
+version = "0.9.0"
+description = "Pretty-print tabular data"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "tabulate-0.9.0-py3-none-any.whl", hash = "sha256:024ca478df22e9340661486f85298cff5f6dcdba14f3813e8830015b9ed1948f"},
+    {file = "tabulate-0.9.0.tar.gz", hash = "sha256:0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c068b3c"},
+]
+
+[package.dependencies]
+wcwidth = {version = "*", optional = true, markers = "extra == \"widechars\""}
+
+[package.extras]
+widechars = ["wcwidth"]
 
 [[package]]
 name = "targ"
@@ -1325,4 +1409,4 @@ test = ["websockets"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "2db3188a8681218bc89e984da988e3f74c8bccd2450fc85fc25d7ed135778e3b"
+content-hash = "06b650fb534a7a39e95500002b2804f2099efc1e8fd3594e92d9c04d078afd80"
