@@ -13,7 +13,7 @@ from ..metadata import Metadata, save_index_metadata
 from ..storage_service import storage
 
 
-async def get_metas():
+async def get_metas() -> list[Metadata]:
     all_series = await storage.get_object("index.json")
     all_series = json.loads(all_series)
     all_series = [Metadata.from_dict(v) for v in all_series.values()]
