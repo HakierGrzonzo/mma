@@ -4,19 +4,20 @@ from .tagging_session import TaggingSession
 
 
 async def add_tags_to_series():
-    session = await TaggingSession.start()
+    session = TaggingSession()
     await session.tagging_loop()
 
 
 async def review_tags():
-    tag_sheet = await TagSheet.from_file_system()
+    tag_sheet = TagSheet()
     prompt_session = PromptSession()
-    for tag in tag_sheet:
-        if tag.details is not None:
+    tags = await tag_sheet.get_all()
+    for tag in tags:
+        if tag.description is not None:
             continue
         print(tag)
         command = await prompt_session.prompt_async("$ ")
         command = command.strip()
         if len(command) > 0:
-            tag.details = command
-    await tag_sheet.save()
+            tag.description = command
+            await tag.save()

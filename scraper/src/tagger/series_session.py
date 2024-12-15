@@ -22,23 +22,28 @@ logger = getLogger(__name__)
 
 
 class SeriesSession:
-    def __init__(self, comic_series: SubjectInfo, tagging_session: TaggingSession) -> None:
+    def __init__(
+        self, comic_series: SubjectInfo, tagging_session: TaggingSession
+    ) -> None:
         self.subject = comic_series
         self.parent = tagging_session
         self.image_cursor = 0
-        self.images = [asyncio.Future() for _ in range(self.subject["number_of_images"])]
+        self.images = [
+            asyncio.Future() for _ in range(self.subject["number_of_images"])
+        ]
+        self.tags_to_add = []
 
     def start_downloading_images(self):
         self.parent.run_in_background(self._download_images())
 
     async def _download_images(self):
-        images = await Image.select(
-            *Image.all_columns()
-        ).where(
-            Image.comic._.series._.id == self.subject["id"]
-        ).order_by(
-            Image.comic._.uploaded_at,
-            Image.order,
+        images = (
+            await Image.select(*Image.all_columns())
+            .where(Image.comic._.series._.id == self.subject["id"])
+            .order_by(
+                Image.comic._.uploaded_at,
+                Image.order,
+            )
         )
         for i, image in enumerate(images):
             image = Image(**image)
@@ -76,7 +81,7 @@ class SeriesSession:
 
     async def _print_series_details(self):
         tags = await ComicSeries.raw(
-        """
+            """
         SELECT 
             tag.name 
         FROM 
@@ -86,7 +91,9 @@ class SeriesSession:
             JOIN tag 
                 ON tag.id = comic_series_tag.tag 
         WHERE comic_series.id = {};
-        """, self.subject["id"])
+        """,
+            self.subject["id"],
+        )
         self._print_separator()
         text = f"""
 <b>Title:</b>\t<i>{self.subject['title']}</i>
@@ -100,7 +107,7 @@ class SeriesSession:
     async def prompt_user(self):
         completer = NestedCompleter.from_nested_dict(
             {
-                "tag": self.parent.tag_sheet.get_completer(),
+                "tag": await self.parent.tag_sheet.get_completer(),
                 "new": None,
                 "save": None,
                 "next": None,
@@ -134,10 +141,14 @@ class SeriesSession:
             tags = [tag_name.strip()]
         for tag_name in tags:
             tag = await self.parent.tag_sheet.get(tag_name)
+            self.tags_to_add.append(tag)
             print_formatted_text(f"Added tag {tag}")
 
     async def save_subject_with_new_tags(self):
-        raise NotImplemented()
+        operation = ComicSeriesTag.insert()
+        for tag in self.tags_to_add:
+            operation.add(ComicSeriesTag(tag=tag.id, comic_series=self.subject["id"]))
+        await operation
 
     async def tag_series(self):
         await self._draw_image()
@@ -164,10 +175,13 @@ class SeriesSession:
                 case "list":
                     await self._print_series_details()
                 case "clear":
-                    await ComicSeriesTag.delete().where(ComicSeriesTag.comic_series == self.subject["id"])
+                    await ComicSeriesTag.delete().where(
+                        ComicSeriesTag.comic_series == self.subject["id"]
+                    )
+                    self.tags_to_add = []
                     await self._print_series_details()
                 case "revert":
-                    raise NotImplemented()
+                    self.tags_to_add.pop()
                     await self._print_series_details()
                 case _:
                     print_formatted_text("unknown command")

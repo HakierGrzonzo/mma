@@ -1,17 +1,32 @@
 import asyncio
-from ..tagger.tagging_session import get_metas
-from ..tagger.tag_sheet import TagSheet
+from ..storage_service import storage
+import json
+from ..metadata import Metadata
 from .tables import ComicSeries, ComicSeriesTag, Image, Tag, Comic
 
 
-async def import_existing_data():
-    metadatas, tag_sheet = await asyncio.gather(
-        get_metas(), TagSheet.from_file_system()
+async def get_tags() -> list[dict]:
+    raw_sheet = await storage.get_object("tags.json")
+    json_sheet = json.loads(raw_sheet)
+    return json_sheet
+
+
+async def get_metas():
+    all_series = await storage.get_object("index.json")
+    all_series = json.loads(all_series)
+    all_series = [Metadata.from_dict(v) for v in all_series.values()]
+    sorted_series = sorted(
+        all_series, key=lambda item: item.series.latest_update(), reverse=True
     )
+    return sorted_series
+
+
+async def import_existing_data():
+    metadatas, tag_sheet = await asyncio.gather(get_metas(), get_tags())
     async with ComicSeries._meta.db.transaction():
         await Tag.insert(
             *[
-                Tag(id=tag.id, name=tag.name, description=tag.details)
+                Tag(id=tag["id"], name=tag["name"], description=tag["details"])
                 for tag in tag_sheet
             ]
         )

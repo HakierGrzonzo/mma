@@ -1,6 +1,5 @@
 from ..schema.tables import Tag
 from logging import getLogger
-from typing import Iterable, Self
 
 from prompt_toolkit.completion import (
     CompleteEvent,
@@ -53,5 +52,6 @@ class TagSheet:
         tags = await Tag.select()
         return FuzzyCompleter(TagCompleter([Tag(**t) for t in tags]))
 
-    async def __aiter__(self):
-        return await Tag.select()
+    async def get_all(self):
+        tags = await Tag.select()
+        return [Tag(**tag) for tag in tags]
