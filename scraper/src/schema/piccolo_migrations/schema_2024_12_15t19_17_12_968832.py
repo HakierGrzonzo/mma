@@ -52,7 +52,7 @@ class Tag(Table, tablename="tag", schema=None):
     )
 
 
-ID = "2024-12-11T20:52:31:572304"
+ID = "2024-12-15T19:17:12:968832"
 VERSION = "1.22.0"
 DESCRIPTION = ""
 
@@ -64,10 +64,6 @@ async def forwards():
 
     manager.add_table(class_name="Tag", tablename="tag", schema=None, columns=None)
 
-    manager.add_table(class_name="Comic", tablename="comic", schema=None, columns=None)
-
-    manager.add_table(class_name="Image", tablename="image", schema=None, columns=None)
-
     manager.add_table(
         class_name="ComicSeriesTag",
         tablename="comic_series_tag",
@@ -75,12 +71,16 @@ async def forwards():
         columns=None,
     )
 
+    manager.add_table(class_name="Image", tablename="image", schema=None, columns=None)
+
     manager.add_table(
         class_name="ComicSeries",
         tablename="comic_series",
         schema=None,
         columns=None,
     )
+
+    manager.add_table(class_name="Comic", tablename="comic", schema=None, columns=None)
 
     manager.add_column(
         table_class_name="Tag",
@@ -146,36 +146,18 @@ async def forwards():
     )
 
     manager.add_column(
-        table_class_name="Comic",
-        tablename="comic",
-        column_name="id",
-        db_column_name="id",
-        column_class_name="Text",
-        column_class=Text,
+        table_class_name="ComicSeriesTag",
+        tablename="comic_series_tag",
+        column_name="tag",
+        db_column_name="tag",
+        column_class_name="ForeignKey",
+        column_class=ForeignKey,
         params={
-            "default": "",
-            "null": False,
-            "primary_key": True,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
-        table_class_name="Comic",
-        tablename="comic",
-        column_name="title",
-        db_column_name="title",
-        column_class_name="Text",
-        column_class=Text,
-        params={
-            "default": "",
-            "null": False,
+            "references": Tag,
+            "on_delete": OnDelete.cascade,
+            "on_update": OnUpdate.cascade,
+            "target_column": None,
+            "null": True,
             "primary_key": False,
             "unique": False,
             "index": False,
@@ -188,73 +170,10 @@ async def forwards():
     )
 
     manager.add_column(
-        table_class_name="Comic",
-        tablename="comic",
-        column_name="upvotes",
-        db_column_name="upvotes",
-        column_class_name="Integer",
-        column_class=Integer,
-        params={
-            "default": 0,
-            "null": False,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
-        table_class_name="Comic",
-        tablename="comic",
-        column_name="link",
-        db_column_name="link",
-        column_class_name="Text",
-        column_class=Text,
-        params={
-            "default": "",
-            "null": False,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
-        table_class_name="Comic",
-        tablename="comic",
-        column_name="uploaded_at",
-        db_column_name="uploaded_at",
-        column_class_name="Timestamptz",
-        column_class=Timestamptz,
-        params={
-            "default": TimestamptzNow(),
-            "null": False,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
-        table_class_name="Comic",
-        tablename="comic",
-        column_name="series",
-        db_column_name="series",
+        table_class_name="ComicSeriesTag",
+        tablename="comic_series_tag",
+        column_name="comic_series",
+        db_column_name="comic_series",
         column_class_name="ForeignKey",
         column_class=ForeignKey,
         params={
@@ -425,54 +344,6 @@ async def forwards():
     )
 
     manager.add_column(
-        table_class_name="ComicSeriesTag",
-        tablename="comic_series_tag",
-        column_name="tag",
-        db_column_name="tag",
-        column_class_name="ForeignKey",
-        column_class=ForeignKey,
-        params={
-            "references": Tag,
-            "on_delete": OnDelete.cascade,
-            "on_update": OnUpdate.cascade,
-            "target_column": None,
-            "null": True,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
-        table_class_name="ComicSeriesTag",
-        tablename="comic_series_tag",
-        column_name="comic_series",
-        db_column_name="comic_series",
-        column_class_name="ForeignKey",
-        column_class=ForeignKey,
-        params={
-            "references": ComicSeries,
-            "on_delete": OnDelete.cascade,
-            "on_update": OnUpdate.cascade,
-            "target_column": None,
-            "null": True,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
         table_class_name="ComicSeries",
         tablename="comic_series",
         column_name="id",
@@ -498,6 +369,156 @@ async def forwards():
         tablename="comic_series",
         column_name="title",
         db_column_name="title",
+        column_class_name="Text",
+        column_class=Text,
+        params={
+            "default": "",
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Comic",
+        tablename="comic",
+        column_name="id",
+        db_column_name="id",
+        column_class_name="Text",
+        column_class=Text,
+        params={
+            "default": "",
+            "null": False,
+            "primary_key": True,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Comic",
+        tablename="comic",
+        column_name="title",
+        db_column_name="title",
+        column_class_name="Text",
+        column_class=Text,
+        params={
+            "default": "",
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Comic",
+        tablename="comic",
+        column_name="upvotes",
+        db_column_name="upvotes",
+        column_class_name="Integer",
+        column_class=Integer,
+        params={
+            "default": 0,
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Comic",
+        tablename="comic",
+        column_name="link",
+        db_column_name="link",
+        column_class_name="Text",
+        column_class=Text,
+        params={
+            "default": "",
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Comic",
+        tablename="comic",
+        column_name="uploaded_at",
+        db_column_name="uploaded_at",
+        column_class_name="Timestamptz",
+        column_class=Timestamptz,
+        params={
+            "default": TimestamptzNow(),
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Comic",
+        tablename="comic",
+        column_name="series",
+        db_column_name="series",
+        column_class_name="ForeignKey",
+        column_class=ForeignKey,
+        params={
+            "references": ComicSeries,
+            "on_delete": OnDelete.cascade,
+            "on_update": OnUpdate.cascade,
+            "target_column": None,
+            "null": True,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Comic",
+        tablename="comic",
+        column_name="prefix",
+        db_column_name="prefix",
         column_class_name="Text",
         column_class=Text,
         params={

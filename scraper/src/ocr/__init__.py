@@ -6,7 +6,7 @@ from praw.reddit import asyncio
 
 from src.ocr.corrections import correct_casing
 from ..storage_service import storage
-from ..metadata import Image
+from ..schema.tables import Image
 from .block_tree import Node
 from PIL import Image as pil_image
 

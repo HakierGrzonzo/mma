@@ -1,6 +1,7 @@
 from datetime import datetime
 from piccolo.table import Table
 from piccolo import columns
+from ..storage_service import storage
 
 
 class ComicSeries(Table):
@@ -16,6 +17,7 @@ class Comic(Table):
     link = columns.Text(null=False, required=True)
     uploaded_at = columns.Timestamptz(null=False, required=True)
     series = columns.ForeignKey(references=ComicSeries)
+    prefix = columns.Text(null=False, required=True)
 
 
 class Image(Table):
@@ -26,6 +28,17 @@ class Image(Table):
     file_path = columns.Text(null=True)
     order = columns.Integer(null=False, required=True)
     comic = columns.ForeignKey(Comic)
+
+    def is_measured(self):
+        return self.height is not None and self.width is not None
+
+    def is_ocr(self):
+        return self.ocr is not None
+
+    async def is_downloaded(self):
+        return self.file_path is not None or (
+            await storage.object_exists(self.file_path)
+        )
 
 
 class Tag(Table):

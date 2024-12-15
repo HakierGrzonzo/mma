@@ -1,7 +1,9 @@
 import asyncio
+from collections import defaultdict
+from dataclasses import dataclass, field
+from os import path
 from ..storage_service import storage
 import json
-from ..metadata import Metadata
 from .tables import ComicSeries, ComicSeriesTag, Image, Tag, Comic
 
 
@@ -9,6 +11,63 @@ async def get_tags() -> list[dict]:
     raw_sheet = await storage.get_object("tags.json")
     json_sheet = json.loads(raw_sheet)
     return json_sheet
+
+
+@dataclass
+class ComicWithPrefix:
+    title: str
+    image_urls: list[str]
+    upvotes: int
+    link: str
+    uploaded_at: str
+    id: str
+    prefix: str | None = None
+
+
+@dataclass
+class OldComicSeries:
+    title: str
+    id: str
+    comics: list[ComicWithPrefix]
+
+    def latest_update(self):
+        return self.comics[-1].uploaded_at
+
+    @classmethod
+    def from_dict(cls, value: dict):
+        comics = value["comics"]
+        comics = [ComicWithPrefix(**v) for v in comics]
+        return cls(title=value["title"], id=value["id"], comics=comics)
+
+
+@dataclass
+class Metadata:
+    series: OldComicSeries
+    tags: list[int] = field(default_factory=lambda: list())
+    images: defaultdict[str, Image] | dict[str, Image] = field(
+        default_factory=lambda: defaultdict(lambda: Image())
+    )
+
+    def get_filepath_prefix(self):
+        unique_title = self.series.id
+        sanitized = (
+            unique_title.replace("/", "")
+            .replace("#", "")
+            .replace("%", "")
+            .replace("?", "")
+        )
+        return sanitized
+
+    def get_metadata_path(self):
+        return path.join(self.get_filepath_prefix(), "metadata.json")
+
+    @classmethod
+    def from_dict(cls, value: dict):
+        series = OldComicSeries.from_dict(value["series"])
+        images = {k: Image(**v) for k, v in value["images"].items()}
+        tags = value.get("tags", [])
+        unique_tags = set(tags)
+        return cls(tags=list(unique_tags), series=series, images=images)
 
 
 async def get_metas():

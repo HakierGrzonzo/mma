@@ -1,16 +1,12 @@
-from collections.abc import AsyncGenerator
 from logging import getLogger
-from os import path
 
 from praw.reddit import asyncio
 
-from src.async_buffered_map import AsyncBufferedMap
 from src.ocr import get_ocr_for_image
 from .size import extract_image_size
 from ..storage_service import storage
+from ..schema.tables import ComicSeries, Image
 from src.api import http_client
-
-from src.metadata import Image, Metadata
 
 logger = getLogger(__name__)
 
@@ -41,7 +37,8 @@ async def handle_image(url, image: Image):
             image.ocr = await get_ocr_for_image(image)
 
 
-async def download_from_series(meta: Metadata):
+async def download_from_series(series: ComicSeries):
+    """
     comics = meta.series.comics
     for comic in comics:
         image_urls = comic.image_urls
@@ -58,7 +55,8 @@ async def download_from_series(meta: Metadata):
     )
 
     return meta
+    """
 
 
-def download_images(metas: AsyncGenerator[Metadata]):
-    return AsyncBufferedMap(download_from_series, metas)
+def download_images():
+    pass
