@@ -20,7 +20,7 @@ reddit_image_semaphore = asyncio.Semaphore(4)
 async def download_image_from_url(url, file_path):
     logger.info(f"Downloading {file_path}")
     async with reddit_image_semaphore:
-        result = await http_client.get(url, headers={"Accept": "image/webp"})
+        result = await http_client.get(url, headers={"Accept": "image/webp;image/gif"})
 
     await storage.put_object_bytes(file_path, result.content)
 
@@ -46,10 +46,11 @@ async def download_from_series(meta: Metadata):
     for comic in comics:
         image_urls = comic.image_urls
         for j, url in enumerate(image_urls):
+            file_extension = "gif" if url.endswith(".gif") else "webp"
             if comic.prefix is not None:
-                file_path = f"{comic.prefix}-{j}.webp"
+                file_path = f"{comic.prefix}-{j}.{file_extension}"
             else:
-                file_path = f"{j}.webp"
+                file_path = f"{j}.{file_extension}"
             meta.images[url].file_path = path.join(
                 meta.get_filepath_prefix(), file_path
             )

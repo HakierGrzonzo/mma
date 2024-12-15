@@ -14,7 +14,11 @@ class S3Storage(BaseService):
         self._rate_limit = asyncio.Semaphore(15)
 
     def get_object_content_type_from_key(self, key: str):
-        mime_map = {"webp": "image/webp", "json": "application/json"}
+        mime_map = {
+            "webp": "image/webp",
+            "json": "application/json",
+            "gif": "image/gif",
+        }
         file_extension = key.split(".")[-1]
         return mime_map.get(file_extension, "binary/octet-stream")
 
