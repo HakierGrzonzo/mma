@@ -1,6 +1,7 @@
 import logging
 
 from src.api import get_comics
+from src.images import download_images
 from src.reduce import reduce_submissions_to_series
 from src.schema.tables import Comic
 
@@ -12,3 +13,4 @@ async def main():
     async with Comic._meta.db.transaction():
         comics = get_comics()
         await reduce_submissions_to_series(comics)
+        await download_images()

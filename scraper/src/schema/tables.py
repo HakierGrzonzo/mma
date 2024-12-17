@@ -8,6 +8,16 @@ class ComicSeries(Table):
     id = columns.Text(null=False, required=True, primary_key=True)
     title = columns.Text(null=False, required=True)
     tags = columns.M2M(columns.LazyTableReference("Tag", module_path=__name__))
+    
+    def get_filepath_prefix(self):
+        unique_title = self.id
+        sanitized = (
+            unique_title.replace("/", "")
+            .replace("#", "")
+            .replace("%", "")
+            .replace("?", "")
+        )
+        return sanitized
 
 
 class Comic(Table):
@@ -35,8 +45,17 @@ class Image(Table):
     def is_ocr(self):
         return self.ocr is not None
 
+    async def get_file_path(self):
+        file_extension = "gif" if self.link.endswith(".gif") else "webp"
+        comic = await self.select(Image.comic._.prefix.as_alias('prefix')).where(Image.link == self.link).first()
+        assert comic is not None
+        if prefix := comic['prefix']:
+            return f"{prefix}-{self.order}.{file_extension}"
+        return f"{self.order}.{file_extension}"
+        
+
     async def is_downloaded(self):
-        return self.file_path is not None or (
+        return self.file_path is not None and (
             await storage.object_exists(self.file_path)
         )
 
