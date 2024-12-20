@@ -68,7 +68,7 @@ const IMAGE_HOST =
   process.env.IMAGE_HOST ??
   `${devProtocol}://${bucket_name}.s3-website-us-east-1.amazonaws.com`;
 
-export function getImageUrl(image: Image) {
+export function getImageUrl(image: { file_path: string }) {
   const imagePath = image.file_path.replace("./results/", "");
   if (bucket_name === undefined) {
     return `/images/${imagePath}`;

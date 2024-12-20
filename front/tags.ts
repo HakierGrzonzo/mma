@@ -37,7 +37,7 @@ export async function getMetadataByTag() {
   return tagIdToMetadata;
 }
 
-export function normalizeSlash(tag: Tag) {
+export function normalizeSlash(tag: { name: string }) {
   return tag.name.replaceAll("/", "|");
 }
 export function deNormalizeSlash(tagName: string) {

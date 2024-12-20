@@ -1,19 +1,23 @@
 import Header from "@/components/Header";
 import { MetaTable } from "@/components/MetaTable";
 import { PAGE_URL } from "@/constants";
-import { getMetaTableData, getMetaTableDataForTag } from "@/db";
-import {
-  deNormalizeSlash,
-  getMetadataByTag,
-  getTags,
-  normalizeSlash,
-} from "@/tags";
+import { db, getMetaTableDataForTag } from "@/db";
+import { deNormalizeSlash, normalizeSlash } from "@/tags";
 import { getImageUrl } from "@/utils";
 import { Metadata } from "next";
 import { env } from "process";
 
 export async function generateStaticParams() {
-  const { tags } = await getTags();
+  const tags = db
+    .prepare(
+      `
+      SELECT 
+        tag.name as name
+      FROM 
+        tag
+    `,
+    )
+    .all() as { name: string }[];
   const tagNames = tags.map(normalizeSlash);
   if (env.NODE_ENV !== "production") {
     return tagNames.map((tag) => ({
@@ -31,14 +35,65 @@ type Params = { params: { tag_name: string } };
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { tag_name } = params;
   const tagName = deNormalizeSlash(decodeURIComponent(tag_name));
-  const { tagsByName } = await getTags();
-  const tag = tagsByName[tagName];
-  const metadataByTag = await getMetadataByTag();
-  const metadatas = metadataByTag[tag.id] ?? [];
+  const tag = db
+    .prepare(
+      `
+    SELECT
+      tag.name as name,
+      tag.description as description,
+      tag.id as id
+    FROM
+      tag
+    WHERE
+      tag.name = ?
+`,
+    )
+    .get(tagName) as { name: string; description: string | null; id: number };
+  const someImage = db
+    .prepare(
+      `
+    SELECT
+      image.file_path as file_path
+    FROM
+      comic_series
+    JOIN 
+      comic_series_tag
+      ON
+        comic_series_tag.comic_series = comic_series.id
+    JOIN
+      comic
+      ON
+        comic.series = comic_series.id
+    JOIN 
+      image
+      ON
+        comic.id = image.comic
+    WHERE
+      comic_series_tag.tag = ?
+    ORDER BY
+      comic.uploaded_at,
+      image."order"
+`,
+    )
+    .get(tag.id) as { file_path: string };
 
-  const someComicMetadata = metadatas.at(-1);
-  const someImageUrl = someComicMetadata?.series.comics.at(-1)?.image_urls[0];
-  const someImage = someImageUrl && someComicMetadata?.images[someImageUrl];
+  const numberOfComics = db
+    .prepare(
+      `
+    SELECT
+      COUNT(comic_series.id) as length
+    FROM
+      comic_series
+    JOIN 
+      comic_series_tag
+      ON
+        comic_series_tag.comic_series = comic_series.id
+    WHERE
+      comic_series_tag.tag = ?
+`,
+    )
+    .get(tag.id) as { length: number };
+
   const imageUrl = someImage && getImageUrl(someImage);
 
   return {
@@ -46,11 +101,11 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     openGraph: {
       type: "website",
       title: tag.name,
-      description: tag.details,
+      description: tag.description ?? undefined,
       siteName: "MoringMark Archive",
       images: imageUrl && [imageUrl],
     },
-    description: `${tag.details} Tag at MoringMark Archive with ${metadatas.length} comics`,
+    description: `${tag.description ?? ""} Tag at MoringMark Archive with ${numberOfComics.length} comics`,
     alternates: {
       canonical: `${PAGE_URL}/tags/${tag_name}/`,
     },
@@ -61,8 +116,21 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default async function TagsList({ params }: Params) {
   const { tag_name } = params;
   const tagName = deNormalizeSlash(decodeURIComponent(tag_name));
-  const { tagsByName } = await getTags();
-  const tag = tagsByName[tagName];
+
+  const tag = db
+    .prepare(
+      `
+    SELECT
+      tag.name as name,
+      tag.description as description,
+      tag.id as id
+    FROM
+      tag
+    WHERE
+      tag.name = ?
+`,
+    )
+    .get(tagName) as { name: string; description: string | null; id: number };
 
   const rows = getMetaTableDataForTag(tag.id);
   return (
@@ -72,7 +140,7 @@ export default async function TagsList({ params }: Params) {
         <h1>{tag.name}</h1>
         {
           <p>
-            {tag.details || "This tag does not have a description just yet"}
+            {tag.description || "This tag does not have a description just yet"}
           </p>
         }
         <MetaTable rows={rows} />
