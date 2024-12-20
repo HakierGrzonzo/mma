@@ -81,7 +81,7 @@ export function MetaTable({ rows }: Props) {
       </thead>
       <tbody>
         {sortedData.map((item, index) => (
-          <tr key={item.id}>
+          <tr key={item.id} id={item.id}>
             <td>
               <Link
                 className={

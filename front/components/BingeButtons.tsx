@@ -1,25 +1,73 @@
 import { sortComicMetadata } from "@/hooks";
-import { Metadata } from "@/types";
+import { Comic, Metadata } from "@/types";
 import Link from "next/link";
 import classes from "./BingeButtons.module.css";
+import { ComicSeries, db } from "@/db";
 
 interface Props {
-  currentComic: Metadata;
-  metadatas: Metadata[];
+  currentComicSeriesId: string;
 }
 
-export default function BingeButtons({ metadatas, currentComic }: Props) {
-  const sortedMetadatas = sortComicMetadata(metadatas, "firstUploaded");
-  const thisComicIndex = sortedMetadatas.findIndex(
-    (v) => v.series.id === currentComic.series.id,
-  );
-  const nextComic = sortedMetadatas.at(thisComicIndex + 1);
-  const previousComic =
-    thisComicIndex > 0 && sortedMetadatas.at(thisComicIndex - 1);
+export default function BingeButtons({ currentComicSeriesId }: Props) {
+  const previousComic = db
+    .prepare(
+      `
+    SELECT 
+      comic_series.id
+    FROM
+      comic_series
+    JOIN
+      comic
+      ON
+        comic.series = comic_series.id
+    GROUP BY
+      comic_series.id
+    HAVING
+      MIN(comic.uploaded_at) < (
+        SELECT
+          MIN(comic.uploaded_at)
+        FROM
+          comic
+        WHERE 
+          comic.series = ?
+      )
+    ORDER BY
+      MIN(comic.uploaded_at) DESC
+    `,
+    )
+    .get(currentComicSeriesId) as ComicSeries | undefined;
 
-  const comicButton = (metadata: Metadata, text: string) => (
+  const nextComic = db
+    .prepare(
+      `
+    SELECT 
+      comic_series.id
+    FROM
+      comic_series
+    JOIN
+      comic
+      ON
+        comic.series = comic_series.id
+    GROUP BY
+      comic_series.id
+    HAVING
+      MIN(comic.uploaded_at) > (
+        SELECT
+          MIN(comic.uploaded_at)
+        FROM
+          comic
+        WHERE 
+          comic.series = ?
+      )
+    ORDER BY
+      MIN(comic.uploaded_at) ASC
+    `,
+    )
+    .get(currentComicSeriesId) as ComicSeries | undefined;
+
+  const comicButton = (comicSeries: ComicSeries, text: string) => (
     <Link
-      href={`/comic/${encodeURIComponent(metadata.series.id)}/`}
+      href={`/comic/${encodeURIComponent(comicSeries.id)}/`}
       className={classes.button}
     >
       {text}

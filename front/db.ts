@@ -3,7 +3,7 @@ import { MetaTableRow } from "./types/db";
 
 export const db = new Database(
   "/home/hakiergrzonzo/Desktop/programy/mma/scraper/mma.sqlite",
-  { readonly: true, verbose: console.log },
+  { readonly: true },
 );
 
 export interface ComicSeries {
@@ -24,7 +24,7 @@ export interface Comic {
 export interface Image {
   link: string;
   ocr: string;
-  height: string;
+  height: number;
   width: number;
   file_path: string;
   order: number;
