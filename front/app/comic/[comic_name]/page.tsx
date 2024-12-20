@@ -1,16 +1,10 @@
 import classes from "./page.module.css";
 import { Submission } from "@/components/Submission";
 import { PAGE_URL } from "@/constants";
-import {
-  getComicDescrtiptionFromAltText,
-  getImageUrl,
-  getSpecificMetadata,
-} from "@/utils";
-import { getSeriesTitle } from "@/clientUtils";
+import { getImageUrl } from "@/utils";
 import { Metadata } from "next";
 import Link from "next/link";
 import { env } from "process";
-import { getTags } from "@/tags";
 import TagLink from "@/components/TagLink";
 import Header from "@/components/Header";
 import BingeButtons from "@/components/BingeButtons";

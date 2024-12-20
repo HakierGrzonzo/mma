@@ -1,5 +1,4 @@
 import TagLink from "@/components/TagLink";
-import { getMetadataByTag, getTags, Tag } from "@/tags";
 import classes from "./page.module.css";
 import Header from "@/components/Header";
 import { Metadata } from "next";

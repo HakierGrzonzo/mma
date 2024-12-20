@@ -1,4 +1,4 @@
-import { Tag, normalizeSlash } from "@/tags";
+import { normalizeSlash } from "@/tags";
 import Link from "next/link";
 import { PropsWithChildren } from "react";
 import classes from "./TagLink.module.css";
