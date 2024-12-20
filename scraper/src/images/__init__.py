@@ -26,21 +26,25 @@ textract_semaphore = asyncio.Semaphore(5)
 
 async def handle_image(image: Image):
     was_image_downloaded = await image.is_downloaded()
+    does_need_to_be_saved = False
     if not was_image_downloaded:
         image.file_path = await image.get_file_path()
         await download_image_from_url(image.link, image.file_path)
+        does_need_to_be_saved = True
     if not image.is_measured():
         size = await extract_image_size(image.file_path)
         image.height = size["height"]
         image.width = size["width"]
+        does_need_to_be_saved = True
     if not image.is_ocr():
         async with textract_semaphore:
             image.ocr = await get_ocr_for_image(image)
+        does_need_to_be_saved = True
+    if does_need_to_be_saved:
+        image.save()
     return image
 
 
 async def download_images():
     images = await Image.objects()
-    images = await asyncio.gather(*[handle_image(i) for i in images])
-    for img in images:
-        img.save()
+    await asyncio.gather(*[handle_image(i) for i in images])
