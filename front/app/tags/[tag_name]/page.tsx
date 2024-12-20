@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import { MetaTable } from "@/components/MetaTable";
 import { PAGE_URL } from "@/constants";
+import { getMetaTableData, getMetaTableDataForTag } from "@/db";
 import {
   deNormalizeSlash,
   getMetadataByTag,
@@ -62,8 +63,8 @@ export default async function TagsList({ params }: Params) {
   const tagName = deNormalizeSlash(decodeURIComponent(tag_name));
   const { tagsByName } = await getTags();
   const tag = tagsByName[tagName];
-  const metadataByTag = await getMetadataByTag();
-  const metadatas = metadataByTag[tag.id] ?? [];
+
+  const rows = getMetaTableDataForTag(tag.id);
   return (
     <>
       <Header />
@@ -74,7 +75,7 @@ export default async function TagsList({ params }: Params) {
             {tag.details || "This tag does not have a description just yet"}
           </p>
         }
-        <MetaTable metadatas={metadatas} />
+        <MetaTable rows={rows} />
       </section>
     </>
   );

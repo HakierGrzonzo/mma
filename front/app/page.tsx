@@ -1,10 +1,10 @@
 import RSSbutton from "@/components/RSSbutton";
 import { MetaTable } from "@/components/MetaTable";
-import { getAllMetadata } from "@/utils";
 import { Metadata } from "next";
 import Link from "next/link";
 import { PAGE_URL } from "@/constants";
 import CoverImage from "@/components/CoverImage";
+import { getMetaTableData } from "@/db";
 
 export const metadata: Metadata = {
   title: "MoringMark Archive",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const metadatas = await getAllMetadata();
+  const data = getMetaTableData();
   return (
     <>
       <CoverImage>
@@ -44,7 +44,7 @@ export default async function Home() {
           Browse all comics or <Link href="/tags">browse by tags.</Link>
         </p>
         <RSSbutton />
-        <MetaTable metadatas={metadatas} />
+        <MetaTable rows={data} />
       </section>
     </>
   );

@@ -1,4 +1,5 @@
 import { Metadata } from "./types";
+import { MetaTableRow } from "./types/db";
 
 type DeserializedMetadata = Omit<Metadata, "latest_episode"> & {
   latest_episode: Date;
@@ -7,41 +8,27 @@ type DeserializedMetadata = Omit<Metadata, "latest_episode"> & {
 
 const filterFunctions: Record<
   string,
-  (a: DeserializedMetadata, b: DeserializedMetadata) => number
+  (a: MetaTableRow, b: MetaTableRow) => number
 > = {
-  name: (a, b) => a.series.title.localeCompare(b.series.title),
-  upvote: (a, b) => b.upvotes_total - a.upvotes_total,
-  upload: (a, b) => b.latest_episode.valueOf() - a.latest_episode.valueOf(),
-  firstUploaded: (a, b) =>
-    new Date(a.series.comics.at(-1)?.uploaded_at ?? "").valueOf() -
-    new Date(b.series.comics.at(-1)?.uploaded_at ?? "").valueOf(),
+  name: (a, b) => a.title.localeCompare(b.title),
+  upvote: (a, b) => b.totalUpvotes - a.totalUpvotes,
+  upload: (a, b) => b.lastEpisode.valueOf() - a.lastEpisode.valueOf(),
 } as const;
 
 export type Filters = keyof typeof filterFunctions;
 export type Direction = "asc" | "dsc";
 
 export function sortComicMetadata(
-  rawMetadatas: Metadata[],
+  data: MetaTableRow[],
   sortMethod: Filters,
   sortDirection: Direction = "asc",
 ) {
-  const data = rawMetadatas.map((item) => {
-    return {
-      ...item,
-      latest_episode: new Date(item.series.comics[0].uploaded_at),
-      upvotes_total: item.series.comics.reduce(
-        (sum, comic) => sum + comic.upvotes,
-        0,
-      ),
-    } as DeserializedMetadata;
-  });
-
   const filter = filterFunctions[sortMethod];
   const directedFilter =
     sortDirection === "asc"
       ? filter
-      : (a: DeserializedMetadata, b: DeserializedMetadata) => filter(b, a);
+      : (a: MetaTableRow, b: MetaTableRow) => filter(b, a);
 
-  const sortedData = data.sort(directedFilter);
+  const sortedData = data.toSorted(directedFilter);
   return sortedData;
 }

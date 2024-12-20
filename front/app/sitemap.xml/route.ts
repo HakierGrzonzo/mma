@@ -1,35 +1,61 @@
 // See https://github.com/vercel/next.js/issues/59136#issuecomment-1938195038
 
 import { PAGE_URL } from "@/constants";
-import { sortComicMetadata } from "@/hooks";
-import { getMetadataByTag } from "@/tags";
-import { Tag, getTags, normalizeSlash } from "@/tags";
-import { getAllMetadata } from "@/utils";
+import { db } from "@/db";
+import { normalizeSlash } from "@/tags";
 import { MetadataRoute } from "next";
 
 async function getSitemapForTags(): Promise<MetadataRoute.Sitemap> {
-  const { tags } = await getTags();
-  const newestTag = tags.at(-1) as Tag;
-  const newestTagTimestampInMiliseconds = newestTag.id * 1000;
-  const metadataPerTag = await getMetadataByTag();
+  const newestTagId = db
+    .prepare(
+      `
+    SELECT 
+      MAX(tag.id) * 1000 as id
+    FROM 
+      tag;
+ `,
+    )
+    .get() as { id: number };
+
+  const tags = db
+    .prepare(
+      `
+    SELECT 
+      tag.id as id,
+      tag.name as name,
+      MAX(comic.uploaded_at) as lastcomic
+    FROM 
+      tag
+    JOIN 
+      comic_series_tag
+      ON 
+         comic_series_tag.tag = tag.id
+    JOIN 
+      comic_series
+      ON 
+         comic_series_tag.comic_series = comic_series.id
+    JOIN 
+      comic 
+      ON 
+         comic_series.id = comic.series
+    GROUP BY 
+      tag.id;
+  `,
+    )
+    .all() as { id: number; name: string; lastcomic: string }[];
+
   return [
     {
       url: `${PAGE_URL}/tags/`,
       changeFrequency: "monthly",
-      lastModified: new Date(newestTagTimestampInMiliseconds),
+      lastModified: new Date(newestTagId.id),
       priority: 1,
     },
     ...(tags
       .map((t) => {
-        const metas = metadataPerTag[t.id] ?? [];
-        if (metas.length === 0) {
-          return undefined;
-        }
-        const sortedMetas = sortComicMetadata(metas, "date");
-        const lastMeta = sortedMetas[0];
         return {
           url: `${PAGE_URL}/tags/${normalizeSlash(t)}/`,
-          lastModified: lastMeta.latest_episode,
+          lastModified: new Date(t.lastcomic),
           priority: 0.7,
           changeFrequency: "weekly",
         };
@@ -39,8 +65,33 @@ async function getSitemapForTags(): Promise<MetadataRoute.Sitemap> {
 }
 
 async function getSitemap(): Promise<MetadataRoute.Sitemap> {
-  const rawMetadata = await getAllMetadata();
-  const metadata = sortComicMetadata(rawMetadata, "name");
+  const rows = db
+    .prepare(
+      `
+    SELECT 
+      comic_series.id as id, 
+      MAX(comic.uploaded_at) as last_episode,
+      COUNT(comic.id) > 1 as is_oneshot
+    FROM 
+      comic_series 
+    JOIN 
+      comic 
+    ON 
+      comic.series = comic_series.id 
+    GROUP BY 
+      comic_series.title 
+    ORDER BY 
+      last_episode DESC;
+  `,
+    )
+    .all() as { id: string; last_episode: string; is_oneshot: number }[];
+
+  const comicsInSitemap = rows.map((row) => ({
+    id: row.id,
+    lastEpisode: new Date(row.last_episode),
+    isOneshot: row.is_oneshot > 0,
+  }));
+
   return [
     {
       url: `${PAGE_URL}/`,
@@ -48,12 +99,11 @@ async function getSitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       priority: 1,
     },
-    ...(metadata.map((m) => {
-      const isOneshot = m.series.comics.length === 1;
+    ...(comicsInSitemap.map((comic) => {
       return {
-        url: `${PAGE_URL}/comic/${m.series.id}/`,
-        lastModified: m.series.comics[0].uploaded_at,
-        changeFrequency: isOneshot ? "monthly" : "weekly",
+        url: `${PAGE_URL}/comic/${comic.id}/`,
+        lastModified: comic.lastEpisode,
+        changeFrequency: comic.isOneshot ? "weekly" : "monthly",
         priority: 0.5,
       };
     }) as MetadataRoute.Sitemap),

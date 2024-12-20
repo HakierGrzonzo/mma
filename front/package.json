@@ -13,11 +13,13 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.623.0",
+    "@types/better-sqlite3": "^7.6.12",
     "@types/node": "20.5.7",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "@types/rss": "^0.0.32",
     "autoprefixer": "10.4.16",
+    "better-sqlite3": "^11.7.0",
     "eslint": "8.48.0",
     "eslint-config-next": "14.0.2",
     "intl-messageformat": "^10.5.0",
