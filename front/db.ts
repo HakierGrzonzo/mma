@@ -1,10 +1,7 @@
 import Database from "better-sqlite3";
 import { MetaTableRow } from "./types/db";
 
-export const db = new Database(
-  "/home/hakiergrzonzo/Desktop/programy/mma/scraper/mma.sqlite",
-  { readonly: true },
-);
+export const db = new Database(process.env.DB, { readonly: true });
 
 export interface ComicSeries {
   id: string;
