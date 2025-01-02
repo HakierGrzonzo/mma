@@ -10,4 +10,4 @@ WORKDIR /scraper
 COPY ./poetry.lock ./pyproject.toml .
 RUN poetry install --only=main
 COPY . .
-ENTRYPOINT poetry run python -m src deploy
+ENTRYPOINT poetry run ./runner.sh
