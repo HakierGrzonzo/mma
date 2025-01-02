@@ -5,14 +5,14 @@ import random
 
 BUCKET = environ["BUCKET"]
 
-def get_current_comic_ids():
+def get_current_comic_ids() -> list[str]:
     client = boto3.client('s3')
-    response = client.get_object(Bucket=BUCKET, Key="index.json")
+    response = client.get_object(Bucket=BUCKET, Key="ids.json")
     body = response["Body"]
 
     body_json = json.load(body)
 
-    return list(body_json.keys())
+    return body_json
 
 list_of_comic_ids = get_current_comic_ids()
 
@@ -28,11 +28,12 @@ def get_host_from_referer(referer_header_value: str):
 
     return DEFAULT_DOMAIN
 
-def get_comic_candidates(queryParams: dict):
+def get_comic_candidates(queryParams: dict) -> list[str]:
     except_comic_id = queryParams.get("except")
     if except_comic_id is None:
         return list_of_comic_ids
-    return [comic for comic in list_of_comic_ids if comic != except_comic_id]
+    possible_ids = filter(lambda c: c != except_comic_id, list_of_comic_ids)
+    return list(possible_ids)
 
 def lambda_handler(event, context):
     referer = event.get("headers", {}).get("Referer")
