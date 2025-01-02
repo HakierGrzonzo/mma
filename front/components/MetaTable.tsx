@@ -1,18 +1,19 @@
 "use client";
 import classes from "./metatable.module.css";
 import { useEffect, useState } from "react";
-import { Metadata } from "../types";
 import { getSeriesTitle } from "../clientUtils";
 import Link from "next/link";
 import { Direction, Filters, sortComicMetadata } from "@/hooks";
+import { MetaTableRow } from "@/types/db";
 
 interface Props {
-  metadatas: Metadata[];
+  rows: MetaTableRow[];
 }
 
-export function MetaTable({ metadatas }: Props) {
+export function MetaTable({ rows }: Props) {
   const [filter, setFilter] = useState<Filters>("upload");
   const [direction, setDirection] = useState<Direction>("asc");
+
   const [lastVisitedDate, setLastVisitedDate] = useState<null | Date>(null);
   useEffect(() => {
     try {
@@ -36,7 +37,7 @@ export function MetaTable({ metadatas }: Props) {
     year: "numeric",
   });
 
-  const sortedData = sortComicMetadata(metadatas, filter, direction);
+  const sortedData = sortComicMetadata(rows, filter, direction);
 
   const handleFilterClick = (newFilter: Filters) => () => {
     if (newFilter === filter) {
@@ -80,23 +81,23 @@ export function MetaTable({ metadatas }: Props) {
       </thead>
       <tbody>
         {sortedData.map((item, index) => (
-          <tr key={item.series.id}>
+          <tr key={item.id} id={item.id}>
             <td>
               <Link
                 className={
                   lastVisitedDate &&
-                  lastVisitedDate.valueOf() <= item.latest_episode.valueOf()
+                  lastVisitedDate.valueOf() <= item.lastEpisode.valueOf()
                     ? classes.unread
                     : undefined
                 }
                 prefetch={index < 6}
-                href={`/comic/${encodeURIComponent(item.series.id)}/`}
+                href={`/comic/${encodeURIComponent(item.id)}/`}
               >
-                {getSeriesTitle(item.series)}
+                {item.title}
               </Link>
             </td>
-            <td>{formatter.format(item.latest_episode)}</td>
-            <td className="text-right">{item.upvotes_total}</td>
+            <td>{formatter.format(item.lastEpisode)}</td>
+            <td className="text-right">{item.totalUpvotes}</td>
           </tr>
         ))}
       </tbody>

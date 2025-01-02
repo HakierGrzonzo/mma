@@ -6,9 +6,9 @@ const RANDOM_HOST =
 export function RandomComicButton({
   currentComic,
 }: {
-  currentComic?: Metadata;
+  currentComic?: { id: string };
 }) {
   const exceptText =
-    currentComic === undefined ? "" : `?except=${currentComic.series.id}`;
+    currentComic === undefined ? "" : `?except=${currentComic.id}`;
   return <a href={`${RANDOM_HOST}/random${exceptText}`}>Random Comic</a>;
 }

@@ -1,19 +1,8 @@
 import { PAGE_URL } from "@/constants";
-import { getAllMetadata, getSubmissionLinks } from "@/utils";
-import { Metadata, Comic } from "@/types";
+import { getSubmissionLinks } from "@/utils";
 import RSS from "rss";
 import { RSSdescription } from "@/components/RSSdescription";
-
-interface ComicWithMetadata {
-  comic: Comic;
-  metadata: Metadata;
-}
-
-function compare(a: ComicWithMetadata, b: ComicWithMetadata) {
-  const aDate = new Date(a.comic.uploaded_at);
-  const bDate = new Date(b.comic.uploaded_at);
-  return bDate.valueOf() - aDate.valueOf();
-}
+import { db } from "@/db";
 
 export async function GET() {
   const { renderToString } = await import("react-dom/server");
@@ -26,20 +15,37 @@ export async function GET() {
     ttl: 60, // 1 hour
   });
 
-  const rawMetadata = await getAllMetadata();
-  const comicsWithMetadata = rawMetadata.flatMap((metadata) => {
-    const { series } = metadata;
-    return series.comics.map((comic) => ({ comic, metadata }));
-  });
-  comicsWithMetadata.sort(compare);
-  comicsWithMetadata.length = 30;
+  const comics = db
+    .prepare(
+      `
+    SELECT 
+      comic.id as id,
+      comic.title as title,
+      comic.link as link,
+      comic_series.id as series_id,
+      comic.uploaded_at as uploaded_at
+    FROM
+      comic
+    JOIN 
+      comic_series
+      ON 
+        comic_series.id = comic.series
+    ORDER BY
+      comic.uploaded_at DESC
+    LIMIT 30
+    `,
+    )
+    .all() as {
+    id: string;
+    title: string;
+    link: string;
+    series_id: string;
+    uploaded_at: string;
+  }[];
 
-  comicsWithMetadata.forEach((comicWithMetadata) => {
-    const { comic, metadata } = comicWithMetadata;
-    let description = renderToString(
-      <RSSdescription comic={comic} metadata={metadata} />,
-    );
-    const seriesLink = `${PAGE_URL}/comic/${metadata.series.id}`;
+  comics.forEach((comic) => {
+    let description = renderToString(<RSSdescription comic={comic} />);
+    const seriesLink = `${PAGE_URL}/comic/${comic.series_id}`;
     const { comicLink } = getSubmissionLinks(seriesLink, comic.title);
     feed.item({
       title: comic.title,

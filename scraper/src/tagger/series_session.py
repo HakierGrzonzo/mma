@@ -6,36 +6,47 @@ from typing import TYPE_CHECKING
 from prompt_toolkit import HTML, print_formatted_text
 from prompt_toolkit.completion import NestedCompleter
 from term_image.image import AutoImage
-from PIL import Image
-from ..metadata import Metadata
+from PIL import Image as PILimage
+
+from src.schema.tables import ComicSeries, ComicSeriesTag, Image
 from xml.parsers.expat import ExpatError
 from ..storage_service import storage
 
 if TYPE_CHECKING:
-    from src.tagger.tagging_session import TaggingSession
+    from src.tagger.tagging_session import TaggingSession, SubjectInfo
 else:
     TaggingSession = None
+    SubjectInfo = None
 
 logger = getLogger(__name__)
 
 
 class SeriesSession:
-    def __init__(self, meta: Metadata, tagging_session: TaggingSession) -> None:
-        self.subject = meta
+    def __init__(
+        self, comic_series: SubjectInfo, tagging_session: TaggingSession
+    ) -> None:
+        self.subject = comic_series
         self.parent = tagging_session
         self.image_cursor = 0
-        image_ids = sum(
-            [c.image_urls for c in reversed(self.subject.series.comics)],
-            start=[],
-        )
-        self.image_meta = [self.subject.images[id] for id in image_ids]
-        self.images = [asyncio.Future() for _ in self.image_meta]
+        self.images = [
+            asyncio.Future() for _ in range(self.subject["number_of_images"])
+        ]
+        self.tags_to_add = []
 
     def start_downloading_images(self):
         self.parent.run_in_background(self._download_images())
 
     async def _download_images(self):
-        for i, image in enumerate(self.image_meta):
+        images = (
+            await Image.select(*Image.all_columns())
+            .where(Image.comic._.series._.id == self.subject["id"])
+            .order_by(
+                Image.comic._.uploaded_at,
+                Image.order,
+            )
+        )
+        for i, image in enumerate(images):
+            image = Image(**image)
             if image.file_path:
                 content = await storage.get_object_bytes(image.file_path)
             else:
@@ -59,7 +70,7 @@ class SeriesSession:
         if image_bytes is None:
             return
         io = BytesIO(image_bytes)
-        img = Image.open(io)
+        img = PILimage.open(io)
         auto_image = AutoImage(img, height=30)
         auto_image.draw(h_align="left", v_align="bottom", pad_height=10)
         print(f"({self.image_cursor + 1}/{len(self.images)})")
@@ -68,14 +79,25 @@ class SeriesSession:
         separator = "=" * 20
         print_formatted_text(f"\n{separator}\n")
 
-    def _print_series_details(self):
-        human_readable_tags = self.parent.tag_sheet.resolve_ids_to_names(
-            self.subject.tags
+    async def _print_series_details(self):
+        tags = await ComicSeries.raw(
+            """
+        SELECT 
+            tag.name 
+        FROM 
+            comic_series 
+            JOIN comic_series_tag 
+                ON comic_series_tag.comic_series = comic_series.id 
+            JOIN tag 
+                ON tag.id = comic_series_tag.tag 
+        WHERE comic_series.id = {};
+        """,
+            self.subject["id"],
         )
         self._print_separator()
         text = f"""
-<b>Title:</b>\t<i>{self.subject.series.title}</i>
-<b>Tags:</b>\t<i>{", ".join(human_readable_tags)}</i>
+<b>Title:</b>\t<i>{self.subject['title']}</i>
+<b>Tags:</b>\t<i>{", ".join([tag['name'] for tag in tags])}</i>
         """
         try:
             print_formatted_text(HTML(text))
@@ -85,7 +107,7 @@ class SeriesSession:
     async def prompt_user(self):
         completer = NestedCompleter.from_nested_dict(
             {
-                "tag": self.parent.tag_sheet.get_completer(),
+                "tag": await self.parent.tag_sheet.get_completer(),
                 "new": None,
                 "save": None,
                 "next": None,
@@ -108,7 +130,7 @@ class SeriesSession:
                 break
             yield command, args
 
-    def add_tag(self, tag_name):
+    async def add_tag(self, tag_name):
         if tag_name is None:
             logger.error("Can't add empty tag")
             return
@@ -118,28 +140,30 @@ class SeriesSession:
         else:
             tags = [tag_name.strip()]
         for tag_name in tags:
-            tag = self.parent.tag_sheet.get(tag_name)
+            tag = await self.parent.tag_sheet.get(tag_name)
+            self.tags_to_add.append(tag)
             print_formatted_text(f"Added tag {tag}")
-            self.subject.tags.append(tag.id)
 
     async def save_subject_with_new_tags(self):
-        await self.subject.save()
+        operation = ComicSeriesTag.insert()
+        for tag in self.tags_to_add:
+            operation.add(ComicSeriesTag(tag=tag.id, comic_series=self.subject["id"]))
+        await operation
 
     async def tag_series(self):
         await self._draw_image()
-        self._print_series_details()
+        await self._print_series_details()
         async for command, args in self.prompt_user():
             match command:
                 case "new":
                     try:
-                        self.parent.tag_sheet.create(args)
-                        self.parent.run_in_background(self.parent.tag_sheet.save())
-                        self.add_tag(args)
+                        await self.parent.tag_sheet.create(args)
+                        await self.add_tag(args)
                     except AssertionError:
                         print("Failed to create tag, duplicate exists")
                 case "tag":
                     try:
-                        self.add_tag(args)
+                        await self.add_tag(args)
                     except KeyError:
                         logger.error(f"Tag {args} does not exist")
                 case "next":
@@ -149,13 +173,16 @@ class SeriesSession:
                     self.image_cursor -= 1
                     await self._draw_image()
                 case "list":
-                    self._print_series_details()
+                    await self._print_series_details()
                 case "clear":
-                    self.subject.tags = []
-                    self._print_series_details()
+                    await ComicSeriesTag.delete().where(
+                        ComicSeriesTag.comic_series == self.subject["id"]
+                    )
+                    self.tags_to_add = []
+                    await self._print_series_details()
                 case "revert":
-                    self.subject.tags = self.subject.tags[:-1]
-                    self._print_series_details()
+                    self.tags_to_add.pop()
+                    await self._print_series_details()
                 case _:
                     print_formatted_text("unknown command")
         self.parent.run_in_background(self.save_subject_with_new_tags())

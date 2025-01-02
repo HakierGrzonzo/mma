@@ -1,10 +1,10 @@
-import { Tag, normalizeSlash } from "@/tags";
+import { normalizeSlash } from "@/tags";
 import Link from "next/link";
 import { PropsWithChildren } from "react";
 import classes from "./TagLink.module.css";
 
 interface Props extends PropsWithChildren {
-  tag: Tag;
+  tag: { name: string; description: string | null };
   prefetch?: boolean;
 }
 
@@ -15,7 +15,7 @@ export default function TagLink({ tag, children, prefetch }: Props) {
       prefetch={prefetch ?? false}
       href={`/tags/${encodeURIComponent(normalizeSlash(tag))}`}
     >
-      <div title={tag.details} className={classes.tag}>
+      <div title={tag.description ?? undefined} className={classes.tag}>
         {tag.name} {children}
       </div>
     </Link>

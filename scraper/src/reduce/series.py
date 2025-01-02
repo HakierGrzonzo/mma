@@ -1,4 +1,4 @@
-from ..api import Comic
+from praw.models import Submission
 from pathlib import Path
 from lark import Lark, ParseError, Transformer
 
@@ -32,7 +32,7 @@ class ComicTitleTransformer(Transformer):
 transformer = ComicTitleTransformer()
 
 
-def get_possible_series(comic: Comic) -> tuple[str, str] | None:
+def get_possible_series(comic: Submission) -> tuple[str, str] | None:
     edge_case_comics = [
         "16cgmg1",  # First part of Grom Factor lacks the series indicator
         "18ofkcf",  # First part of Mama Eda also lacks it
