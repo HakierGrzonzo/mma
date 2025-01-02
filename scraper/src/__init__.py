@@ -1,6 +1,7 @@
 import logging
 
 from src.api import get_comics
+from src.exports import export_series_id_json
 from src.images import download_images
 from src.reduce import reduce_submissions_to_series
 from src.schema.tables import Comic
@@ -14,3 +15,4 @@ async def main():
         comics = get_comics()
         await reduce_submissions_to_series(comics)
         await download_images()
+        await export_series_id_json()
