@@ -19,7 +19,10 @@ if secret is None:
     logger.error("No SECRET env specified!")
     secret = "foo"
 
-http_client = httpx.AsyncClient(headers={"User-Agent": USER_AGENT})
+http_transport = httpx.AsyncHTTPTransport(retries=5, http2=True, http1=True)
+http_client = httpx.AsyncClient(
+    headers={"User-Agent": USER_AGENT}, timeout=30, transport=http_transport
+)
 
 reddit = praw.Reddit(
     user_agent=USER_AGENT,
