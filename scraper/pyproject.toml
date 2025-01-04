@@ -19,6 +19,7 @@ lark = "^1.2.2"
 prompt-toolkit = "^3.0.47"
 term-image = "^0.7.2"
 piccolo = {extras = ["sqlite"], version = "^1.22.0"}
+h2 = "^4.1.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.5"

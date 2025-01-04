@@ -41,7 +41,7 @@ async def handle_image(image: Image):
             image.ocr = await get_ocr_for_image(image)
         does_need_to_be_saved = True
     if does_need_to_be_saved:
-        image.save()
+        await image.save()
     return image
 
 
