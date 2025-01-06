@@ -24,6 +24,34 @@ class SeriesRecognitionTestCase(unittest.TestCase):
         result = get_possible_series(ComicLike(input))
         self.assertIsNone(result)
 
+    @parameterized.expand(
+        [
+            ("Evil Luz : Lumity", "Evil Luz", "Lumity"),
+            ("Evil Luz: Detention Track ", "Evil Luz", "Detention Track"),
+            ("Luzifer AU: Who I am to judge", "Luzifer AU", "Who I am to judge"),
+        ]
+    )
+    def test_handles_prefix_series(self, input, expected, expected_part):
+        result = get_possible_series(ComicLike(input))
+        self.assertIsNotNone(result)
+        title, part = result
+        self.assertEqual(title, expected)
+        self.assertEqual(part, expected_part)
+
+    def test_handles_evil_luz_vs_emperor_belos(self):
+        result = get_possible_series(ComicLike("Evil Luz vs Emperor Belos", "1f8u244"))
+        self.assertIsNotNone(result)
+        title, part = result
+        self.assertEqual(title, "Evil Luz")
+        self.assertEqual(part, "Evil Luz vs. Emperor Belos")
+
+    def test_handles_evil_luz_au(self):
+        result = get_possible_series(ComicLike("Evil Luz AU", "1f4vz4t"))
+        self.assertIsNotNone(result)
+        title, part = result
+        self.assertEqual(title, "Evil Luz")
+        self.assertEqual(part, "Evil Luz AU")
+
     def test_handles_grom_factors_first_part(self):
         result = get_possible_series(ComicLike("Grom Factor", "16cgmg1"))
         self.assertIsNotNone(result)

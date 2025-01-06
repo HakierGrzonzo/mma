@@ -1,4 +1,10 @@
-start : multiple_words " "* series_marker " "* multiple_words?
+start: conventional_series | prefix_series
+
+prefix_series: prefix_series_title " "* ":" " "* multiple_words
+
+?prefix_series_title: "Evil Luz" -> evil_luz | "Luzifer AU" -> luzifer_au
+
+conventional_series: multiple_words " "* series_marker " "* multiple_words?
 
 ?series_marker: hash_marker | out_of_marker | a_little_hint_of_blue_marker
 

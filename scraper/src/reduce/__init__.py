@@ -1,4 +1,5 @@
 from datetime import datetime
+from logging import getLogger
 from typing import Generator
 from praw.models import Submission
 
@@ -8,10 +9,26 @@ from ..schema.tables import Comic, ComicSeries, Image
 from collections import defaultdict
 from string import ascii_letters, digits
 
+logger = getLogger(__name__)
+
+
+async def handle_orphan_series(series_id: str):
+    number_of_comics = await Comic.count().where(Comic.series == series_id)
+    if number_of_comics == 0:
+        logger.warn(f"Series {series_id} is an orphan, deleting")
+        await ComicSeries.delete().where(ComicSeries.id == series_id)
+
 
 async def update_comic(series_id: str, comic: Submission, prefixes: dict[str, str]):
     existing_comic = await Comic.select().where(Comic.id == comic.id).first()
     if existing_comic:
+        if series_id != (old_series_id := existing_comic["series"]):
+            logger.warn(
+                f"Inconsistent series in {existing_comic['title']}, swapping to {series_id}"
+            )
+            await Comic.update({Comic.series: series_id}).where(Comic.id == comic.id)
+            await handle_orphan_series(old_series_id)
+
         return (
             await Comic.update({Comic.upvotes: comic.score})
             .where(Comic.id == comic.id)
