@@ -80,6 +80,17 @@ async def get_metas():
     return sorted_series
 
 
+async def import_missing_links():
+    metadatas = await get_metas()
+    for metadata in metadatas:
+        for old_comic in metadata.series.comics:
+            comic = await Comic.objects().where(Comic.id == old_comic.id).first()
+            assert comic is not None
+            if comic.link == "":
+                comic.link = old_comic.link
+                await comic.save([Comic.link])
+
+
 async def import_existing_data():
     metadatas, tag_sheet = await asyncio.gather(get_metas(), get_tags())
     async with ComicSeries._meta.db.transaction():

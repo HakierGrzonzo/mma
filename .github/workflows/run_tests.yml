@@ -35,6 +35,11 @@ jobs:
       run: |
         poetry install
 
+    - name: Download data
+      working-directory: ./scraper
+      run: |
+        wget http://img.moringmark.grzegorzkoperwas.site/mma.sqlite --output-document mma.sqlite
+
     - name: Run tests
       working-directory: ./scraper
       run: |
