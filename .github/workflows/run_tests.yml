@@ -33,7 +33,7 @@ jobs:
     - name: Install dependencies
       working-directory: ./scraper
       run: |
-        poetry install
+        poetry install --no-root
 
     - name: Download data
       working-directory: ./scraper

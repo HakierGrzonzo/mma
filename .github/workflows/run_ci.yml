@@ -44,7 +44,7 @@ jobs:
     - name: Install dependencies
       working-directory: ./scraper
       run: |
-        poetry install
+        poetry install --no-root
 
     - name: Run ruff format
       working-directory: ./scraper
