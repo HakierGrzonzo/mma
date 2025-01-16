@@ -33,10 +33,7 @@ class SeriesSession:
         ]
         self.tags_to_add = []
 
-    def start_downloading_images(self):
-        self.parent.run_in_background(self._download_images())
-
-    async def _download_images(self):
+    async def download_images(self):
         images = (
             await Image.select(*Image.all_columns())
             .where(Image.comic._.series._.id == self.subject["id"])

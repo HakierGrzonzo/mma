@@ -1,5 +1,4 @@
 import asyncio
-from itertools import pairwise
 from typing import TypedDict
 
 from prompt_toolkit import PromptSession, patch_stdout
@@ -26,6 +25,10 @@ class TaggingSession:
         new_task = asyncio.create_task(coroutine)
         self.background_tasks.append(new_task)
 
+    async def download_images(self, series_sessions: list[SeriesSession]):
+        for session in series_sessions:
+            await session.download_images()
+
     async def tagging_loop(self):
         series_to_tag: list[SubjectInfo] = await ComicSeries.raw(
             """
@@ -49,22 +52,13 @@ class TaggingSession:
         if len(series_to_tag) == 0:
             print("No series to tag!")
             return
+        series = [SeriesSession(s, self) for s in series_to_tag]
+        self.run_in_background(self.download_images(series))
         with patch_stdout.patch_stdout(True):
-            sessions_with_numbers = [
-                (i, SeriesSession(meta, self)) for i, meta in enumerate(series_to_tag)
-            ]
-            sessions_with_numbers[0][1].start_downloading_images()
-            iterator = (
-                pairwise(sessions_with_numbers)
-                if len(sessions_with_numbers) > 1
-                else [(sessions_with_numbers[0], (1, None))]
-            )
-            for (i, series_session), (_, next_session) in iterator:
+            for i, series in enumerate(series):
                 print(f"({i+1}/{len(series_to_tag)})")
-                if next_session:
-                    next_session.start_downloading_images()
                 try:
-                    await series_session.tag_series()
+                    await series.tag_series()
                 except EOFError:
                     break
         await asyncio.gather(*self.background_tasks)

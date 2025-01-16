@@ -28,7 +28,11 @@ class SeriesRecognitionTestCase(unittest.TestCase):
         [
             ("Evil Luz : Lumity", "Evil Luz", "Lumity"),
             ("Evil Luz: Detention Track ", "Evil Luz", "Detention Track"),
-            ("Luzifer AU: Who I am to judge", "Luzifer AU", "Who I am to judge"),
+            (
+                "Luzifer AU: Who I am to judge",
+                "Luzifer AU",
+                "Who I am to judge",
+            ),
         ]
     )
     def test_handles_prefix_series(self, input, expected, expected_part):

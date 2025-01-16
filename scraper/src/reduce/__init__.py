@@ -68,7 +68,9 @@ async def update_existing_series(
         await update_comic(series.id, comic, prefixes)
 
 
-async def reduce_submissions_to_series(submissions: Generator[Submission, None, None]):
+async def reduce_submissions_to_series(
+    submissions: Generator[Submission, None, None],
+):
     series_titles = {}
     series_prefixes = defaultdict(lambda: "")
     comics_dict: defaultdict[str, list[Submission]] = defaultdict(list)
