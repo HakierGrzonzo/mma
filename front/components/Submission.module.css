@@ -45,3 +45,15 @@
 .submissionHeader:hover {
   color: var(--purple);
 }
+
+.special {
+  background-color: var(--purple);
+  padding: 1em;
+  text-align: center;
+  font-size: 200%;
+  border-radius: 8px;
+}
+
+.special a {
+  color: var(--accent-4);
+}

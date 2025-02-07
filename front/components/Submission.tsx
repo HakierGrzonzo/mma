@@ -7,6 +7,41 @@ import { db } from "@/db";
 import type { Image as Timage } from "@/db";
 import Image from "next/image";
 
+type Special = Record<string, JSX.Element>;
+
+const specialHeaders: Special = {
+  "1i8w04h": (
+    <p className={classes.special}>
+      <a href="/comic/Luzifer%20AU%20tumblr/">Tumblr timeline</a> merges here.
+    </p>
+  ),
+  "1h1wjv6alt": (
+    <p className={classes.special}>
+      Continues from{" "}
+      <a href="/comic/Luzifer%20AU#Luzifer%20AU%3A%20Decision%20">
+        the main timeline.
+      </a>
+    </p>
+  ),
+};
+
+const specialFooters: Special = {
+  "1hy4zx9alt": (
+    <p className={classes.special}>
+      Continues in the{" "}
+      <a href="/comic/Luzifer%20AU#Luzifer%20AU%3A%20First%20Meet">
+        main timeline.
+      </a>
+    </p>
+  ),
+  "1guxrlu": (
+    <p className={classes.special}>
+      <a href="/comic/Luzifer AU tumblr/">Alternative tumblr timeline</a> splits
+      here!
+    </p>
+  ),
+};
+
 export function Submission({
   isOneshot,
   pageUrl,
@@ -48,8 +83,10 @@ export function Submission({
 
   const uploadDate = new Date(comic.uploaded_at);
   const { idForComic, comicLink } = getSubmissionLinks(pageUrl, comic.title);
+  console.log(comic.link, comic.title, comicId);
   return (
     <div className={classes.submission}>
+      {specialHeaders[comicId] ?? null}
       <div className={classes.metadataContainer}>
         {!isOneshot && (
           <CopyToClipboard text={comicLink}>
@@ -82,6 +119,7 @@ export function Submission({
           />
         );
       })}
+      {specialFooters[comicId] ?? null}
     </div>
   );
 }
