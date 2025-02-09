@@ -13,7 +13,8 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: [
           "GPTBot",
           "ChatGPT-User",
-          "Google-Extended",
+          // Test if it has impact
+          //"Google-Extended",
           "CCBot",
           "PerplexityBot",
           "anthropic-ai",
