@@ -126,6 +126,10 @@ module "mma_webroot" {
     path                       = "/_next/*"
     policy_id                  = data.aws_cloudfront_cache_policy.caching_optimized.id
     response_headers_policy_id = aws_cloudfront_response_headers_policy.mma["optimized"].id
+    }, {
+    path                       = "/assets/*"
+    policy_id                  = data.aws_cloudfront_cache_policy.caching_optimized.id
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.mma["optimized"].id
   }]
 }
 
