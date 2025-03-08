@@ -40,6 +40,22 @@ const specialFooters: Special = {
       here!
     </p>
   ),
+  "1j08araalt": (
+    <p className={classes.special}>
+      The rest of hunter is stuck in{" "}
+      <a href="/comic/Luzifer%20AU#Luzifer%20AU%3A%20Phantom%20Limb">
+        the main timeline.
+      </a>
+    </p>
+  ),
+  "1j08ara": (
+    <p className={classes.special}>
+      Luz and hunter&apos;s hand goes to{" "}
+      <a href="/comic/Luzifer%20AU%20tumblr#Luzifer%20AU%3A%20Phantom%20Limb%20-%20Alternative%20Timeline">
+        the tumblr timeline.
+      </a>
+    </p>
+  ),
 };
 
 export function Submission({
