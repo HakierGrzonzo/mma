@@ -12,7 +12,7 @@ export default function RSSbutton() {
       <Image
         alt="rss icon"
         className={classes.icon}
-        src="/feed.png"
+        src="/assets/feed32.png"
         width={14}
         height={14}
       />{" "}
