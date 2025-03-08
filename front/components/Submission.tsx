@@ -99,7 +99,6 @@ export function Submission({
 
   const uploadDate = new Date(comic.uploaded_at);
   const { idForComic, comicLink } = getSubmissionLinks(pageUrl, comic.title);
-  console.log(comic.link, comic.title, comicId);
   return (
     <div className={classes.submission}>
       {specialHeaders[comicId] ?? null}
