@@ -43,7 +43,7 @@ export default function RootLayout({
           sizes="16x16"
           href="/favicon-16x16.png"
         />
-        <link rel="preload" href="/cover.webp" as="image" />
+        <link rel="preload" href="/assets/cover.webp" as="image" />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#e3606c" />
         <meta name="msapplication-TileColor" content="#da532c" />
