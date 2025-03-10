@@ -3,6 +3,14 @@ import { Metadata } from "next";
 import { siteConfig } from "@/config/site";
 import Link from "next/link";
 import UpdatedAtTimestamp from "@/components/UpdatedAtTimestamp";
+import { Karla } from "next/font/google";
+
+const karla = Karla({
+  weight: ["400", "700"],
+  display: "swap",
+  subsets: ["latin"],
+  preload: true,
+});
 
 export const metadata: Metadata = {
   title: {
@@ -24,7 +32,7 @@ export default function RootLayout({
 }) {
   const now = new Date();
   return (
-    <html lang="en">
+    <html lang="en" className={karla.className}>
       <head>
         <link
           rel="apple-touch-icon"
