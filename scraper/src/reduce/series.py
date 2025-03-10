@@ -10,6 +10,7 @@ parser = Lark(raw_grammar)
 class ComicTitleTransformer(Transformer):
     evil_luz = lambda _1, _2: "Evil Luz"  # noqa: E731
     luzifer_au = lambda _1, _2: "Luzifer AU"  # noqa: E731
+    actor_au = lambda _1, _2: "Actor AU"  # noqa: E731
 
     def multiple_words(self, items):
         return " ".join(items)

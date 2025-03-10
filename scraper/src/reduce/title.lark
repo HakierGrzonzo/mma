@@ -2,7 +2,9 @@ start: conventional_series | prefix_series
 
 prefix_series: prefix_series_title " "* ":" " "* multiple_words
 
-?prefix_series_title: "Evil Luz" -> evil_luz | "Luzifer AU" -> luzifer_au
+?prefix_series_title: "Evil Luz" -> evil_luz 
+  | "Luzifer AU" -> luzifer_au
+  | "Actor AU" -> actor_au
 
 conventional_series: multiple_words " "* series_marker " "* multiple_words?
 
