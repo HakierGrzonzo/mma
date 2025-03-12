@@ -18,6 +18,10 @@ variable "reddit_api_secret" {
   sensitive = true
 }
 
+variable "tumblr_api_secret" {
+  type      = string
+  sensitive = true
+}
 
 resource "aws_route53_zone" "mma" {
   name = local.root_domain

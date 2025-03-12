@@ -102,6 +102,10 @@ resource "aws_ecs_task_definition" "mma-scraper" {
         value = var.reddit_api_secret
       },
       {
+        name  = "TUMBLR_API_KEY"
+        value = var.tumblr_api_secret
+      },
+      {
         name  = "BUCKET"
         value = module.mma_images.bucket.id
       },
