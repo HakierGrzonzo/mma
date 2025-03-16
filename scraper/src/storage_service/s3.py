@@ -1,8 +1,11 @@
 import asyncio
 from io import BytesIO
+from logging import getLogger
 from .base import BaseService
 import boto3
 import botocore
+
+logger = getLogger(__name__)
 
 
 class S3Storage(BaseService):
@@ -33,6 +36,9 @@ class S3Storage(BaseService):
             if e.response["Error"]["Code"] == "404":
                 return False
             raise e
+        except botocore.exceptions.ParamValidationError:
+            logger.error(f"Failed to get object with key {key=}")
+            return False
 
     async def get_object_bytes(self, key):
         io = BytesIO()
