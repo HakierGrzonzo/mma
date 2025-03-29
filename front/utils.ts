@@ -6,7 +6,8 @@ const IMAGE_HOST =
   `${devProtocol}://${bucket_name}.s3-website-us-east-1.amazonaws.com`;
 
 export function getImageUrl(image: { file_path: string }) {
-  const imagePath = image.file_path.replace("./results/", "");
+  let imagePath = image.file_path.replace("./results/", "");
+  imagePath = encodeURIComponent(imagePath);
   if (bucket_name === undefined) {
     return `/images/${imagePath}`;
   }
