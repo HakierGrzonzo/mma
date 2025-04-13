@@ -133,7 +133,7 @@ resource "aws_scheduler_schedule" "mma-refresh" {
     mode = "OFF"
   }
 
-  schedule_expression          = "cron(30 15,22 * * ? *)"
+  schedule_expression          = "cron(30 16,2 * * ? *)"
   schedule_expression_timezone = "Europe/Warsaw"
 
   target {
