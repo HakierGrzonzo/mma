@@ -1,7 +1,6 @@
 "use client";
 import classes from "./metatable.module.css";
 import { useEffect, useState } from "react";
-import { getSeriesTitle } from "../clientUtils";
 import Link from "next/link";
 import { Direction, Filters, sortComicMetadata } from "@/hooks";
 import { MetaTableRow } from "@/types/db";
