@@ -1,0 +1,13 @@
+.container * {
+  min-width: min(80vw, 600px);
+}
+
+input.search {
+  border: 0px;
+  border-bottom: 1px solid var(--accent-6);
+  font-size: 120%;
+  padding: 0.3em;
+  outline: none;
+  background-color: var(--background);
+  color: var(--foreground);
+}
