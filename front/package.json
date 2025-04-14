@@ -32,7 +32,8 @@
     "react-dom": "18.2.0",
     "rss": "^1.2.2",
     "sql.js": "^1.13.0",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "use-debounce": "^10.0.4"
   },
   "devDependencies": {
     "eslint-config-prettier": "^9.1.0"

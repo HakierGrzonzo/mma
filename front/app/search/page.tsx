@@ -7,6 +7,9 @@ export default async function SearchPage() {
     <>
       <Header />
       <SqliteProvider>
+        <noscript>
+          Dear User, this page requires client side javascript+wasm to work :(
+        </noscript>
         <Search />
       </SqliteProvider>
     </>

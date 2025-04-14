@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useMemo,
 } from "react";
 import initSqlJs, { BindParams, Database } from "sql.js";
 
@@ -47,24 +48,42 @@ export function useSqlQuery<T>(
   params: BindParams | undefined = undefined,
 ) {
   const db = useContext(SqliteContext);
-  const result = makeQuery(db, query, params);
+  const result = useMemo(
+    () => makeQuery(db, query, params),
+    [db, query, params],
+  );
   return result as T[];
 }
 
 export function SqliteProvider({ children }: PropsWithChildren) {
-  const [db, setDb] = useState<Database | null>(null);
+  const [db, setDb] = useState<Database | "error" | null>(null);
   useEffect(() => {
     const foo = async () => {
       const sql = await loadData();
       setDb(sql);
     };
     if (db === null) {
-      foo();
+      foo().catch(() => setDb("error"));
     }
   }, [db, setDb]);
 
   if (db === null) {
-    return <p>loading...</p>;
+    return (
+      <section>
+        <p>Loading the database...</p>
+      </section>
+    );
+  }
+  if (db === "error") {
+    return (
+      <section>
+        <h1>:-(</h1>
+        <p>
+          This page requires webassembly to work, or your browser does not like
+          sqlite
+        </p>
+      </section>
+    );
   }
   return <SqliteContext.Provider value={db}>{children}</SqliteContext.Provider>;
 }

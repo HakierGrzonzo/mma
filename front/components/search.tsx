@@ -4,16 +4,20 @@ import classes from "./search.module.css";
 import { useSqlQuery } from "./SqliteContext";
 import { usePathname, useSearchParams } from "next/navigation";
 import { getSubmissionLinks } from "@/utils";
+import { useDebounce } from "use-debounce";
+import { useEffect, useState } from "react";
 
 export function Search() {
   const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("query") || "";
+  const [query, setQuery] = useState(initialQuery);
   const pathname = usePathname();
-  const query = searchParams.get("query") || "";
-  const setQuery = (value: string) => {
-    const encoded = encodeURIComponent(value);
+  const [debouncedQuery] = useDebounce(query, 300);
+  const pattern = `%${debouncedQuery}%`;
+  useEffect(() => {
+    const encoded = encodeURIComponent(debouncedQuery);
     history.replaceState(null, "", `${pathname}?query=${encoded}`);
-  };
-  const pattern = `%${query}%`;
+  }, [debouncedQuery, pathname]);
   const result = useSqlQuery<{
     id: string;
     title: string;
@@ -44,6 +48,7 @@ export function Search() {
         OR 
         ocrMatch
       GROUP BY comic_series.id
+      LIMIT 200
       ;
     `,
     [pattern, pattern],
