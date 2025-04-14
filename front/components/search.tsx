@@ -64,14 +64,18 @@ export function Search() {
         onChange={(e) => setQuery(e.target.value)}
       />
       <ul>
-        {result.map((r) => {
+        {result.map((r, i) => {
           const { comicLink } = getSubmissionLinks(
             `/comic/${encodeURIComponent(r.id)}`,
             r.comicTitle,
           );
           return (
             <li key={r.id}>
-              <Link title={r.ocrMatch ? r.ocr : undefined} href={comicLink}>
+              <Link
+                prefetch={i < 2}
+                title={r.ocrMatch ? r.ocr : undefined}
+                href={comicLink}
+              >
                 {r.title}{" "}
                 {r.ocrMatch && r.isMultipart ? `(${r.comicTitle})` : null}
               </Link>
