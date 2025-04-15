@@ -11,6 +11,7 @@ export default function Header({ currentComicSeries }: Props) {
     <div className={classes.stickyHeader}>
       <Link href="/">Home</Link>
       <Link href="/tags">Tags</Link>
+      <Link href="/search">Search</Link>
       <RandomComicButton currentComic={currentComicSeries} />
     </div>
   );

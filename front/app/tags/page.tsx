@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "A list of moringmark comics, categorized by ships, characters and other tags",
     images: {
-      url: `${PAGE_URL}/cover.webp`,
+      url: `${PAGE_URL}/assets/cover.webp`,
     },
   },
 };

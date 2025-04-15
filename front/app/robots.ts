@@ -7,14 +7,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: "/random",
+        disallow: ["/random", "/search"],
       },
       {
         userAgent: [
           "GPTBot",
           "ChatGPT-User",
-          // Test if it has impact
-          //"Google-Extended",
           "CCBot",
           "PerplexityBot",
           "anthropic-ai",

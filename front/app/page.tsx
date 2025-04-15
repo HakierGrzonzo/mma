@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     title: `MoringMark Archive`,
     description: `An archive of all MoringMark comics about The Owl House, well most of them`,
     images: {
-      url: `${PAGE_URL}/cover.webp`,
+      url: `${PAGE_URL}/assets/cover.webp`,
     },
   },
   alternates: {
@@ -41,7 +41,8 @@ export default async function Home() {
       </CoverImage>
       <section>
         <p style={{ fontSize: "120%" }}>
-          Browse all comics or <Link href="/tags">browse by tags.</Link>
+          Browse all comics, <Link href="/search">use the search</Link> or{" "}
+          <Link href="/tags">browse by tags.</Link>
         </p>
         <RSSbutton />
         <MetaTable rows={data} />
