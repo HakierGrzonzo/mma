@@ -56,13 +56,14 @@ export function Search() {
   return (
     <section className={classes.container}>
       <h1>Search</h1>
-      <input
-        className={classes.search}
-        value={query}
-        type="search"
-        placeholder="Type to search for comics"
-        onChange={(e) => setQuery(e.target.value)}
-      />
+      <div className={classes.search}>
+        <input
+          value={query}
+          type="search"
+          placeholder="Type to search for comics"
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
       {query === "" ? (
         <p>Start typing to see results</p>
       ) : result.length === 0 ? (

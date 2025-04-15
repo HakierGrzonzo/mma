@@ -5,16 +5,21 @@
 
 .container ul {
   font-size: 110%;
+  line-height: 180%;
 }
 
-input.search {
-  border: 0px;
+.search input {
+  border: 1px solid transparent;
   border-bottom: 1px solid var(--accent-6);
   font-size: 120%;
   padding: 0.3em;
   outline: none;
   background-color: var(--background);
   color: var(--foreground);
+}
+
+.search input:focus {
+  border: 1px solid var(--accent-6);
 }
 
 .context {
@@ -25,4 +30,14 @@ input.search {
 .context .hit {
   font-weight: 800;
   color: var(--accent-6);
+}
+@media screen and (max-width: 600px) {
+  .search {
+    position: sticky;
+    top: 3.5em;
+    width: calc(100vw);
+    display: flex;
+    justify-content: center;
+    background-color: var(--background);
+  }
 }
