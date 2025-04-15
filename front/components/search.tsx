@@ -63,26 +63,53 @@ export function Search() {
         placeholder="Type to search for comics"
         onChange={(e) => setQuery(e.target.value)}
       />
-      <ul>
-        {result.map((r, i) => {
-          const { comicLink } = getSubmissionLinks(
-            `/comic/${encodeURIComponent(r.id)}`,
-            r.comicTitle,
-          );
-          return (
-            <li key={r.id}>
-              <Link
-                prefetch={i < 2}
-                title={r.ocrMatch ? r.ocr : undefined}
-                href={comicLink}
-              >
-                {r.title}{" "}
-                {r.ocrMatch && r.isMultipart ? `(${r.comicTitle})` : null}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      {query === "" ? (
+        <p>Start typing to see results</p>
+      ) : result.length === 0 ? (
+        <div>
+          <h3>No comics contain this text!</h3>
+          <p>
+            Try using a shorter query. Consider searching for a different part
+            of the comic, the OCR is not always 100% correct.
+          </p>
+        </div>
+      ) : (
+        <ul>
+          {result.map((r, i) => {
+            const pageUrl = `/comic/${encodeURIComponent(r.id)}`;
+            const { comicLink } = getSubmissionLinks(pageUrl, r.comicTitle);
+            const queryIndex = r.ocr
+              .toLowerCase()
+              .indexOf(debouncedQuery.toLowerCase());
+            const context = 15;
+            const snippetStart = r.ocr.substring(
+              queryIndex - context,
+              queryIndex,
+            );
+            const endPos = queryIndex + debouncedQuery.length;
+            const snippetCenter = r.ocr.substring(queryIndex, endPos);
+            const snippetEnd = r.ocr.substring(endPos, endPos + context);
+            return (
+              <li key={r.id}>
+                <Link
+                  prefetch={i < 2}
+                  href={r.isMultipart && r.ocrMatch ? comicLink : pageUrl}
+                >
+                  {r.title}{" "}
+                  {r.ocrMatch && r.isMultipart ? `(${r.comicTitle})` : null}
+                </Link>
+                {r.ocrMatch ? (
+                  <span className={classes.context}>
+                    - {snippetStart}
+                    <span className={classes.hit}>{snippetCenter}</span>
+                    {snippetEnd}
+                  </span>
+                ) : null}
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </section>
   );
 }

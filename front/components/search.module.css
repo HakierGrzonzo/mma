@@ -1,5 +1,10 @@
 .container * {
   min-width: min(80vw, 600px);
+  max-width: 600px;
+}
+
+.container ul {
+  font-size: 110%;
 }
 
 input.search {
@@ -10,4 +15,14 @@ input.search {
   outline: none;
   background-color: var(--background);
   color: var(--foreground);
+}
+
+.context {
+  font-style: italic;
+  font-size: 90%;
+}
+
+.context .hit {
+  font-weight: 800;
+  color: var(--accent-6);
 }
