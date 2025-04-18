@@ -77,6 +77,8 @@ async def try_correlate_alternative_timelines(series: ComicSeries):
                     Image.link: image_url,
                     Image.order: i,
                     Image.comic: new_comic.id,
+                    Image.width: None,
+                    Image.height: None,
                 }
             )
             try:
