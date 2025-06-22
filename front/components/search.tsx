@@ -93,7 +93,8 @@ export function Search() {
             return (
               <li key={r.id}>
                 <Link
-                  prefetch={i < 2}
+                  prefetch={false}
+                  target="_blank"
                   href={r.isMultipart && r.ocrMatch ? comicLink : pageUrl}
                 >
                   {r.title}{" "}
