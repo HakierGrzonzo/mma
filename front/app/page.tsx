@@ -41,8 +41,8 @@ export default async function Home() {
       </CoverImage>
       <section>
         <p style={{ fontSize: "120%" }}>
-          Browse all comics, <Link href="/search">use the search</Link> or{" "}
-          <Link href="/tags">browse by tags.</Link>
+          Browse all comics, <Link href="/search/">use the search</Link> or{" "}
+          <Link href="/tags/">browse by tags.</Link>
         </p>
         <RSSbutton />
         <MetaTable rows={data} />

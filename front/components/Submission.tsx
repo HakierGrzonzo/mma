@@ -18,7 +18,7 @@ const specialHeaders: Special = {
   "1h1wjv6alt": (
     <p className={classes.special}>
       Continues from{" "}
-      <a href="/comic/Luzifer%20AU#Luzifer%20AU%3A%20Decision%20">
+      <a href="/comic/Luzifer%20AU#Luzifer%20AU%3A%20Decision%20/">
         the main timeline.
       </a>
     </p>
@@ -29,7 +29,7 @@ const specialFooters: Special = {
   "1hy4zx9alt": (
     <p className={classes.special}>
       Continues in the{" "}
-      <a href="/comic/Luzifer%20AU#Luzifer%20AU%3A%20First%20Meet">
+      <a href="/comic/Luzifer%20AU#Luzifer%20AU%3A%20First%20Meet/">
         main timeline.
       </a>
     </p>
@@ -43,7 +43,7 @@ const specialFooters: Special = {
   "1j08araalt": (
     <p className={classes.special}>
       The rest of hunter is stuck in{" "}
-      <a href="/comic/Luzifer%20AU#Luzifer%20AU%3A%20Phantom%20Limb">
+      <a href="/comic/Luzifer%20AU#Luzifer%20AU%3A%20Phantom%20Limb/">
         the main timeline.
       </a>
     </p>
@@ -51,7 +51,7 @@ const specialFooters: Special = {
   "1j08ara": (
     <p className={classes.special}>
       Luz and hunter&apos;s hand goes to{" "}
-      <a href="/comic/Luzifer%20AU%20tumblr#Luzifer%20AU%3A%20Phantom%20Limb%20-%20Alternative%20Timeline">
+      <a href="/comic/Luzifer%20AU%20tumblr#Luzifer%20AU%3A%20Phantom%20Limb%20-%20Alternative%20Timeline/">
         the tumblr timeline.
       </a>
     </p>
