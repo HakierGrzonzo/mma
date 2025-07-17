@@ -47,11 +47,27 @@ export async function GET() {
     let description = renderToString(<RSSdescription comic={comic} />);
     const seriesLink = `${PAGE_URL}/comic/${comic.series_id}`;
     const { comicLink } = getSubmissionLinks(seriesLink, comic.title);
+    const tags = db
+      .prepare(
+        `
+      SELECT
+        tag.name as name
+      FROM
+        tag
+      JOIN
+        comic_series_tag
+        ON
+          comic_series_tag.tag = tag.id
+      WHERE
+        comic_series_tag.comic_series = ?
+      `,
+      )
+      .all(comic.series_id) as { name: string }[];
     feed.item({
       title: comic.title,
       description: description,
       url: comicLink,
-      categories: [],
+      categories: tags.map((tag) => tag.name),
       author: "u/makmark",
       date: comic.uploaded_at,
     });
