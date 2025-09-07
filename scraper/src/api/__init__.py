@@ -40,7 +40,7 @@ def get_new_comics() -> Generator[models.Submission, None, None]:
     for i, submission in enumerate(mark_mark.submissions.new(limit=None)):
         if i > COMIC_LIMIT and COMIC_LIMIT != 0:
             break
-        if submission.subreddit.display_name != "TheOwlHouse":
+        if submission.subreddit.display_name not in ["TheOwlHouse", "MoringMark"]:
             continue
         yield submission
 

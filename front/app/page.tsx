@@ -36,6 +36,8 @@ export default async function Home() {
         <p>
           This page contains an archive of all MoringMark comics that were ever
           posted to{" "}
+          <Link href="https://www.reddit.com/r/MoringMark">r/MoringMark</Link>{" "}
+          or{" "}
           <Link href="https://www.reddit.com/r/theowlhouse">r/TheOwlHouse</Link>
         </p>
       </CoverImage>
