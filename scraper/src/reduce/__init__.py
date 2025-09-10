@@ -1,6 +1,6 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Generator
+from typing import Iterable
 from praw.models import Submission
 
 from src.api.image_urls import get_image_urls
@@ -15,15 +15,19 @@ logger = getLogger(__name__)
 async def handle_orphan_series(series_id: str):
     number_of_comics = await Comic.count().where(Comic.series == series_id)
     if number_of_comics == 0:
-        logger.warn(f"Series {series_id} is an orphan, deleting")
+        logger.warning(f"Series {series_id} is an orphan, deleting")
         await ComicSeries.delete().where(ComicSeries.id == series_id)
+
+
+def clean_title(raw: str):
+    return raw.replace("[MoringMark]", "").strip()
 
 
 async def update_comic(series_id: str, comic: Submission, prefixes: dict[str, str]):
     existing_comic = await Comic.select().where(Comic.id == comic.id).first()
     if existing_comic:
         if series_id != (old_series_id := existing_comic["series"]):
-            logger.warn(
+            logger.warning(
                 f"Inconsistent series in {existing_comic['title']}, swapping to {series_id}"
             )
             await Comic.update({Comic.series: series_id}).where(Comic.id == comic.id)
@@ -37,7 +41,7 @@ async def update_comic(series_id: str, comic: Submission, prefixes: dict[str, st
     date = datetime.fromtimestamp(comic.created)
     new_comic = Comic(
         id=comic.id,
-        title=comic.title,
+        title=clean_title(comic.title),
         upvotes=comic.score,
         link=comic.shortlink,
         uploaded_at=date,
@@ -69,7 +73,7 @@ async def update_existing_series(
 
 
 async def reduce_submissions_to_series(
-    submissions: Generator[Submission, None, None],
+    submissions: Iterable[Submission],
 ):
     series_titles = {}
     series_prefixes = defaultdict(lambda: "")
@@ -106,7 +110,7 @@ async def reduce_submissions_to_series(
 
         comic_series = ComicSeries(
             id=series_id,
-            title=series_titles[series_id],
+            title=clean_title(series_titles[series_id]),
         )
         await comic_series.save()
         for comic in comics:

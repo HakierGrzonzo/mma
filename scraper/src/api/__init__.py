@@ -5,6 +5,8 @@ from praw import models
 import httpx
 from os import environ
 
+from praw.reddit import Submission
+
 
 from .filters import is_submission_valid
 
@@ -35,7 +37,7 @@ def get_moring_mark() -> models.Redditor:
     return reddit.redditor("makmark")
 
 
-def get_new_comics() -> Generator[models.Submission, None, None]:
+def get_new_comics() -> Generator[Submission, None, None]:
     mark_mark = get_moring_mark()
     for i, submission in enumerate(mark_mark.submissions.new(limit=None)):
         if i > COMIC_LIMIT and COMIC_LIMIT != 0:
@@ -46,6 +48,11 @@ def get_new_comics() -> Generator[models.Submission, None, None]:
 
 
 logger = getLogger(__name__)
+
+
+def get_one_comic(url: str):
+    submission = Submission(reddit, url=url)
+    return submission
 
 
 def get_comics() -> Generator[models.Submission, None, None]:
