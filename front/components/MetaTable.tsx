@@ -48,10 +48,16 @@ export function MetaTable({ rows }: Props) {
     setDirection("asc");
   };
 
+  const pillProps: Record<MetaTableRow["show"], [string, string]> = {
+    "The Owl House": ["TOH", "var(--toh)"],
+    "Knights of Guinevere": ["KoG", "var(--kod)"],
+  };
+
   return (
     <table className={classes.table}>
       <thead>
         <tr>
+          <th></th>
           <th
             className={`${classes.first} ${
               filter === "name" && classes.active
@@ -79,26 +85,36 @@ export function MetaTable({ rows }: Props) {
         </tr>
       </thead>
       <tbody>
-        {sortedData.map((item, index) => (
-          <tr key={item.id} id={item.id}>
-            <td>
-              <Link
-                className={
-                  lastVisitedDate &&
-                  lastVisitedDate.valueOf() <= item.lastEpisode.valueOf()
-                    ? classes.unread
-                    : undefined
-                }
-                prefetch={index < 6}
-                href={`/comic/${encodeURIComponent(item.id)}/`}
+        {sortedData.map((item, index) => {
+          const [pillText, pillColor] = pillProps[item.show];
+          return (
+            <tr key={item.id} id={item.id}>
+              <td
+                title={item.show}
+                className={classes.show}
+                style={{ backgroundColor: pillColor }}
               >
-                {item.title}
-              </Link>
-            </td>
-            <td>{formatter.format(item.lastEpisode)}</td>
-            <td className="text-right">{item.totalUpvotes}</td>
-          </tr>
-        ))}
+                {pillText}
+              </td>
+              <td>
+                <Link
+                  className={
+                    lastVisitedDate &&
+                    lastVisitedDate.valueOf() <= item.lastEpisode.valueOf()
+                      ? classes.unread
+                      : undefined
+                  }
+                  prefetch={index < 6}
+                  href={`/comic/${encodeURIComponent(item.id)}/`}
+                >
+                  {item.title}
+                </Link>
+              </td>
+              <td>{formatter.format(item.lastEpisode)}</td>
+              <td className="text-right">{item.totalUpvotes}</td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

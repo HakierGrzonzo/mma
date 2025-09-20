@@ -39,6 +39,10 @@ export default async function Home() {
           <Link href="https://www.reddit.com/r/MoringMark">r/MoringMark</Link>{" "}
           or{" "}
           <Link href="https://www.reddit.com/r/theowlhouse">r/TheOwlHouse</Link>
+          .
+        </p>
+        <p>
+          Now with <em>Knights of Guinevere</em> comics?! (Work in progress)
         </p>
       </CoverImage>
       <section>

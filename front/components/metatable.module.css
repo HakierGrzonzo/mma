@@ -58,3 +58,16 @@
   font-weight: 700;
   color: var(--accent-4) !important;
 }
+
+.show {
+  --toh: #9b24cd;
+  --kod: #2c67fb;
+  background-color: red;
+  border-radius: 30%;
+  font-size: 80%;
+  font-weight: 700;
+}
+
+tr:hover .show {
+  color: var(--accent-6);
+}
