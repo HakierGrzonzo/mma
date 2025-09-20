@@ -1,14 +1,21 @@
 from datetime import datetime
+from enum import Enum
 from os import path
 from piccolo.table import Table
 from piccolo import columns
 from ..storage_service import storage
 
 
+class Shows(Enum):
+    TOH = "The Owl House"
+    KOG = "Knights of Guinevere"
+
+
 class ComicSeries(Table):
     id = columns.Text(null=False, required=True, primary_key=True)
     title = columns.Text(null=False, required=True)
     tags = columns.M2M(columns.LazyTableReference("Tag", module_path=__name__))
+    show = columns.Text(null=False, required=True, choices=Shows, default=Shows.TOH)
 
     def get_filepath_prefix(self):
         unique_title = self.id

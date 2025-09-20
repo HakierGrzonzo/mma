@@ -5,7 +5,7 @@ from praw.models import Submission
 
 from src.api.image_urls import get_image_urls
 from .series import get_possible_series
-from ..schema.tables import Comic, ComicSeries, Image
+from ..schema.tables import Comic, ComicSeries, Image, Shows
 from collections import defaultdict
 from string import ascii_letters, digits
 
@@ -108,9 +108,13 @@ async def reduce_submissions_to_series(
             )
             continue
 
+        # WIP to identify all KOG comics
+        is_kog = any(comic.link_flair_text == "Kog" for comic in comics)
+
         comic_series = ComicSeries(
             id=series_id,
             title=clean_title(series_titles[series_id]),
+            show=Shows.KOG if is_kog else Shows.TOH,
         )
         await comic_series.save()
         for comic in comics:
