@@ -75,6 +75,7 @@ export function getMetaTableDataForTag(tagId: number) {
     SELECT 
       comic_series.id as id, 
       comic_series.title as title, 
+      comic_series.show as show,
       SUM(comic.upvotes) as total_upvotes, 
       MAX(comic.uploaded_at) as last_episode
     FROM 
@@ -97,6 +98,7 @@ export function getMetaTableDataForTag(tagId: number) {
     )
     .all(tagId) as {
     title: string;
+    show: MetaTableRow["show"];
     total_upvotes: number;
     last_episode: string;
     id: string;
@@ -105,6 +107,7 @@ export function getMetaTableDataForTag(tagId: number) {
   const tableRows: MetaTableRow[] = rows.map((row) => ({
     id: row["id"],
     title: row["title"],
+    show: row["show"],
     totalUpvotes: row["total_upvotes"],
     lastEpisode: new Date(row["last_episode"]),
   }));
