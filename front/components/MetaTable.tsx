@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Direction, Filters, sortComicMetadata } from "@/hooks";
 import { MetaTableRow } from "@/types/db";
+import { SeriesPill } from "./Pill";
 
 interface Props {
   rows: MetaTableRow[];
@@ -48,11 +49,6 @@ export function MetaTable({ rows }: Props) {
     setDirection("asc");
   };
 
-  const pillProps: Record<MetaTableRow["show"], [string, string]> = {
-    "The Owl House": ["TOH", "var(--toh)"],
-    "Knights of Guinevere": ["KoG", "var(--kod)"],
-  };
-
   return (
     <table className={classes.table}>
       <thead>
@@ -86,16 +82,9 @@ export function MetaTable({ rows }: Props) {
       </thead>
       <tbody>
         {sortedData.map((item, index) => {
-          const [pillText, pillColor] = pillProps[item.show];
           return (
             <tr key={item.id} id={item.id}>
-              <td
-                title={item.show}
-                className={classes.show}
-                style={{ backgroundColor: pillColor }}
-              >
-                {pillText}
-              </td>
+              <SeriesPill show={item.show} className={classes.show} />
               <td>
                 <Link
                   className={
