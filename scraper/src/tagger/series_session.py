@@ -8,7 +8,7 @@ from prompt_toolkit.completion import NestedCompleter
 from term_image.image import AutoImage
 from PIL import Image as PILimage
 
-from src.schema.tables import ComicSeries, ComicSeriesTag, Image
+from src.schema.tables import ComicSeries, ComicSeriesTag, Image, Shows, Tag
 from xml.parsers.expat import ExpatError
 from ..storage_service import storage
 
@@ -31,7 +31,7 @@ class SeriesSession:
         self.images = [
             asyncio.Future() for _ in range(self.subject["number_of_images"])
         ]
-        self.tags_to_add = []
+        self.tags_to_add: list[Tag] = []
 
     async def download_images(self):
         images = (
@@ -91,10 +91,21 @@ class SeriesSession:
         """,
             self.subject["id"],
         )
+        show = (
+            await ComicSeries.select(ComicSeries.show)
+            .where(ComicSeries.id == self.subject["id"])
+            .first()
+        )
         self._print_separator()
+
+        final_tags = [tag["name"] for tag in tags]
+
+        final_tags.extend([tag.name for tag in self.tags_to_add])
+
         text = f"""
 <b>Title:</b>\t<i>{self.subject['title']}</i>
-<b>Tags:</b>\t<i>{", ".join([tag['name'] for tag in tags])}</i>
+<b>Tags:</b>\t<i>{", ".join(final_tags)}</i>
+<b>Show:</b>\t<i>{show["show"]}</i>
         """
         try:
             print_formatted_text(HTML(text))
@@ -105,6 +116,10 @@ class SeriesSession:
         completer = NestedCompleter.from_nested_dict(
             {
                 "tag": await self.parent.tag_sheet.get_completer(),
+                "show": {
+                    Shows.TOH.value: None,
+                    Shows.KOG.value: None,
+                },
                 "new": None,
                 "save": None,
                 "next": None,
@@ -147,6 +162,15 @@ class SeriesSession:
             operation.add(ComicSeriesTag(tag=tag.id, comic_series=self.subject["id"]))
         await operation
 
+    async def set_show(self, show_name: str):
+        if show_name not in [Shows.TOH.value, Shows.KOG.value]:
+            logger.error(f"Show '{show_name}' does not exist")
+            return
+        await ComicSeries.update({ComicSeries.show: show_name}).where(
+            ComicSeries.id == self.subject["id"]
+        )
+        print_formatted_text(f"Set show to {show_name}")
+
     async def tag_series(self):
         await self._draw_image()
         await self._print_series_details()
@@ -166,6 +190,8 @@ class SeriesSession:
                 case "next":
                     self.image_cursor += 1
                     await self._draw_image()
+                case "show":
+                    await self.set_show(args)
                 case "previous":
                     self.image_cursor -= 1
                     await self._draw_image()

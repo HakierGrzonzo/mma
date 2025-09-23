@@ -8,6 +8,7 @@ from prompt_toolkit.completion import (
     FuzzyCompleter,
 )
 from prompt_toolkit.document import Document
+from sqlite3 import IntegrityError
 
 
 logger = getLogger(__name__)
@@ -37,9 +38,12 @@ class TagSheet:
         pass
 
     async def create(self, name: str) -> Tag:
-        return await Tag.new(name)
+        try:
+            return await Tag.new(name)
+        except IntegrityError as e:
+            logger.exception(e)
 
-    async def get(self, name_or_id: int | str):
+    async def get(self, name_or_id: int | str) -> Tag:
         if isinstance(name_or_id, int):
             tag = await Tag.select().where(Tag.id == name_or_id).first()
         else:
