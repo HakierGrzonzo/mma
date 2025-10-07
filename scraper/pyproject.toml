@@ -27,6 +27,12 @@ ruff = "^0.1.5"
 ipython = "^8.30.0"
 litecli = "^1.13.2"
 
+
+[tool.poetry.group.ml.dependencies]
+tensorflow = "^2.20.0"
+keras = "^3.11.3"
+matplotlib = "^3.10.6"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

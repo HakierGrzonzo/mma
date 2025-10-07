@@ -3,6 +3,7 @@
 *.sqlite
 .env
 results
+dataset
 # Local .terraform directories
 **/.terraform/*
 
