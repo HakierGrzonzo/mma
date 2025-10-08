@@ -1,7 +1,10 @@
+from os import listdir
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
+from os.path import join
+import numpy as np
 
 from src.classification.dataset import DATASET_DIR
 
@@ -13,18 +16,12 @@ img_width = 180
 
 def train_model():
     train_ds = tf.keras.utils.image_dataset_from_directory(
-        DATASET_DIR,
-        validation_split=0.2,
-        subset="training",
-        seed=123,
+        join(DATASET_DIR, "train"),
         image_size=(img_height, img_width),
         batch_size=batch_size,
     )
     val_ds = tf.keras.utils.image_dataset_from_directory(
-        DATASET_DIR,
-        validation_split=0.2,
-        subset="training",
-        seed=123,
+        join(DATASET_DIR, "validation"),
         image_size=(img_height, img_width),
         batch_size=batch_size,
     )
@@ -38,6 +35,9 @@ def train_model():
 
     model = Sequential(
         [
+            layers.RandomFlip("horizontal", input_shape=(img_height, img_width, 3)),
+            layers.RandomRotation(0.1),
+            layers.RandomZoom(0.1),
             layers.Rescaling(1.0 / 255, input_shape=(img_height, img_width, 3)),
             layers.Conv2D(16, 3, padding="same", activation="relu"),
             layers.MaxPooling2D(),
@@ -45,7 +45,9 @@ def train_model():
             layers.MaxPooling2D(),
             layers.Conv2D(64, 3, padding="same", activation="relu"),
             layers.MaxPooling2D(),
+            layers.Dropout(0.2),
             layers.Flatten(),
+            layers.Dense(128, activation="relu"),
             layers.Dense(128, activation="relu"),
             layers.Dense(num_classes),
         ]
@@ -59,8 +61,9 @@ def train_model():
     model.summary()
 
     epochs = 10
-    model.fit(train_ds, validation_data=val_ds, epochs=epochs)
+    history = model.fit(train_ds, validation_data=val_ds, epochs=epochs)
     save_model(model)
+    visualize_training(history, epochs)
 
 
 def save_model(model):
@@ -94,3 +97,27 @@ def visualize_training(history, epochs: int):
     plt.legend(loc="upper right")
     plt.title("Training and Validation Loss")
     plt.show()
+
+
+def run_inference(path: str):
+    TF_MODEL_FILE_PATH = (
+        "model.tflite"  # The default path to the saved TensorFlow Lite model
+    )
+
+    interpreter = tf.lite.Interpreter(model_path=TF_MODEL_FILE_PATH)
+
+    class_names = ["KOG", "TOH"]
+
+    for file in listdir(path):
+        file = join(path, file)
+        img = tf.keras.utils.load_img(file, target_size=(img_height, img_width))
+        img_array = tf.keras.utils.img_to_array(img)
+        img_array = tf.expand_dims(img_array, 0)  # Create a batch
+
+        classify_lite = interpreter.get_signature_runner("serving_default")
+        predictions_lite = classify_lite(keras_tensor=img_array)["output_0"]
+        score_lite = tf.nn.softmax(predictions_lite)
+
+        print(
+            file, class_names[np.argmax(score_lite)], 100 * np.max(score_lite), sep="\t"
+        )

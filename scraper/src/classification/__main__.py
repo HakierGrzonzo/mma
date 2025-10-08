@@ -2,7 +2,7 @@ from .dataset import prepare_dataset
 from sys import argv
 import asyncio
 
-from . import train_model
+from . import run_inference, train_model
 
 
 match argv[1]:
@@ -10,3 +10,6 @@ match argv[1]:
         asyncio.run(prepare_dataset())
     case "ml-train":
         train_model()
+
+    case "ml-predict":
+        run_inference(argv[2])

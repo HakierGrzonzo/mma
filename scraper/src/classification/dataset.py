@@ -29,11 +29,15 @@ async def prepare_dataset():
     try_create_directory(DATASET_DIR)
 
     images = await Image.select(
-        Image.file_path.as_alias("path"), Image.comic._.series._.show.as_alias("show")
+        Image.file_path.as_alias("path"),
+        Image.comic._.series._.show.as_alias("show"),
+        Image.order.as_alias("order"),
     )
 
-    for show in [Shows.TOH, Shows.KOG]:
-        try_create_directory(join(DATASET_DIR, show.value))
+    for kind in ["validation", "train"]:
+        try_create_directory(join(DATASET_DIR, kind))
+        for show in [Shows.TOH, Shows.KOG]:
+            try_create_directory(join(DATASET_DIR, kind, show.value))
 
     tasks = []
 
@@ -43,7 +47,9 @@ async def prepare_dataset():
 
         new_image_name = path.replace("/", "-").replace(".webp", ".png")
 
-        new_image_path = join(DATASET_DIR, show, new_image_name)
+        dataset_to_use = "validation" if image["order"] == 0 else "train"
+
+        new_image_path = join(DATASET_DIR, dataset_to_use, show, new_image_name)
 
         old_path = join("./results", path)
 
