@@ -174,14 +174,15 @@ export default async function ComicPage({
       `
     SELECT
       id,
-      title
+      title,
+      show
     FROM
       comic_series
     WHERE
       id = ?
     `,
     )
-    .get(comicName) as { id: string; title: string };
+    .get(comicName) as { id: string; title: string; show: string };
 
   const tags = db
     .prepare(
@@ -234,7 +235,9 @@ export default async function ComicPage({
           <h1>{isOneshot ? comics[0].title : comicSeries.title}</h1>
           <div className={classes.subtitleElements}>
             <p>
-              Author:{" "}
+              A{" "}
+              <Link href={`/show/${comicSeries.show}`}>{comicSeries.show}</Link>{" "}
+              comic by{" "}
               <Link href="https://www.reddit.com/user/makmark">u/makmark</Link>
             </p>
             {!isOneshot ? (

@@ -1,4 +1,5 @@
 import { MetaTableRow } from "@/types/db";
+import Link from "next/link";
 interface Props {
   className?: string;
   show: MetaTableRow["show"];
@@ -15,7 +16,7 @@ export function SeriesPill({ className, show }: Props) {
       className={className}
       style={{ backgroundColor: "var(--kog)" }}
     >
-      <a href={`/show/${show}/`}>KoG</a>
+      <Link href={`/show/${show}/`}>KoG</Link>
     </td>
   );
 }
