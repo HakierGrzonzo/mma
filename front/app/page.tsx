@@ -42,7 +42,7 @@ export default async function Home() {
           .
         </p>
         <p>
-          Now with <em>Knights of Guinevere</em> comics?! (Work in progress)
+          Now with <em>Knights of Guinevere</em> comics!
         </p>
       </CoverImage>
       <section>
