@@ -5,25 +5,17 @@ interface Props {
 }
 
 export function SeriesPill({ className, show }: Props) {
-  const pillProps: Record<MetaTableRow["show"], [string, string] | null> = {
-    "The Owl House": null,
-    "Knights of Guinevere": ["KoG", "var(--kod)"],
-  };
-  const pill = pillProps[show];
-
-  if (pill === null) {
+  if (show === "The Owl House") {
     return <td />;
   }
-
-  const [pillText, pillColor] = pill || ["", ""];
 
   return (
     <td
       title={`This is a "${show}" comic`}
       className={className}
-      style={{ backgroundColor: pillColor }}
+      style={{ backgroundColor: "var(--kog)" }}
     >
-      {pillText}
+      <a href={`/show/${show}/`}>KoG</a>
     </td>
   );
 }

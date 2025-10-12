@@ -113,3 +113,45 @@ export function getMetaTableDataForTag(tagId: number) {
   }));
   return tableRows;
 }
+
+export function getMetaTableDataForShow(show: string) {
+  const rows = db
+    .prepare(
+      `
+    SELECT 
+      comic_series.id as id, 
+      comic_series.title as title, 
+      comic_series.show as show,
+      SUM(comic.upvotes) as total_upvotes, 
+      MAX(comic.uploaded_at) as last_episode
+    FROM 
+      comic_series 
+    JOIN 
+      comic 
+      ON 
+        comic.series = comic_series.id 
+    WHERE 
+      comic_series.show = ?
+    GROUP BY 
+      comic_series.title 
+    ORDER BY 
+      last_episode DESC;
+  `,
+    )
+    .all(show) as {
+    title: string;
+    show: MetaTableRow["show"];
+    total_upvotes: number;
+    last_episode: string;
+    id: string;
+  }[];
+
+  const tableRows: MetaTableRow[] = rows.map((row) => ({
+    id: row["id"],
+    title: row["title"],
+    show: row["show"],
+    totalUpvotes: row["total_upvotes"],
+    lastEpisode: new Date(row["last_episode"]),
+  }));
+  return tableRows;
+}
