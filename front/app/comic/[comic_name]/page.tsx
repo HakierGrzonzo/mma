@@ -98,7 +98,12 @@ export async function generateMetadata({
       ON
         image.comic = comic.id
     WHERE
-      comic.series = ? AND not (image.ocr isnull)
+      comic.series = ? 
+      AND not (image.ocr isnull)
+    ORDER BY
+      comic.uploaded_at,
+      image."order"
+    LIMIT 1
     `,
     )
     .get(comicSeries.id) as { alt: string } | undefined;
