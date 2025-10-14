@@ -1,4 +1,5 @@
 from prompt_toolkit import PromptSession
+from src.schema.tables import Tag
 from src.tagger.tag_sheet import TagSheet
 from .tagging_session import TaggingSession
 
@@ -13,11 +14,10 @@ async def review_tags():
     prompt_session = PromptSession()
     tags = await tag_sheet.get_all()
     for tag in tags:
-        if tag.description is not None:
+        if tag.description is not None and len(tag.description.strip()) > 0:
             continue
-        print(tag)
+        print(tag.name)
         command = await prompt_session.prompt_async("$ ")
         command = command.strip()
         if len(command) > 0:
-            tag.description = command
-            await tag.save()
+            await Tag.update({"description": command}).where(Tag.id == tag.id)
