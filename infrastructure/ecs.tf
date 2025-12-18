@@ -133,8 +133,8 @@ resource "aws_scheduler_schedule" "mma-refresh" {
     mode = "OFF"
   }
 
-  schedule_expression          = "cron(30 16 * * ? *)"
-  schedule_expression_timezone = "Europe/Warsaw"
+  schedule_expression          = "cron(30 14 * * ? *)"
+  schedule_expression_timezone = "UTC"
 
   target {
     arn      = aws_ecs_cluster.mma.arn
