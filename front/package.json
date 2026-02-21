@@ -12,7 +12,7 @@
     "prod": "python -m http.server 3000 --directory ./out"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.623.0",
+    "@aws-sdk/client-s3": "^3.995.0",
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "20.5.7",
     "@types/react": "18.2.21",
