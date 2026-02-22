@@ -45,7 +45,7 @@ export function getMetaTableData() {
     ON 
       comic.series = comic_series.id 
     GROUP BY 
-      comic_series.title 
+      comic_series.id
     ORDER BY 
       last_episode DESC;
   `,
@@ -91,7 +91,7 @@ export function getMetaTableDataForTag(tagId: number) {
     WHERE
       comic_series_tag.tag = ?
     GROUP BY 
-      comic_series.title 
+      comic_series.id
     ORDER BY 
       last_episode DESC;
   `,
@@ -133,7 +133,7 @@ export function getMetaTableDataForShow(show: string) {
     WHERE 
       comic_series.show = ?
     GROUP BY 
-      comic_series.title 
+      comic_series.id
     ORDER BY 
       last_episode DESC;
   `,
