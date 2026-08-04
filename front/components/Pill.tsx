@@ -10,13 +10,21 @@ export function SeriesPill({ className, show }: Props) {
     return <td />;
   }
 
+  const props = {
+    "False Memory": {
+      color: "var(--fm)",
+      pillText: "FM",
+    },
+    "Knights of Guinevere": { color: "var(--kog)", pillText: "KoG" },
+  }[show];
+
   return (
     <td
       title={`This is a "${show}" comic`}
       className={className}
-      style={{ backgroundColor: "var(--kog)" }}
+      style={{ backgroundColor: props.color }}
     >
-      <Link href={`/show/${show}/`}>KoG</Link>
+      <Link href={`/show/${show}/`}>{props.pillText}</Link>
     </td>
   );
 }

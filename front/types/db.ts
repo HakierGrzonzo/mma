@@ -4,5 +4,5 @@ export interface MetaTableRow {
   totalUpvotes: number;
   lastEpisode: Date;
 
-  show: "The Owl House" | "Knights of Guinevere";
+  show: "The Owl House" | "Knights of Guinevere" | "False Memory";
 }

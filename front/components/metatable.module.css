@@ -62,6 +62,8 @@
 .show {
   --toh: #9b24cd;
   --kog: #2c67fb;
+  --fm: #c98d85;
+  text-align: center;
   background-color: red;
   border-radius: 30%;
   font-size: 80%;

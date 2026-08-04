@@ -9,6 +9,7 @@ from ..storage_service import storage
 class Shows(Enum):
     TOH = "The Owl House"
     KOG = "Knights of Guinevere"
+    FM = "False Memory"
 
 
 class ComicSeries(Table):

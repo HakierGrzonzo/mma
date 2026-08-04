@@ -116,10 +116,7 @@ class SeriesSession:
         completer = NestedCompleter.from_nested_dict(
             {
                 "tag": await self.parent.tag_sheet.get_completer(),
-                "show": {
-                    Shows.TOH.value: None,
-                    Shows.KOG.value: None,
-                },
+                "show": {show.value: None for show in Shows._member_map_.values()},
                 "new": None,
                 "save": None,
                 "next": None,
@@ -157,13 +154,15 @@ class SeriesSession:
             print_formatted_text(f"Added tag {tag}")
 
     async def save_subject_with_new_tags(self):
+        if len(self.tags_to_add) == 0:
+            return
         operation = ComicSeriesTag.insert()
         for tag in self.tags_to_add:
             operation.add(ComicSeriesTag(tag=tag.id, comic_series=self.subject["id"]))
         await operation
 
     async def set_show(self, show_name: str):
-        if show_name not in [Shows.TOH.value, Shows.KOG.value]:
+        if show_name not in (value.value for value in Shows._member_map_.values()):
             logger.error(f"Show '{show_name}' does not exist")
             return
         await ComicSeries.update({ComicSeries.show: show_name}).where(

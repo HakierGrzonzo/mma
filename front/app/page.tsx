@@ -42,7 +42,8 @@ export default async function Home() {
           .
         </p>
         <p>
-          Now with <em>Knights of Guinevere</em> comics?! (Work in progress)
+          Now with <em>False Memory</em> comics?! (Need to watch it to tag them
+          properly)
         </p>
       </CoverImage>
       <section>
