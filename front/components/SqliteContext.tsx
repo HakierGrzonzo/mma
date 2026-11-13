@@ -12,7 +12,9 @@ import initSqlJs, { BindParams, Database } from "sql.js";
 
 async function loadData() {
   const sqlPromise = initSqlJs({
-    locateFile: (file) => `/assets/${file}`,
+    // Bundle the wasm shipped with the installed sql.js, so it always matches the JS
+    locateFile: () =>
+      new URL("sql.js/dist/sql-wasm-browser.wasm", import.meta.url).toString(),
   });
   const mmaSqlitePromise = fetch("/assets/mma.sqlite").then((res) =>
     res.arrayBuffer(),
