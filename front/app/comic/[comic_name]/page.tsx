@@ -38,9 +38,9 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { comic_name: string };
+  params: Promise<{ comic_name: string }>;
 }): Promise<Metadata> {
-  const { comic_name } = params;
+  const { comic_name } = await params;
   const comicName = decodeURIComponent(comic_name);
   const comicSeries = db
     .prepare(
@@ -163,9 +163,9 @@ export async function generateMetadata({
 export default async function ComicPage({
   params,
 }: {
-  params: { comic_name: string };
+  params: Promise<{ comic_name: string }>;
 }) {
-  const { comic_name } = params;
+  const { comic_name } = await params;
   const comicName = decodeURIComponent(comic_name);
   const pageUrl = `${PAGE_URL}/comic/${comic_name}`;
 

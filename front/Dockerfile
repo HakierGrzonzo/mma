@@ -1,4 +1,4 @@
-FROM node:20-bullseye-slim
+FROM node:24-bookworm-slim
 RUN apt update && apt install -y wget unzip
 
 WORKDIR /aws

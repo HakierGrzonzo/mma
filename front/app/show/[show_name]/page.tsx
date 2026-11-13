@@ -29,10 +29,10 @@ export async function generateStaticParams() {
   }));
 }
 
-type Params = { params: { show_name: string } };
+type Params = { params: Promise<{ show_name: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const { show_name } = params;
+  const { show_name } = await params;
   const showName = deNormalizeSlash(decodeURIComponent(show_name));
   const someImage = db
     .prepare(
@@ -91,7 +91,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 export default async function TagsList({ params }: Params) {
-  const { show_name } = params;
+  const { show_name } = await params;
   const showName = deNormalizeSlash(decodeURIComponent(show_name));
 
   const rows = getMetaTableDataForShow(showName);

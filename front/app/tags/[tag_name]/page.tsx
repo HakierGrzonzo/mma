@@ -30,10 +30,10 @@ export async function generateStaticParams() {
   }));
 }
 
-type Params = { params: { tag_name: string } };
+type Params = { params: Promise<{ tag_name: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const { tag_name } = params;
+  const { tag_name } = await params;
   const tagName = deNormalizeSlash(decodeURIComponent(tag_name));
   const tag = db
     .prepare(
@@ -114,7 +114,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 export default async function TagsList({ params }: Params) {
-  const { tag_name } = params;
+  const { tag_name } = await params;
   const tagName = deNormalizeSlash(decodeURIComponent(tag_name));
 
   const tag = db

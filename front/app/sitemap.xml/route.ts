@@ -5,6 +5,8 @@ import { db } from "@/db";
 import { normalizeSlash } from "@/tags";
 import { MetadataRoute } from "next";
 
+export const dynamic = "force-static";
+
 async function getSitemapForTags(): Promise<MetadataRoute.Sitemap> {
   const newestTagId = db
     .prepare(

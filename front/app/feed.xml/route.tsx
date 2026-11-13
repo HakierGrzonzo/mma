@@ -4,6 +4,8 @@ import RSS from "rss";
 import { RSSdescription } from "@/components/RSSdescription";
 import { db } from "@/db";
 
+export const dynamic = "force-static";
+
 export async function GET() {
   const { renderToString } = await import("react-dom/server");
   const feed = new RSS({
