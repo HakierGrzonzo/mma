@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING
 
 from prompt_toolkit import HTML, print_formatted_text
 from prompt_toolkit.completion import NestedCompleter
-from term_image.image import AutoImage
+from rich.console import Console
+from textual_image.renderable import Image as TerminalImage
 from PIL import Image as PILimage
 
 from src.schema.tables import ComicSeries, ComicSeriesTag, Image, Shows, Tag
@@ -68,8 +69,7 @@ class SeriesSession:
             return
         io = BytesIO(image_bytes)
         img = PILimage.open(io)
-        auto_image = AutoImage(img, height=30)
-        auto_image.draw(h_align="left", v_align="bottom", pad_height=10)
+        Console().print(TerminalImage(img, width="auto", height=30))
         print(f"({self.image_cursor + 1}/{len(self.images)})")
 
     def _print_separator(self):

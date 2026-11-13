@@ -1,3 +1,4 @@
+import type React from "react";
 import classes from "./Submission.module.css";
 import { getImageUrl, getSubmissionLinks } from "../utils";
 import { Comic } from "../types";
@@ -7,20 +8,21 @@ import { db } from "@/db";
 import type { Image as Timage } from "@/db";
 import Image from "next/image";
 
-type Special = Record<string, JSX.Element>;
+type Special = Record<string, React.JSX.Element>;
 
 const specialHeaders: Special = {
   "1i8w04h": (
     <p className={classes.special}>
-      <a href="/comic/Luzifer%20AU%20tumblr/">Tumblr timeline</a> merges here.
+      <Link href="/comic/Luzifer%20AU%20tumblr/">Tumblr timeline</Link> merges
+      here.
     </p>
   ),
   "1h1wjv6alt": (
     <p className={classes.special}>
       Continues from{" "}
-      <a href="/comic/Luzifer%20AU#Luzifer%20AU%3A%20Decision%20/">
+      <Link href="/comic/Luzifer%20AU#Luzifer%20AU%3A%20Decision%20/">
         the main timeline.
-      </a>
+      </Link>
     </p>
   ),
 };
@@ -29,31 +31,31 @@ const specialFooters: Special = {
   "1hy4zx9alt": (
     <p className={classes.special}>
       Continues in the{" "}
-      <a href="/comic/Luzifer%20AU#Luzifer%20AU%3A%20First%20Meet/">
+      <Link href="/comic/Luzifer%20AU#Luzifer%20AU%3A%20First%20Meet/">
         main timeline.
-      </a>
+      </Link>
     </p>
   ),
   "1guxrlu": (
     <p className={classes.special}>
-      <a href="/comic/Luzifer AU tumblr/">Alternative tumblr timeline</a> splits
-      here!
+      <Link href="/comic/Luzifer AU tumblr/">Alternative tumblr timeline</Link>{" "}
+      splits here!
     </p>
   ),
   "1j08araalt": (
     <p className={classes.special}>
       The rest of hunter is stuck in{" "}
-      <a href="/comic/Luzifer%20AU#Luzifer%20AU%3A%20Phantom%20Limb/">
+      <Link href="/comic/Luzifer%20AU#Luzifer%20AU%3A%20Phantom%20Limb/">
         the main timeline.
-      </a>
+      </Link>
     </p>
   ),
   "1j08ara": (
     <p className={classes.special}>
       Luz and hunter&apos;s hand goes to{" "}
-      <a href="/comic/Luzifer%20AU%20tumblr#Luzifer%20AU%3A%20Phantom%20Limb%20-%20Alternative%20Timeline/">
+      <Link href="/comic/Luzifer%20AU%20tumblr#Luzifer%20AU%3A%20Phantom%20Limb%20-%20Alternative%20Timeline/">
         the tumblr timeline.
-      </a>
+      </Link>
     </p>
   ),
 };
